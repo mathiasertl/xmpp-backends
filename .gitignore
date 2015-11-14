@@ -1,2 +1,7 @@
 *.sw[po]
 *.py[co]
+/bin
+/include
+/lib
+/local
+/pip-selfcheck.json
