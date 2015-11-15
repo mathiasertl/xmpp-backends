@@ -3,6 +3,7 @@
 
 
 import unittest
+import xmlrpclib as stdxmlrpclib
 
 from xmpp_backends import xmlrpclib
 
@@ -36,6 +37,7 @@ class TestUnicodeChars(unittest.TestCase):
         self.assertEqual(self.get_response(m, 'aäb'), 'a&#228;b')
         self.assertEqual(self.get_response(m, u'aäb'), 'a&#228;b')
         self.assertEqual(self.get_response(m, u'&ä<>'), '&amp;&#228;&lt;&gt;')
+        self.assertEqual(self.get_response(m, '&ä<>'), '&amp;&#228;&lt;&gt;')
 
     def test_php(self):
         m = xmlrpclib.Marshaller(utf8_encoding='php')
@@ -46,3 +48,20 @@ class TestUnicodeChars(unittest.TestCase):
         self.assertEqual(self.get_response(m, u'aäb'), 'a&#195;&#164;b')
         self.assertEqual(self.get_response(m, u'&ä<>'), '&amp;&#195;&#164;&lt;&gt;')
         self.assertEqual(self.get_response(m, '&ä<>'), '&amp;&#195;&#164;&lt;&gt;')
+
+    def assertXmlRpcEqual(self, value):
+        m1 = xmlrpclib.Marshaller(utf8_encoding='python2')
+        m2 = stdxmlrpclib.Marshaller()
+
+        value1 = m1.dumps(value)
+        value2 = m2.dumps(value)
+        self.assertEqual(value1, value2)
+
+    def test_python2(self):
+        self.assertXmlRpcEqual('ä')
+        self.assertXmlRpcEqual('aäb')
+        self.assertXmlRpcEqual('&ä<>')
+
+        # py2 xmlrpclib does not accept unicode strs (except for empty unicode)
+        with self.assertRaises(TypeError):
+            self.assertXmlRpcEqual(u'a')
