@@ -57,6 +57,7 @@
 # 2003-07-12 gp  Correct marshalling of Faults
 # 2003-10-31 mvl Add multicall support
 # 2004-08-20 mvl Bump minimum supported Python version to 2.1
+# 2014-12-02 ch/doko  Add workaround for gzip bomb vulnerability
 #
 # Copyright (c) 1999-2002 by Secret Labs AB.
 # Copyright (c) 1999-2002 by Fredrik Lundh.
@@ -146,7 +147,9 @@ Exported functions:
 
 import re, string, time, operator
 
-from types import *
+# xmpp-backends: Do not use wildcard import to improve syntax checkers
+from types import (TupleType, StringType, InstanceType, NoneType, IntType,
+                   LongType, FloatType, ListType, DictType, UnicodeType)
 import socket
 import errno
 import httplib
@@ -1530,6 +1533,10 @@ class Transport:
 class SafeTransport(Transport):
     """Handles an HTTPS transaction to an XML-RPC server."""
 
+    def __init__(self, use_datetime=0, context=None):
+        Transport.__init__(self, use_datetime=use_datetime)
+        self.context = context
+
     # FIXME: mostly untested
 
     def make_connection(self, host):
@@ -1545,7 +1552,7 @@ class SafeTransport(Transport):
                 )
         else:
             chost, self._extra_headers, x509 = self.get_host_info(host)
-            self._connection = host, HTTPS(chost, None, **(x509 or {}))
+            self._connection = host, HTTPS(chost, None, context=self.context, **(x509 or {}))
             return self._connection[1]
 
 ##
@@ -1591,7 +1598,7 @@ class ServerProxy:
 
     # xmpp-backends: Add the utf8_encoding parameter
     def __init__(self, uri, transport=None, encoding=None, verbose=0,
-                 allow_none=0, use_datetime=0, utf8_encoding='standard'):
+                 allow_none=0, use_datetime=0, context=None, utf8_encoding='standard'):
         # establish a "logical" server connection
 
         if isinstance(uri, unicode):
@@ -1608,7 +1615,7 @@ class ServerProxy:
 
         if transport is None:
             if type == "https":
-                transport = SafeTransport(use_datetime=use_datetime)
+                transport = SafeTransport(use_datetime=use_datetime, context=context)
             else:
                 transport = Transport(use_datetime=use_datetime)
         self.__transport = transport
