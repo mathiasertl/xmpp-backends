@@ -591,8 +591,13 @@ else:
             self._parser.Parse(data, 0)
 
         def close(self):
-            self._parser.Parse("", 1) # end of data
-            del self._target, self._parser # get rid of circular references
+            try:
+                parser = self._parser
+            except AttributeError:
+                pass
+            else:
+                del self._target, self._parser # get rid of circular references
+                parser.Parse("", 1) # end of data
 
 class SlowParser:
     """Default XML parser (based on xmllib.XMLParser)."""
@@ -1220,10 +1225,13 @@ def gzip_encode(data):
 # in the HTTP header, as described in RFC 1952
 #
 # @param data The encoded data
+# @keyparam max_decode Maximum bytes to decode (20MB default), use negative
+#    values for unlimited decoding
 # @return the unencoded data
 # @raises ValueError if data is not correctly coded.
+# @raises ValueError if max gzipped payload length exceeded
 
-def gzip_decode(data):
+def gzip_decode(data, max_decode=20971520):
     """gzip encoded data -> unencoded data
 
     Decode data using the gzip content encoding as described in RFC 1952
@@ -1233,11 +1241,16 @@ def gzip_decode(data):
     f = StringIO.StringIO(data)
     gzf = gzip.GzipFile(mode="rb", fileobj=f)
     try:
-        decoded = gzf.read()
+        if max_decode < 0: # no limit
+            decoded = gzf.read()
+        else:
+            decoded = gzf.read(max_decode + 1)
     except IOError:
         raise ValueError("invalid data")
     f.close()
     gzf.close()
+    if max_decode >= 0 and len(decoded) > max_decode:
+        raise ValueError("max gzipped payload length exceeded")
     return decoded
 
 ##
@@ -1260,8 +1273,10 @@ class GzipDecodedResponse(gzip.GzipFile if gzip else object):
         gzip.GzipFile.__init__(self, mode="rb", fileobj=self.stringio)
 
     def close(self):
-        gzip.GzipFile.close(self)
-        self.stringio.close()
+        try:
+            gzip.GzipFile.close(self)
+        finally:
+            self.stringio.close()
 
 
 # --------------------------------------------------------------------
@@ -1430,9 +1445,10 @@ class Transport:
     # Used in the event of socket errors.
     #
     def close(self):
-        if self._connection[1]:
-            self._connection[1].close()
+        host, connection = self._connection
+        if connection:
             self._connection = (None, None)
+            connection.close()
 
     ##
     # Send request header.
