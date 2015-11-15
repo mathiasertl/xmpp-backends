@@ -31,7 +31,14 @@
 #     <string>&#195;&#164;</string>
 #     ...
 #
-# What xmlrpclib produces:
+# No encoding - Conforms to standards and is what Python3 produces
+# (unknown if ejabberd accepts it)
+#
+#     >>> import xmlrpclib
+#     >>> xmlrpclib.escape('ä')
+#     'ä'
+#
+# What xmlrpclib in Python2 produces:
 #     >>> import xmlrpclib
 #     >>> xmlrpclib.escape('ä')
 #     '\xc3\xa4'
@@ -226,6 +233,10 @@ def escape(s, replace=string.replace, utf8_encoding='standard'):
 
     if utf8_encoding == 'python2':
         return s
+    elif utf8_encoding == 'none':
+        if isinstance(s, unicode):
+            return s
+        return s.decode('utf-8')
 
     encoded = ''
 
@@ -263,8 +274,8 @@ else:
 __version__ = "1.0.1"
 
 # xmlrpc integer limits
-MAXINT =  2L**31-1
-MININT = -2L**31
+MAXINT =  2 **31-1
+MININT = -2 **31
 
 # --------------------------------------------------------------------
 # Error constants (from Dan Libby's specification at
@@ -724,26 +735,26 @@ class Marshaller:
             try:
                 value.__dict__
             except:
-                raise TypeError, "cannot marshal %s objects" % type(value)
+                raise TypeError("cannot marshal %s objects" % type(value))
             # check if this class is a sub-class of a basic type,
             # because we don't know how to marshal these types
             # (e.g. a string sub-class)
             for type_ in type(value).__mro__:
                 if type_ in self.dispatch.keys():
-                    raise TypeError, "cannot marshal %s objects" % type(value)
+                    raise TypeError("cannot marshal %s objects" % type(value))
             f = self.dispatch[InstanceType]
         f(self, value, write)
 
     def dump_nil (self, value, write):
         if not self.allow_none:
-            raise TypeError, "cannot marshal None unless allow_none is enabled"
+            raise TypeError("cannot marshal None unless allow_none is enabled")
         write("<value><nil/></value>")
     dispatch[NoneType] = dump_nil
 
     def dump_int(self, value, write):
         # in case ints are > 32 bits
         if value > MAXINT or value < MININT:
-            raise OverflowError, "int exceeds XML-RPC limits"
+            raise OverflowError("int exceeds XML-RPC limits")
         write("<value><int>")
         write(str(value))
         write("</int></value>\n")
@@ -758,7 +769,7 @@ class Marshaller:
 
     def dump_long(self, value, write):
         if value > MAXINT or value < MININT:
-            raise OverflowError, "long int exceeds XML-RPC limits"
+            raise OverflowError("long int exceeds XML-RPC limits")
         write("<value><int>")
         write(str(int(value)))
         write("</int></value>\n")
@@ -788,7 +799,7 @@ class Marshaller:
     def dump_array(self, value, write):
         i = id(value)
         if i in self.memo:
-            raise TypeError, "cannot marshal recursive sequences"
+            raise TypeError("cannot marshal recursive sequences")
         self.memo[i] = None
         dump = self.__dump
         write("<value><array><data>\n")
@@ -802,7 +813,7 @@ class Marshaller:
     def dump_struct(self, value, write, escape=escape):
         i = id(value)
         if i in self.memo:
-            raise TypeError, "cannot marshal recursive dictionaries"
+            raise TypeError("cannot marshal recursive dictionaries")
         self.memo[i] = None
         dump = self.__dump
         write("<value><struct>\n")
@@ -812,7 +823,7 @@ class Marshaller:
                 if unicode and type(k) is UnicodeType:
                     k = k.encode(self.encoding)
                 else:
-                    raise TypeError, "dictionary key must be string"
+                    raise TypeError("dictionary key must be string")
             write("<name>%s</name>\n" % escape(k))
             dump(v, write)
             write("</member>\n")
@@ -865,7 +876,7 @@ class Unmarshaller:
         self.append = self._stack.append
         self._use_datetime = use_datetime
         if use_datetime and not datetime:
-            raise ValueError, "the datetime module is not available"
+            raise ValueError("the datetime module is not available")
 
     def close(self):
         # return response tuple and target method
@@ -932,7 +943,7 @@ class Unmarshaller:
         elif data == "1":
             self.append(True)
         else:
-            raise TypeError, "bad boolean value"
+            raise TypeError("bad boolean value")
         self._value = 0
     dispatch["boolean"] = end_boolean
 
@@ -1039,8 +1050,7 @@ class MultiCallIterator:
         elif type(item) == type([]):
             return item[0]
         else:
-            raise ValueError,\
-                  "unexpected type in multicall result"
+            raise ValueError("unexpected type in multicall result")
 
 class MultiCall:
     """server -> a object used to boxcar method calls
@@ -1094,7 +1104,7 @@ def getparser(use_datetime=0):
     to an unmarshalling object.  Return both objects.
     """
     if use_datetime and not datetime:
-        raise ValueError, "the datetime module is not available"
+        raise ValueError("the datetime module is not available")
     if FastParser and FastUnmarshaller:
         if use_datetime:
             mkdatetime = _datetime_type
@@ -1355,7 +1365,7 @@ class Transport:
         for i in (0, 1):
             try:
                 return self.single_request(host, handler, request_body, verbose)
-            except socket.error, e:
+            except socket.error as e:
                 if i or e.errno not in (errno.ECONNRESET, errno.ECONNABORTED, errno.EPIPE):
                     raise
             except httplib.BadStatusLine: #close after we sent request
@@ -1652,7 +1662,7 @@ class ServerProxy:
         import urllib
         type, uri = urllib.splittype(uri)
         if type not in ("http", "https"):
-            raise IOError, "unsupported XML-RPC protocol"
+            raise IOError("unsupported XML-RPC protocol")
         self.__host, self.__handler = urllib.splithost(uri)
         if not self.__handler:
             self.__handler = "/RPC2"
@@ -1736,5 +1746,5 @@ if __name__ == "__main__":
     try:
         for response in multi():
             print(response)
-    except Error, v:
+    except Error as v:
         print("ERROR: %s" % v)
