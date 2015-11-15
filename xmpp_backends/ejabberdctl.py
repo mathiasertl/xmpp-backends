@@ -17,16 +17,18 @@
 
 from __future__ import unicode_literals
 
+import logging
 import time
-
-from django.conf import settings
 
 from subprocess import PIPE
 from subprocess import Popen
 
-from backends.base import UserExists
-from backends.base import BackendError
-from backends.base import XmppBackendBase
+from .base import UserExists
+from .base import BackendError
+from .base import XmppBackendBase
+
+log = logging.getLogger(__name__)
+
 
 class EjabberdctlBackend(XmppBackendBase):
     """This backend uses the ejabberdctl command line utility.
@@ -63,25 +65,27 @@ class EjabberdctlBackend(XmppBackendBase):
     def ctl(self, *cmd):
         return self.ex(self.ejabberdctl, *cmd)
 
-    def create(self, username, domain, password, email):
-        if password is None:
-            password = self.get_random_password()
-
-        elif settings.XMPP_HOSTS[domain].get('RESERVE', False):
-            self.set_password(username, domain, password)
-            self.set_email(username, domain, email)
-            return
-
+    def create(self, username, domain, password, email=None):
         code, out, err = self.ctl('register', username, domain, password)
 
         if code == 0:
-            self.ctl('set_last', username, domain, int(time.time()),
-                     'Registered')
-            return
+            try:
+                self.set_last_activity(username, domain, status='Registered')
+            except BackendError as e:
+                log.error('Error setting last activity: %s', e)
+
+            if email is not None:
+                self.set_email(username, domain, email)
         elif code == 1:
             raise UserExists()
         else:
             raise BackendError(code)  # TODO: 3 means nodedown.
+
+    def set_last_activity(self, username, domain, status, timestamp=None):
+        if timestamp is None:
+            timestamp = int(time.time())
+
+        self.ctl('set_last', username, domain, timestamp, status)
 
     def check_password(self, username, domain, password):
         code, out, err = self.ctl('check_password', username, domain, password)
