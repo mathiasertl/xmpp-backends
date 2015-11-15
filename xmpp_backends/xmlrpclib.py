@@ -3,11 +3,45 @@
 # $Id$
 #
 # This is a copy of the xmlrpclib library shipping with Python 2.7.
-# It is modified to encode unicode characters in a way compatible with
-# what ejabberd mod_xmlrpc does, see the escape() function.
-# All changes are marked with a line starting with:
-# xmpp-backends: ...
+# It is modified to encode UTF-8 characters in several different ways.
 #
+# The problem is that this library does not encode UTF-8 correctly and PHP's
+# library doesn't encode them correctly either - but wrong in a differnt way.
+# ejabberd <= 14.07 expects unicode in the way PHP encodes them and ejabberd
+# versions after that expect unicode to be encoded according to XML standards.
+#
+# Here is an overview of what different encoding options there are,
+# demonstrated by the example letter 'ä'. Use:
+#   https://en.wikipedia.org/wiki/%C3%84#Computer_encoding
+# as reference next to the following examples:
+#
+# XML standard = what lxml produces and ejabberd > 14.07 accepts:
+#
+#     >>> from lxml import etree
+#     >>> t = etree.Element('test')
+#     >>> t.text = u'ä'  # note: 'ä' is not accepted
+#     >>> etree.tostring(t)
+#     <test>&#228;</test>
+#
+# What PHP produces and ejabberd <= 14.07 accepts:
+#
+#     $ php -r 'print xmlrpc_encode("ä");'
+#     ...
+#     <string>&#195;&#164;</string>
+#     ...
+#
+# What xmlrpclib produces:
+#     >>> import xmlrpclib
+#     >>> xmlrpclib.escape('ä')
+#     '\xc3\xa4'
+#     >>> xmlrpclib.escape(u'ä')  # just "\xe4" ends up in the XML
+#     u'\xe4'
+#
+# This library differs from the version that ships with Python 2.7.10 in that
+# it adds a `utf8_encoding` parameter to support all three different encoding
+# options. All changes are marked with a line starting with:
+#
+# xmpp-backends: ...
 #
 #
 # an XML-RPC client interface for Python.
@@ -184,6 +218,10 @@ def _decode(data, encoding, is8bit=re.compile("[\x80-\xff]").search):
 
 # xmpp-backends: Add the utf8_encoding parameter
 def escape(s, replace=string.replace, utf8_encoding='standard'):
+    s = replace(s, "&", "&amp;")
+    s = replace(s, "<", "&lt;")
+    s = replace(s, ">", "&gt;")
+
     encoded = ''
 
     # xmpp-backends: Handle the utf8_encoding parameter
@@ -200,12 +238,6 @@ def escape(s, replace=string.replace, utf8_encoding='standard'):
     for char in s:
         if ord(char) >= 128:
             encoded += _encode(char)
-        elif char == '&':
-            encoded += '&amp;'
-        elif char == '<':
-            encoded += '&lt;'
-        elif char == '>':
-            encoded += '&gt;'
         else:
             encoded += char
     return encoded
