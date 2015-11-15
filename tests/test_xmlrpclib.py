@@ -3,7 +3,10 @@
 
 
 import unittest
-import xmlrpclib as stdxmlrpclib
+try:
+    import xmlrpclib as stdxmlrpclib
+except ImportError:
+    from xmlrpc import client as stdxmlrpclib
 
 from xmpp_backends import xmlrpclib
 
@@ -65,3 +68,13 @@ class TestUnicodeChars(unittest.TestCase):
         # py2 xmlrpclib does not accept unicode strs (except for empty unicode)
         with self.assertRaises(TypeError):
             self.assertXmlRpcEqual(u'a')
+
+    def test_none(self):
+        m = xmlrpclib.Marshaller(utf8_encoding='none')
+
+        self.assertEqual(self.get_response(m, 'ä'), u'ä')
+        self.assertEqual(self.get_response(m, u'ä'), u'ä')
+        self.assertEqual(self.get_response(m, 'aäb'), u'aäb')
+        self.assertEqual(self.get_response(m, u'aäb'), u'aäb')
+        self.assertEqual(self.get_response(m, u'&ä<>'), u'&amp;ä&lt;&gt;')
+        self.assertEqual(self.get_response(m, '&ä<>'), u'&amp;ä&lt;&gt;')
