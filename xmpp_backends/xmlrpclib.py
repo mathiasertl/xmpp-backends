@@ -223,6 +223,9 @@ def escape(s, replace=string.replace, utf8_encoding='standard'):
     s = replace(s, "<", "&lt;")
     s = replace(s, ">", "&gt;")
 
+    if utf8_encoding == 'python2':
+        return s
+
     encoded = ''
 
     # xmpp-backends: Handle the utf8_encoding parameter
@@ -775,10 +778,6 @@ class Marshaller:
 
     if unicode:
         def dump_unicode(self, value, write, escape=escape):
-            # xmpp-backends: Only encode to string if utf8_encoding == 'python2'
-            if self.utf8_encoding == 'python2':
-                value = value.encode(self.encoding)
-
             write("<value><string>")
             # xmpp-backends: Pass utf8_encoding parameter
             write(escape(value, utf8_encoding=self.utf8_encoding))
@@ -1609,6 +1608,11 @@ class SafeTransport(Transport):
 #    (default is UTF-8).
 # @keyparam verbose Use a true value to enable debugging output.
 #    (printed to standard output).
+# @keyparam utf8_encoding Way to encode UTF-8 characters. Use
+#    'standard' to conform to XML standards (ejabberd > 14.07),
+#    'php' to encode like PHP (ejabberd <= 14.07)
+#    'python2' to behave in the same way as Python2
+#    Defaults to 'standard'.
 # @see Transport
 
 class ServerProxy:
