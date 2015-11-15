@@ -693,18 +693,15 @@ class Marshaller:
                 if type_ in self.dispatch.keys():
                     raise TypeError, "cannot marshal %s objects" % type(value)
             f = self.dispatch[InstanceType]
-        # xmpp-backends: Pass the utf8_encoding parameter
-        f(self, value, write, utf8_encoding=self.utf8_encoding)
+        f(self, value, write)
 
-    # xmpp-backends: Add the utf8_encoding parameter
     def dump_nil (self, value, write):
         if not self.allow_none:
             raise TypeError, "cannot marshal None unless allow_none is enabled"
         write("<value><nil/></value>")
     dispatch[NoneType] = dump_nil
 
-    # xmpp-backends: Add the utf8_encoding parameter
-    def dump_int(self, value, write, utf8_encoding):
+    def dump_int(self, value, write):
         # in case ints are > 32 bits
         if value > MAXINT or value < MININT:
             raise OverflowError, "int exceeds XML-RPC limits"
@@ -714,15 +711,13 @@ class Marshaller:
     dispatch[IntType] = dump_int
 
     if _bool_is_builtin:
-        # xmpp-backends: Add the utf8_encoding parameter
-        def dump_bool(self, value, write, utf8_encoding):
+        def dump_bool(self, value, write):
             write("<value><boolean>")
             write(value and "1" or "0")
             write("</boolean></value>\n")
         dispatch[bool] = dump_bool
 
-    # xmpp-backends: Add the utf8_encoding parameter
-    def dump_long(self, value, write, utf8_encoding):
+    def dump_long(self, value, write):
         if value > MAXINT or value < MININT:
             raise OverflowError, "long int exceeds XML-RPC limits"
         write("<value><int>")
@@ -730,36 +725,32 @@ class Marshaller:
         write("</int></value>\n")
     dispatch[LongType] = dump_long
 
-    # xmpp-backends: Add the utf8_encoding parameter
-    def dump_double(self, value, write, utf8_encoding):
+    def dump_double(self, value, write):
         write("<value><double>")
         write(repr(value))
         write("</double></value>\n")
     dispatch[FloatType] = dump_double
 
-    # xmpp-backends: Add the utf8_encoding parameter
-    def dump_string(self, value, write, utf8_encoding, escape=escape):
+    def dump_string(self, value, write, escape=escape):
         write("<value><string>")
         # xmpp-backends: Pass utf8_encoding parameter
-        write(escape(value, utf8_encoding=utf8_encoding))
+        write(escape(value, utf8_encoding=self.utf8_encoding))
         write("</string></value>\n")
     dispatch[StringType] = dump_string
 
     if unicode:
-        # xmpp-backends: Add the utf8_encoding parameter
-        def dump_unicode(self, value, write, utf8_encoding, escape=escape):
+        def dump_unicode(self, value, write, escape=escape):
             # xmpp-backends: Only encode to string if utf8_encoding == 'python2'
-            if utf8_encoding == 'python2':
+            if self.utf8_encoding == 'python2':
                 value = value.encode(self.encoding)
 
             write("<value><string>")
             # xmpp-backends: Pass utf8_encoding parameter
-            write(escape(value, utf8_encoding=utf8_encoding))
+            write(escape(value, utf8_encoding=self.utf8_encoding))
             write("</string></value>\n")
         dispatch[UnicodeType] = dump_unicode
 
-    # xmpp-backends: Add the utf8_encoding parameter
-    def dump_array(self, value, write, utf8_encoding):
+    def dump_array(self, value, write):
         i = id(value)
         if i in self.memo:
             raise TypeError, "cannot marshal recursive sequences"
@@ -773,8 +764,7 @@ class Marshaller:
     dispatch[TupleType] = dump_array
     dispatch[ListType] = dump_array
 
-    # xmpp-backends: Add the utf8_encoding parameter
-    def dump_struct(self, value, write, utf8_encoding, escape=escape):
+    def dump_struct(self, value, write, escape=escape):
         i = id(value)
         if i in self.memo:
             raise TypeError, "cannot marshal recursive dictionaries"
@@ -796,15 +786,13 @@ class Marshaller:
     dispatch[DictType] = dump_struct
 
     if datetime:
-        # xmpp-backends: Add the utf8_encoding parameter
-        def dump_datetime(self, value, utf8_encoding, write):
+        def dump_datetime(self, value, write):
             write("<value><dateTime.iso8601>")
             write(_strftime(value))
             write("</dateTime.iso8601></value>\n")
         dispatch[datetime.datetime] = dump_datetime
 
-    # xmpp-backends: Add the utf8_encoding parameter
-    def dump_instance(self, value, utf8_encoding, write):
+    def dump_instance(self, value, write):
         # check for special wrappers
         if value.__class__ in WRAPPERS:
             self.write = write
