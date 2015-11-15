@@ -17,9 +17,10 @@
 
 from __future__ import unicode_literals
 
-from importlib import import_module
+import string
+import random
 
-from core.utils import random_string
+from importlib import import_module
 
 
 class BackendError(Exception):
@@ -74,12 +75,16 @@ class XmppBackendBase(object):
             self._module = module
         return self._module
 
-    def get_random_password(self, length=32):
+    def get_random_password(self, length=32, chars=None):
         """Get a random password.
 
         :param length: The length of the random password.
+        :param  chars: A string with characters to choose from. Defaults to all
+            ASCII letters and digits.
         """
-        return random_string(length=length)
+        if chars is None:
+            chars = string.ascii_letters + string.digits
+        return ''.join(random.choice(chars) for x in range(length))
 
     def exists(self, username, domain):
         """Return True if the user exists, false otherwise."""
