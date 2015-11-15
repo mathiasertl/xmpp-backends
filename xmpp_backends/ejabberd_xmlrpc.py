@@ -117,8 +117,8 @@ class EjabberdXMLRPCBackend(XmppBackendBase):
                 # we ignore errors here because not setting last activity is only a problem in
                 # edge-cases.
                 self.set_last_activity(username, domain, status='Registered')
-            except BackendError:
-                log.error('Temporary error when setting last activity.')
+            except BackendError as e:
+                log.error('Error setting last activity: %s', e)
 
             if email is not None:
                 self.set_email(username, domain, email)
