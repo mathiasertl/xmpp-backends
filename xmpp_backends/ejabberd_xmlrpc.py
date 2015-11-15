@@ -41,41 +41,10 @@ log = logging.getLogger(__name__)
 class EjabberdXMLRPCBackend(XmppBackendBase):
     """This backend uses the Ejabberd XMLRPC interface.
 
-    This backend requires ejabberd mod_admin_extra to be installed.
+    In addition to `mod_xmlrpc`, this backend requires `mod_admin_extra` to be installed.
 
-    .. WARNING:: The encoding of UTF8 characters differs in ejabberd <= 14.07. Set the
-        `UTF8_ENCODING` option to `php` if you use any of these versions.
-
-    Example::
-
-        XMPP_BACKENDS = {
-            'default': {
-                'BACKEND': 'backends.ejabberd_xmlrpc.EjabberdXMLRPCBackend',
-                # optional:
-                #'HOST': 'http:///127.0.0.1:4560',
-                # optional, only if access is restricted in ejabberd config!
-                #'USER': 'account',
-                #'SERVER': 'jabber.at',
-                #'PASSWORD': 'super-secure-password',
-            },
-        }
-
-    This backend uses the following settings:
-
-    **HOST** (optional, default:: ``http:///127.0.0.1:4560``)
-        The host to connect to.
-    **USER** (optional)
-        The username of user used in the XMLRCP connection. Only use this setting if you actually
-        restricted access in the ejabberd config!
-    **SERVER** (optional)
-        The server of the user used in the XMLRPC connection. Only use this setting if you actually
-        restricted access in the ejabberd config!
-    **PASSWORD** (optional)
-        The password of the user used in the XMLRPC connection. Only use this setting if you
-        actually restricted access in the ejabberd config!
-    **UTF8_ENCODING** (optional)
-        How to encode UTF8 characters. Set to 'php' for ejabberd <= 14.05. Currently only used for
-        Python 2.
+    .. WARNING:: If you use ejabberd <= 14.07, please take special care of the `utf8_encoding`
+        parameter.
 
     **ejabberd configuration:** The ``xmlrpc`` module is included with ejabberd_ since version
     13.12. If you use an earlier version, please get and run the module from the
@@ -85,6 +54,21 @@ class EjabberdXMLRPCBackend(XmppBackendBase):
             - ip: "127.0.0.1"
               port: 4560
               module: ejabberd_xmlrpc
+
+    :param           uri: Directly passed to xmlrpclib, defaults to `http://127.0.0.1:4560`.
+    :param     transport: Directly passed to xmlrpclib.
+    :param      encoding: Directly passed to xmlrpclib.
+    :param       verbose: Directly passed to xmlrpclib.
+    :param    allow_none: Directly passed to xmlrpclib.
+    :param  use_datetime: Directly passed to xmlrpclib.
+    :param       context: Directly passed to xmlrpclib.
+    :param          user: Username of the JID used for authentication.
+    :param        server: Server of the JID used for authenticiation.
+    :param      password: The password of the given JID.
+    :param utf8_encoding: How utf-8 characters are encoded. Valid values are `standard`, `php`,
+        `python2` and `none`. Use `standard` for ejabberd > 14.07 and `php` for ejabberd <= 14.07.
+        Please see comments in `xmpp_backends.xmlrpclib` if you care (don't!) about the details of
+        this value. This parameter is ignored in Python3.
     """
     credentials = None
 
