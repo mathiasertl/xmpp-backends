@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #
 # XML-RPC CLIENT LIBRARY
 # $Id$
@@ -231,6 +232,8 @@ def escape(s, replace=string.replace, utf8_encoding='standard'):
         else:  # py2 str
             _encode = lambda char: ''.join(['&#%s;' % ord(b) for b in char])
     elif utf8_encoding == 'standard':
+        if isinstance(s, str):
+            s = s.decode('utf-8')
         _encode = lambda char: '&#%s;' % ord(char)
     else:
         raise AttributeError("Unknown utf8_encoding '%s'" % utf8_encoding)
