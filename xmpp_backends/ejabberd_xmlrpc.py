@@ -21,17 +21,15 @@ import logging
 import socket
 import time
 
-from httplib import BadStatusLine
+import six
 
-from django.conf import settings
-from django.utils import six
-from django.utils.translation import ugettext_lazy as _
+from six.moves.http_client import BadStatusLine
 
-if six.PY2:
+if six.PY2:  # we have a special version for Python2
     from core import xmlrpclib
-else:  # py3
+else:  # use the default for Python3 (god save us all!)
     from xmlrpc import client as xmlrpclib
-from core.exceptions import TemporaryError
+
 
 from backends.base import XmppBackendBase
 from backends.base import BackendError
@@ -90,59 +88,66 @@ class EjabberdXMLRPCBackend(XmppBackendBase):
     """
     credentials = None
 
-    def __init__(self, HOST='http://127.0.0.1:4560', USER=None, SERVER=None, PASSWORD=None,
-                 UTF8_ENCODING='standard'):
+    def __init__(self, uri='http://127.0.0.1:4560', transport=None, encoding=None, verbose=0,
+                 allow_none=0, use_datetime=0, context=None,
+                 user=None, server=None, password=None, utf8_encoding='standard'):
         super(EjabberdXMLRPCBackend, self).__init__()
 
-        kwargs = {}
+        kwargs = {
+            'transport': transport,
+            'encoding': encoding,
+            'verbose': verbose,
+            'allow_none': allow_none,
+            'use_datetime': use_datetime,
+            'context': context,
+        }
         if six.PY2:
-            kwargs['utf8_encoding'] = UTF8_ENCODING
-        if settings.DEBUG:
-            kwargs['verbose'] = True
+            kwargs['utf8_encoding'] = utf8_encoding
 
-        self.client = xmlrpclib.ServerProxy(HOST, **kwargs)
-        if USER is not None:
+        self.client = xmlrpclib.ServerProxy(uri, **kwargs)
+        if user is not None:
             self.credentials = {
-                'user': USER,
-                'server': SERVER,
-                'password': PASSWORD,
+                'user': user,
+                'server': server,
+                'password': password,
             }
 
     def rpc(self, cmd, **kwargs):
+        """Generic helper function to call an RPC method."""
+
         func = getattr(self.client, cmd)
         try:
             if self.credentials is None:
                 return func(kwargs)
             else:
                 return func(self.credentials, kwargs)
-        except (xmlrpclib.ProtocolError, BadStatusLine, xmlrpclib.Fault, socket.error):
-            raise TemporaryError(_("Our server is experiencing temporary difficulties. "
-                                   "Please try again later."))
+        except (xmlrpclib.ProtocolError, BadStatusLine, xmlrpclib.Fault, socket.error) as e:
+            log.error(e)
+            raise BackendError("Error reaching backend.")
 
-    def create(self, username, domain, password, email):
-        if password is None:
-            password = self.get_random_password()
-
-        elif settings.XMPP_HOSTS[domain].get('RESERVE', False):
-            self.set_password(username, domain, password)
-            self.set_email(username, domain, email)
-            return
-
+    def create(self, username, domain, password, email=None):
         result = self.rpc('register', user=username, host=domain, password=password)
+
         if result['res'] == 0:
-            # set last activity, so that no user has the activity 'Never'. This way the account
-            # isn't removed with delete_old_users.
             try:
-                self.rpc('set_last', user=username, host=domain, timestamp=int(time.time()),
-                         status='Registered')
-            except TemporaryError:
+                # we ignore errors here because not setting last activity is only a problem in
+                # edge-cases.
+                self.set_last_activity(username, domain, status='Registered')
+            except BackendError:
                 log.error('Temporary error when setting last activity.')
 
-            return
+            if email is not None:
+                self.set_email(username, domain, email)
         elif result['res'] == 1:
             raise UserExists()
         else:
             raise BackendError(result.get('text', 'Unknown Error'))
+
+    def set_last_activity(self, username, domain, status, timestamp=None):
+        if timestamp is None:
+            timestamp = int(time.time())
+
+        self.rpc('set_last', user=username, host=domain, timestamp=timestamp, status=status)
 
     def exists(self, username, domain):
         result = self.rpc('check_account', user=username, host=domain)
