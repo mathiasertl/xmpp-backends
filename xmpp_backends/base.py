@@ -76,7 +76,7 @@ class XmppBackendBase(object):
         return self._module
 
     def get_random_password(self, length=32, chars=None):
-        """Get a random password.
+        """Helper function that gets a random password.
 
         :param length: The length of the random password.
         :param  chars: A string with characters to choose from. Defaults to all
@@ -87,21 +87,30 @@ class XmppBackendBase(object):
         return ''.join(random.choice(chars) for x in range(length))
 
     def exists(self, username, domain):
-        """Return True if the user exists, false otherwise."""
+        """Return `True` if the user exists, `False` otherwise."""
 
         raise NotImplementedError
 
-    def reserve(self, username, domain, email):
+    def create(self, username, domain, password, email=None):
+        """Create a new user.
+
+        :param    username: The username of the new user.
+        :param      domain: The selected domain, may be any domain provided
+                            in :ref:`settings-XMPP_HOSTS`.
+        :param    password: The password of the new user.
+        :param       email: The email address provided by the user.
+        """
+        raise NotImplementedError
+
+    def reserve(self, username, domain, password, email=None):
         """Reserve a new account.
 
-        This method is called when the user first registers for an account on a domain with its
-        ``RESERVE`` setting set to True (see :ref:`settings-XMPP_HOSTS`). The email address is not
-        yet confirmed and the user hasn't provided a password yet, so login via XMPP should be
-        impossible at this point.
+        This method is called when a user account should be reserved, meaning that the account can
+        no longer be registered by anybody else but the user cannot yet log in either. This is
+        useful if e.g. an email confirmation is still pending.
 
-        The default implementation calls :py:func:`~backends.base.XmppBackendBase.create` with
-        password=None.  You can override this if your account supports a true "reservation" method
-        that blocks registration via other means but does not allow the user to log in.
+        The default implementation calls :py:func:`~xmpp_backends.base.XmppBackendBase.create` with
+        a random password.
 
         :param username: The username of the new user.
         :param   domain: The selected domain, may be any domain provided
@@ -109,45 +118,17 @@ class XmppBackendBase(object):
         :param    email: The email address provided by the user. Note that at this point it is not
                          confirmed. You are free to ignore this parameter.
         """
-        self.create(username=username, domain=domain, password=None,
-                    email=email)
+        password = self.get_random_password()
+        self.create(username=username, domain=domain, password=password, email=email)
 
-    def create(self, username, domain, password, email):
-        """Create a new user.
+    def confirm(self, username, domain, password, email=None):
+        """Confirm a reservation for a username.
 
-        If the domains ``RESERVE`` setting is ``True`` (see :ref:`settings-XMPP_BACKENDS`) and your
-        backend does not override :py:func:`~backends.base.XmppBackendBase.reserve`, then the
-        password is ``None`` if this function is called via
-        :py:func:`~backends.base.XmppBackendBase.reserve`, in which case you can use
-        :py:func:`~backends.base.XmppBackendBase.get_random_password` for a password. If the
-        password is not ``None``, you have to consider that the user already exists (with a random
-        password) in the backend and you only have to set his/her email and password::
-
-            from django.conf import settings
-            from backends.base import XmppBackendBase
-
-            class YourBackend(XmppBackendBase):
-                def create(self, username, domain, password, email):
-                    if password is None:
-                        password = self.get_random_password()
-
-                    elif settings.XMPP_HOSTS[domain].get('RESERVE', False):
-                        # RESERVE setting is true, user already exists
-                        self.set_password(username, domain, password)
-                        self.set_email(username, domain, email)
-                        return  # our work is done
-
-                    # actually create the user in the backend
-                    self._really_create(username, domain, password, email)
-
-        :param    username: The username of the new user.
-        :param      domain: The selected domain, may be any domain provided
-                            in :ref:`settings-XMPP_HOSTS`.
-        :param    password: The password of the new user.
-        :param       email: The email address provided by the user. Note that at this point it is
-                            not confirmed. You are free to ignore this parameter.
+        The default implementation just calls `set_password()` and optionally `set_email()`.
         """
-        raise NotImplementedError
+        self.set_password(username=username, domain=domain, password=password)
+        if email is not None:
+            self.set_email(username=username, domain=domain, email=email)
 
     def check_password(self, username, domain, password):
         """Check the password of a user.
@@ -170,15 +151,12 @@ class XmppBackendBase(object):
         """
         raise NotImplementedError
 
-    def set_unusable_password(self, username, domain):
+    def block_user(self, username, domain):
         """Called when a user is blocked.
 
         The default implementation calls :py:func:`set_password` with a random password.
         """
         self.set_password(username, domain, self.get_random_password())
-
-    def has_usable_password(self, username, domain):
-        return True
 
     def set_email(self, username, domain, email):
         """Set the email address of a user."""
@@ -191,9 +169,9 @@ class XmppBackendBase(object):
     def expire(self, username, domain):
         """Expire a username reservation.
 
-        This method is called when the confirmation key for a registration expires. The default
-        implementation just calls :py:func:`~backends.base.XmppBackendBase.remove`. This is fine if
-        you do not override :py:func:`~backends.base.XmppBackendBase.reserve`.
+        This method is called when a reservation expires. The default implementation just calls
+        :py:func:`~backends.base.XmppBackendBase.remove`. This is fine if you do not override
+        :py:func:`~backends.base.XmppBackendBase.reserve`.
         """
         self.remove(username, domain)
 
@@ -204,9 +182,9 @@ class XmppBackendBase(object):
     def all_users(self, domain):
         """Get all users for a given domain.
 
-        :param   domain: The selected domain, may be any domain provided
-                         in :ref:`settings-XMPP_HOSTS`.
-        :returns: A set of all users.
+        :param   domain: The domain of interest.
+        :returns: A set of all users. The usernames do not include the domain, so
+            `user@example.com` will just be `user`.
         """
         raise NotImplementedError
 
