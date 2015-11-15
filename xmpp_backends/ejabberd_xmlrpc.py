@@ -26,14 +26,14 @@ import six
 from six.moves.http_client import BadStatusLine
 
 if six.PY2:  # we have a special version for Python2
-    from core import xmlrpclib
+    from . import xmlrpclib
 else:  # use the default for Python3 (god save us all!)
     from xmlrpc import client as xmlrpclib
 
 
-from backends.base import XmppBackendBase
-from backends.base import BackendError
-from backends.base import UserExists
+from xmpp_backends.base import XmppBackendBase
+from xmpp_backends.base import BackendError
+from xmpp_backends.base import UserExists
 
 log = logging.getLogger(__name__)
 
