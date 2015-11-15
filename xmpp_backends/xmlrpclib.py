@@ -6,7 +6,7 @@
 # It is modified to encode unicode characters in a way compatible with
 # what ejabberd mod_xmlrpc does, see the escape() function.
 # All changes are marked with a line starting with:
-# django-xmpp-account: ...
+# xmpp-backends: ...
 #
 #
 #
@@ -179,11 +179,11 @@ def _decode(data, encoding, is8bit=re.compile("[\x80-\xff]").search):
         data = unicode(data, encoding)
     return data
 
-# django-xmpp-account: Add the utf8_encoding parameter
+# xmpp-backends: Add the utf8_encoding parameter
 def escape(s, replace=string.replace, utf8_encoding='standard'):
     encoded = ''
 
-    # django-xmpp-account: Handle the utf8_encoding parameter
+    # xmpp-backends: Handle the utf8_encoding parameter
     if utf8_encoding == 'php':
         if isinstance(s, unicode):  # py2 and unicode
             _encode = lambda char: ''.join(['&#%s;' % ord(b) for b in char.encode('utf-8')])
@@ -631,13 +631,13 @@ class Marshaller:
     # by the way, if you don't understand what's going on in here,
     # that's perfectly ok.
 
-    # django-xmpp-account: Add the utf8_encoding parameter
+    # xmpp-backends: Add the utf8_encoding parameter
     def __init__(self, encoding=None, allow_none=0, utf8_encoding='standard'):
         self.memo = {}
         self.data = None
         self.encoding = encoding
         self.allow_none = allow_none
-        # django-xmpp-account: Set the self.utf8_encoding property
+        # xmpp-backends: Set the self.utf8_encoding property
         self.utf8_encoding = utf8_encoding
 
     dispatch = {}
@@ -685,17 +685,17 @@ class Marshaller:
                 if type_ in self.dispatch.keys():
                     raise TypeError, "cannot marshal %s objects" % type(value)
             f = self.dispatch[InstanceType]
-        # django-xmpp-account: Pass the utf8_encoding parameter
+        # xmpp-backends: Pass the utf8_encoding parameter
         f(self, value, write, utf8_encoding=self.utf8_encoding)
 
-    # django-xmpp-account: Add the utf8_encoding parameter
+    # xmpp-backends: Add the utf8_encoding parameter
     def dump_nil (self, value, write):
         if not self.allow_none:
             raise TypeError, "cannot marshal None unless allow_none is enabled"
         write("<value><nil/></value>")
     dispatch[NoneType] = dump_nil
 
-    # django-xmpp-account: Add the utf8_encoding parameter
+    # xmpp-backends: Add the utf8_encoding parameter
     def dump_int(self, value, write, utf8_encoding):
         # in case ints are > 32 bits
         if value > MAXINT or value < MININT:
@@ -706,14 +706,14 @@ class Marshaller:
     dispatch[IntType] = dump_int
 
     if _bool_is_builtin:
-        # django-xmpp-account: Add the utf8_encoding parameter
+        # xmpp-backends: Add the utf8_encoding parameter
         def dump_bool(self, value, write, utf8_encoding):
             write("<value><boolean>")
             write(value and "1" or "0")
             write("</boolean></value>\n")
         dispatch[bool] = dump_bool
 
-    # django-xmpp-account: Add the utf8_encoding parameter
+    # xmpp-backends: Add the utf8_encoding parameter
     def dump_long(self, value, write, utf8_encoding):
         if value > MAXINT or value < MININT:
             raise OverflowError, "long int exceeds XML-RPC limits"
@@ -722,35 +722,35 @@ class Marshaller:
         write("</int></value>\n")
     dispatch[LongType] = dump_long
 
-    # django-xmpp-account: Add the utf8_encoding parameter
+    # xmpp-backends: Add the utf8_encoding parameter
     def dump_double(self, value, write, utf8_encoding):
         write("<value><double>")
         write(repr(value))
         write("</double></value>\n")
     dispatch[FloatType] = dump_double
 
-    # django-xmpp-account: Add the utf8_encoding parameter
+    # xmpp-backends: Add the utf8_encoding parameter
     def dump_string(self, value, write, utf8_encoding, escape=escape):
         write("<value><string>")
-        # django-xmpp-account: Pass utf8_encoding parameter
+        # xmpp-backends: Pass utf8_encoding parameter
         write(escape(value, utf8_encoding=utf8_encoding))
         write("</string></value>\n")
     dispatch[StringType] = dump_string
 
     if unicode:
-        # django-xmpp-account: Add the utf8_encoding parameter
+        # xmpp-backends: Add the utf8_encoding parameter
         def dump_unicode(self, value, write, utf8_encoding, escape=escape):
-            # django-xmpp-account: Only encode to string if utf8_encoding == 'python2'
+            # xmpp-backends: Only encode to string if utf8_encoding == 'python2'
             if utf8_encoding == 'python2':
                 value = value.encode(self.encoding)
 
             write("<value><string>")
-            # django-xmpp-account: Pass utf8_encoding parameter
+            # xmpp-backends: Pass utf8_encoding parameter
             write(escape(value, utf8_encoding=utf8_encoding))
             write("</string></value>\n")
         dispatch[UnicodeType] = dump_unicode
 
-    # django-xmpp-account: Add the utf8_encoding parameter
+    # xmpp-backends: Add the utf8_encoding parameter
     def dump_array(self, value, write, utf8_encoding):
         i = id(value)
         if i in self.memo:
@@ -765,7 +765,7 @@ class Marshaller:
     dispatch[TupleType] = dump_array
     dispatch[ListType] = dump_array
 
-    # django-xmpp-account: Add the utf8_encoding parameter
+    # xmpp-backends: Add the utf8_encoding parameter
     def dump_struct(self, value, write, utf8_encoding, escape=escape):
         i = id(value)
         if i in self.memo:
@@ -788,14 +788,14 @@ class Marshaller:
     dispatch[DictType] = dump_struct
 
     if datetime:
-        # django-xmpp-account: Add the utf8_encoding parameter
+        # xmpp-backends: Add the utf8_encoding parameter
         def dump_datetime(self, value, utf8_encoding, write):
             write("<value><dateTime.iso8601>")
             write(_strftime(value))
             write("</dateTime.iso8601></value>\n")
         dispatch[datetime.datetime] = dump_datetime
 
-    # django-xmpp-account: Add the utf8_encoding parameter
+    # xmpp-backends: Add the utf8_encoding parameter
     def dump_instance(self, value, utf8_encoding, write):
         # check for special wrappers
         if value.__class__ in WRAPPERS:
@@ -1094,7 +1094,7 @@ def getparser(use_datetime=0):
 # @keyparam encoding The packet encoding.
 # @return A string containing marshalled data.
 
-# django-xmpp-account: Add the utf8_encoding parameter
+# xmpp-backends: Add the utf8_encoding parameter
 def dumps(params, methodname=None, methodresponse=None, encoding=None,
           allow_none=0, utf8_encoding='standard'):
     """data [,options] -> marshalled data
@@ -1589,7 +1589,7 @@ class ServerProxy:
     the given encoding.
     """
 
-    # django-xmpp-account: Add the utf8_encoding parameter
+    # xmpp-backends: Add the utf8_encoding parameter
     def __init__(self, uri, transport=None, encoding=None, verbose=0,
                  allow_none=0, use_datetime=0, utf8_encoding='standard'):
         # establish a "logical" server connection
@@ -1616,7 +1616,7 @@ class ServerProxy:
         self.__encoding = encoding
         self.__verbose = verbose
         self.__allow_none = allow_none
-        # django-xmpp-account: Set the utf8_encoding parameter
+        # xmpp-backends: Set the utf8_encoding parameter
         self.__utf8_encoding = utf8_encoding
 
     def __close(self):
