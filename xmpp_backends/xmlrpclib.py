@@ -35,8 +35,9 @@
 #     >>> import xmlrpclib
 #     >>> xmlrpclib.escape('ä')
 #     '\xc3\xa4'
-#     >>> xmlrpclib.escape(u'ä')  # just "\xe4" ends up in the XML
-#     u'\xe4'
+#     >>> xmlrpclib.escape(u'ä')  # unicode is not supported!
+#     ...
+#     TypeError: encode() argument 1 must be string, not None
 #
 # This library differs from the version that ships with Python 2.7.10 in that
 # it adds a `utf8_encoding` parameter to support all three different encoding
