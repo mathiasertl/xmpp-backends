@@ -102,7 +102,7 @@ class XmppBackendBase(object):
         """
         raise NotImplementedError
 
-    def reserve(self, username, domain, password, email=None):
+    def reserve(self, username, domain, email=None):
         """Reserve a new account.
 
         This method is called when a user account should be reserved, meaning that the account can
@@ -148,6 +148,18 @@ class XmppBackendBase(object):
         :param   domain: The selected domain, may be any domain provided
                          in :ref:`settings-XMPP_HOSTS`.
         :param password: The password to set.
+        """
+        raise NotImplementedError
+
+    def set_last_activity(self, username, domain, status, timestamp=None):
+        """Set the last activity of the user.
+
+        :param  username: The username of the new user.
+        :param    domain: The selected domain, may be any domain provided
+                         in :ref:`settings-XMPP_HOSTS`.
+        :param    status: The status text.
+        :param timestamp: The timestamp as returned by `time.time()`. If omitted, the current time
+            is used.
         """
         raise NotImplementedError
 
