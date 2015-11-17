@@ -131,7 +131,6 @@ class EjabberdctlBackend(XmppBackendBase):
 
         return set(out.splitlines())
 
-
     def remove(self, username, domain):
         code, out, err = self.ctl('unregister', username, domain)
         if code != 0:  # 0 is also returned if the user does not exist
