@@ -19,12 +19,9 @@ from __future__ import unicode_literals
 
 import logging
 
-from django.conf import settings
-from django.core.cache import cache
-
-from backends.base import XmppBackendBase
-from backends.base import UserExists
-from backends.base import UserNotFound
+from .base import XmppBackendBase
+from .base import UserExists
+from .base import UserNotFound
 
 log = logging.getLogger(__name__)
 
@@ -39,27 +36,24 @@ class DummyBackend(XmppBackendBase):
     for details.
     """
 
+    library = 'django.core.cache'
+
     def exists(self, username, domain):
         user = '%s@%s' % (username, domain)
-        return cache.get(user) is not None
+        return self.module.get(user) is not None
 
-    def create(self, username, domain, password, email):
-        if password is None:
-            password = self.get_random_password()
-        elif settings.XMPP_HOSTS[domain].get('RESERVE', False):
-            self.set_password(username, domain, password)
-            self.set_email(username, domain, email)
-            return
-
+    def create(self, username, domain, password, email=None):
         user = '%s@%s' % (username, domain)
         log.debug('Create user: %s (%s)', user, password)
 
-        data = cache.get(user)
+        data = self.module.get(user)
         if data is None:
-            cache.set(user, {
+            data = {
                 'pass': password,
-                'email': email,
-            })
+            }
+            if email is not None:
+                data['email'] = email
+            self.module.set(user, data)
         else:
             raise UserExists()
 
@@ -67,7 +61,7 @@ class DummyBackend(XmppBackendBase):
         user = '%s@%s' % (username, domain)
         log.debug('Check pass: %s -> %s', user, password)
 
-        data = cache.get(user)
+        data = self.module.get(user)
         if data is None:
             return False
         else:
@@ -77,7 +71,7 @@ class DummyBackend(XmppBackendBase):
         user = '%s@%s' % (username, domain)
         log.debug('Check email: %s --> %s', user, email)
 
-        data = cache.get(user)
+        data = self.module.get(user)
         if data is None:
             return False
         else:
@@ -87,23 +81,23 @@ class DummyBackend(XmppBackendBase):
         user = '%s@%s' % (username, domain)
         log.debug('Set pass: %s -> %s', user, password)
 
-        data = cache.get(user)
+        data = self.module.get(user)
         if data is None:
             raise UserNotFound("User does not exist in backend.")
         else:
             data['pass'] = password
-            cache.set(user, data)
+            self.module.set(user, data)
 
     def set_email(self, username, domain, email):
         user = '%s@%s' % (username, domain)
         log.debug('Set email: %s --> %s', user, email)
 
-        data = cache.get(user)
+        data = self.module.get(user)
         if data is None:
             raise UserNotFound()
         else:
             data['email'] = email
-            cache.set(user, data)
+            self.module.set(user, data)
 
     def all_users(self, domain):
         return set()
@@ -112,4 +106,4 @@ class DummyBackend(XmppBackendBase):
         user = '%s@%s' % (username, domain)
         log.debug('Remove: %s', user)
 
-        cache.delete(user)
+        self.module.delete(user)
