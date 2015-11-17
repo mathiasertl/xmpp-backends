@@ -71,7 +71,7 @@ class XmppBackendBase(object):
             try:
                 module = import_module(mod_path)
             except ImportError:
-                raise ValueError("Couldn't load %s backend library library" % name)
+                raise ValueError("Couldn't load %s backend library" % name)
             self._module = module
         return self._module
 
