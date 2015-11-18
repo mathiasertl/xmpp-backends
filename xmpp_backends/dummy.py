@@ -16,6 +16,7 @@
 from __future__ import unicode_literals
 
 import logging
+import time
 
 from .base import XmppBackendBase
 from .base import UserExists
@@ -48,6 +49,7 @@ class DummyBackend(XmppBackendBase):
         if data is None:
             data = {
                 'pass': password,
+                'last_status': (time.time(), 'Registered'),
             }
             if email is not None:
                 data['email'] = email
@@ -95,6 +97,18 @@ class DummyBackend(XmppBackendBase):
             raise UserNotFound()
         else:
             data['email'] = email
+            self.module.set(user, data)
+
+    def set_last_activity(self, username, domain, status, timestamp=None):
+        user = '%s@%s' % (username, domain)
+        if timestamp is None:
+            timestamp = time.time()
+
+        data = self.module.get(user)
+        if data is None:
+            raise UserNotFound()
+        else:
+            data['last_status'] = (time.time(), status)
             self.module.set(user, data)
 
     def all_users(self, domain):
