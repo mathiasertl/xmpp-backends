@@ -11,3 +11,4 @@
 /Makefile
 /MANIFEST
 /*egg-info/
+/docs/_build/
