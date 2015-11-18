@@ -1,6 +1,29 @@
 # xmpp-backends
 
-A set of classes with common interfaces to communicate with XMPP servers
+**xmpp-backends** provides a set of classes with a common interface to
+communicate with admin interfaces of various XMPP servers. This project was
+born out of
+[django-xmpp-account](https://github.com/mathiasertl/django-xmpp-account/) and
+the methods provided are therefor centered around user management. Currently
+only ejabberd is supported with communication via the `ejabberdctl` command
+line utitlity and via `mod_xmlrpc`.
+
+If you need more functionality and/or other backends please file an issue or
+better yet do a pull request.
+
+## Installation
+
+Simply do:
+
+```
+pip install xmpp-backends
+```
+
+## ChangeLog
+
+### 0.1 (2015-11-18)
+
+* Initial release.
 
 ## License
 
