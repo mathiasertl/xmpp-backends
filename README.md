@@ -19,6 +19,15 @@ Simply do:
 pip install xmpp-backends
 ```
 
+## Supported backends
+
+* `ejabberd_xmlrpc`: Connects to ejabberd via `mod_xmlrpc`. The backend uses
+  it's own version of Python's xmlrpc library to correctly encode UTF-8
+  characters.
+* `ejabberdctl`: Uses the `ejabberdctl` command line utility that obviously
+  needs to be available on the local machine.
+* `dummy`: Uses Django's chache backend, useful for testing.
+
 ## ChangeLog
 
 ### 0.1 (2015-11-18)
