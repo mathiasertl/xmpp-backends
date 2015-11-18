@@ -29,7 +29,7 @@ class BackendError(Exception):
 
 
 class InvalidXmppBackendError(BackendError):
-    """Raised when a backend is raised that cannot be imported."""
+    """Raised when a module cannot be imported."""
     pass
 
 
@@ -86,12 +86,12 @@ class XmppBackendBase(object):
             chars = string.ascii_letters + string.digits
         return ''.join(random.choice(chars) for x in range(length))
 
-    def exists(self, username, domain):
+    def user_exists(self, username, domain):
         """Return `True` if the user exists, `False` otherwise."""
 
         raise NotImplementedError
 
-    def create(self, username, domain, password, email=None):
+    def create_user(self, username, domain, password, email=None):
         """Create a new user.
 
         :param    username: The username of the new user.
@@ -102,7 +102,7 @@ class XmppBackendBase(object):
         """
         raise NotImplementedError
 
-    def reserve(self, username, domain, email=None):
+    def create_reservation(self, username, domain, email=None):
         """Reserve a new account.
 
         This method is called when a user account should be reserved, meaning that the account can
@@ -121,7 +121,7 @@ class XmppBackendBase(object):
         password = self.get_random_password()
         self.create(username=username, domain=domain, password=password, email=email)
 
-    def confirm(self, username, domain, password, email=None):
+    def confirm_reservation(self, username, domain, password, email=None):
         """Confirm a reservation for a username.
 
         The default implementation just calls `set_password()` and optionally `set_email()`.
@@ -178,7 +178,7 @@ class XmppBackendBase(object):
         """Check the email address of a user."""
         raise NotImplementedError
 
-    def expire(self, username, domain):
+    def expire_reservation(self, username, domain):
         """Expire a username reservation.
 
         This method is called when a reservation expires. The default implementation just calls
@@ -187,7 +187,7 @@ class XmppBackendBase(object):
         """
         self.remove(username, domain)
 
-    def message(self, username, domain, subject, message):
+    def message_user(self, username, domain, subject, message):
         """Send a message to the given user."""
         pass
 
@@ -200,7 +200,7 @@ class XmppBackendBase(object):
         """
         raise NotImplementedError
 
-    def remove(self, username, domain):
+    def remove_user(self, username, domain):
         """Remove a user.
 
         This method is called when the user explicitly wants to remove her/his account.
