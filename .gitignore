@@ -9,3 +9,5 @@
 /py3/
 /dist/
 /Makefile
+/MANIFEST
+/*egg-info/
