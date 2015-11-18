@@ -36,11 +36,11 @@ class DummyBackend(XmppBackendBase):
 
     library = 'django.core.cache'
 
-    def exists(self, username, domain):
+    def user_exists(self, username, domain):
         user = '%s@%s' % (username, domain)
         return self.module.get(user) is not None
 
-    def create(self, username, domain, password, email=None):
+    def create_user(self, username, domain, password, email=None):
         user = '%s@%s' % (username, domain)
         log.debug('Create user: %s (%s)', user, password)
 
@@ -100,7 +100,7 @@ class DummyBackend(XmppBackendBase):
     def all_users(self, domain):
         return set()
 
-    def remove(self, username, domain):
+    def remove_user(self, username, domain):
         user = '%s@%s' % (username, domain)
         log.debug('Remove: %s', user)
 
