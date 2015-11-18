@@ -63,7 +63,16 @@ class EjabberdctlBackend(XmppBackendBase):
     def ctl(self, *cmd):
         return self.ex(self.ejabberdctl, *cmd)
 
-    def create(self, username, domain, password, email=None):
+    def user_exists(self, username, domain):
+        code, out, err = self.ctl('check_account', username, domain)
+        if code == 0:
+            return True
+        elif code == 1:
+            return False
+        else:
+            raise BackendError(code)  # TODO: 3 means nodedown.
+
+    def create_user(self, username, domain, password, email=None):
         code, out, err = self.ctl('register', username, domain, password)
 
         if code == 0:
@@ -119,7 +128,7 @@ class EjabberdctlBackend(XmppBackendBase):
         """Not yet implemented."""
         pass  # maybe as vcard field?
 
-    def message(self, username, domain, subject, message):
+    def message_user(self, username, domain, subject, message):
         """Currently use send_message_chat and discard subject, because headline messages are not
         stored by mod_offline."""
         self.ctl('send_message_chat', domain, '%s@%s' % (username, domain), message)
@@ -131,7 +140,7 @@ class EjabberdctlBackend(XmppBackendBase):
 
         return set(out.splitlines())
 
-    def remove(self, username, domain):
+    def remove_user(self, username, domain):
         code, out, err = self.ctl('unregister', username, domain)
         if code != 0:  # 0 is also returned if the user does not exist
             raise BackendError(code)

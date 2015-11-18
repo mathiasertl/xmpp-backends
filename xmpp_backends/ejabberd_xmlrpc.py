@@ -107,7 +107,7 @@ class EjabberdXMLRPCBackend(XmppBackendBase):
             log.error(e)
             raise BackendError("Error reaching backend.")
 
-    def create(self, username, domain, password, email=None):
+    def create_user(self, username, domain, password, email=None):
         result = self.rpc('register', user=username, host=domain, password=password)
 
         if result['res'] == 0:
@@ -131,7 +131,7 @@ class EjabberdXMLRPCBackend(XmppBackendBase):
 
         self.rpc('set_last', user=username, host=domain, timestamp=timestamp, status=status)
 
-    def exists(self, username, domain):
+    def user_exists(self, username, domain):
         result = self.rpc('check_account', user=username, host=domain)
         if result['res'] == 0:
             return True
@@ -167,7 +167,7 @@ class EjabberdXMLRPCBackend(XmppBackendBase):
         """Not yet implemented."""
         pass
 
-    def message(self, username, domain, subject, message):
+    def message_user(self, username, domain, subject, message):
         """Currently use send_message_chat and discard subject, because headline messages are not
         stored by mod_offline."""
 
@@ -184,7 +184,7 @@ class EjabberdXMLRPCBackend(XmppBackendBase):
         users = self.rpc('registered_users', host=domain)['users']
         return set([e['username'] for e in users])
 
-    def remove(self, username, domain):
+    def remove_user(self, username, domain):
         result = self.rpc('unregister', user=username, host=domain)
         if result['res'] == 0:
             return True
