@@ -42,3 +42,32 @@ class TestInterfaces(unittest.TestCase):
 
     def test_dummy(self):
         self.assertEqualInterface(DummyBackend)
+
+
+class TestImplemented(unittest.TestCase):
+    not_implemented = [
+        'all_users',
+        'check_email',
+        'check_password',
+        'create_user',
+        'remove_user',
+        'set_email',
+        'set_last_activity',
+        'set_password',
+        'user_exists',
+    ]
+
+    def assertOverwritten(self, subclass):
+        for name in self.not_implemented:
+            self.assertNotEqual(getattr(XmppBackendBase, name).__func__,
+                             getattr(subclass, name).__func__,
+                             "%s.%s: Function is not overwritten." % (subclass.__name__, name))
+
+    def test_ejabberd_xmlrpc(self):
+        self.assertOverwritten(EjabberdXMLRPCBackend)
+
+    def test_ejabberdctl(self):
+        self.assertOverwritten(EjabberdctlBackend)
+
+    def test_dummy(self):
+        self.assertOverwritten(DummyBackend)
