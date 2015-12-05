@@ -64,15 +64,16 @@ class XmppBackendBase(object):
                 raise ValueError(
                     "Backend '%s' doesn't specify a library attribute" % self.__class__)
 
-            if isinstance(self.library, (tuple, list)):
-                name, mod_path = self.library
-            else:
-                name = mod_path = self.library
             try:
-                module = import_module(mod_path)
-            except ImportError:
-                raise ValueError("Couldn't load %s backend library" % name)
-            self._module = module
+                if '.' in self.library:
+                    mod_path, cls_name = self.library.rsplit('.', 1)
+                    mod = import_module(mod_path)
+                    self._module = getattr(mod, cls_name)
+                else:
+                    self._module = import_module(self.library)
+            except (AttributeError, ImportError):
+                raise ValueError("Couldn't load %s backend library" % cls_name)
+
         return self._module
 
     def get_random_password(self, length=32, chars=None):
