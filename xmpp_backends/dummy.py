@@ -35,7 +35,7 @@ class DummyBackend(XmppBackendBase):
     for details.
     """
 
-    library = 'django.core.cache'
+    library = 'django.core.cache.cache'
 
     def user_exists(self, username, domain):
         user = '%s@%s' % (username, domain)
