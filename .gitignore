@@ -1,6 +1,7 @@
 *.sw[po]
 *.py[co]
 /bin
+/build/
 /include
 /lib
 /local
