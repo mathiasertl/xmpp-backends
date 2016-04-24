@@ -33,6 +33,7 @@ pip install xmpp-backends
 ### 0.2 (2016-04-24)
 
 * Fix import in the dummy backend.
+* Release also adds a Python Wheel.
 
 ### 0.1 (2015-11-18)
 
