@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
     name='xmpp-backends',
-    version='0.1',
+    version='0.2',
     description='A set of classes with common interfaces to communicate with XMPP servers.',
     author='Mathias Ertl',
     author_email='mati@jabber.at',
@@ -12,7 +12,7 @@ setup(
     packages=['xmpp_backends'],
     license="GNU General Public License (GPL) v3",
     install_requires=[
-        'six>=1.10.0'
+        'six>=1.10.0',
     ],
     classifiers=[
         "Development Status :: 4 - Beta",
