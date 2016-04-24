@@ -1,0 +1,4 @@
+ipython
+wheel==0.29.0
+pip>=1.4
+setuptools>=0.8
