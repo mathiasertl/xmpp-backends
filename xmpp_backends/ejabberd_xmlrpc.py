@@ -59,7 +59,8 @@ class EjabberdXMLRPCBackend(XmppBackendBase):
     :param       verbose: Directly passed to xmlrpclib.
     :param    allow_none: Directly passed to xmlrpclib.
     :param  use_datetime: Directly passed to xmlrpclib.
-    :param       context: Directly passed to xmlrpclib.
+    :param       context: Directly passed to xmlrpclib. Note that this parameter is ignored in
+        in Python3. It's still documented but no longer accepted by the ServerProxy constructor.
     :param          user: Username of the JID used for authentication.
     :param        server: Server of the JID used for authenticiation.
     :param      password: The password of the given JID.
@@ -81,10 +82,10 @@ class EjabberdXMLRPCBackend(XmppBackendBase):
             'verbose': verbose,
             'allow_none': allow_none,
             'use_datetime': use_datetime,
-            'context': context,
         }
         if six.PY2:
             kwargs['utf8_encoding'] = utf8_encoding
+            kwargs['context'] = context
 
         self.client = xmlrpclib.ServerProxy(uri, **kwargs)
         if user is not None:
