@@ -30,6 +30,12 @@ pip install xmpp-backends
 
 ## ChangeLog
 
+### 0.2.1 (2016-09-03)
+
+* ejabberd_xmlrpc backend: Ignore the ``context`` parameter in Python3. The
+  parameter is still documented in the official documentation but in fact the
+  constructor no longer accepts it.
+
 ### 0.2 (2016-04-24)
 
 * Fix import in the dummy backend.
