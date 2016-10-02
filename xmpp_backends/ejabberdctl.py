@@ -158,3 +158,21 @@ class EjabberdctlBackend(XmppBackendBase):
         code, out, err = self.ctl('unregister', username, domain)
         if code != 0:  # 0 is also returned if the user does not exist
             raise BackendError(code)
+
+    def stats(self, stat, domain=None):
+        if stat == 'registered_users':
+            stat = 'registeredusers'
+        elif stat == 'onlineusers':
+            stat = 'online_users'
+        else:
+            raise ValueError("Unknown stat %s" % stat)
+
+        if domain is None:
+            code, out, err = self.rpc('stats', name=stat)
+        else:
+            code, out, err = self.rpc('stats_host', name=stat, host=domain)
+
+        if code == 0:
+            return out
+        else:
+            raise BackendError(code)

@@ -221,3 +221,15 @@ class XmppBackendBase(object):
                          provided in :ref:`settings-XMPP_HOSTS`.
         """
         raise NotImplementedError
+
+    def stats(self, stat, domain=None):
+        """Get statistical value about the XMPP server.
+
+        Minimal statistics that should be supported is ``"registered_users"`` and
+        ``"online_users"``. The specific backend might support additional stats.
+
+        :param stat: The value of the statistic.
+        :param domain: Limit statistic to the given domain. If not listed, give statistics
+                       about all users.
+        """
+        raise NotImplementedError

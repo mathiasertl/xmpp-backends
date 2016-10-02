@@ -207,3 +207,21 @@ class EjabberdXMLRPCBackend(XmppBackendBase):
             return True
         else:
             raise BackendError(result.get('text', 'Unknown Error'))
+
+    def stats(self, stat, domain=None):
+        if stat == 'registered_users':
+            stat = 'registeredusers'
+        elif stat == 'onlineusers':
+            stat = 'online_users'
+        else:
+            raise ValueError("Unknown stat %s" % stat)
+
+        if domain is None:
+            result = self.rpc('stats', name=stat)
+        else:
+            result = self.rpc('stats_host', name=stat, host=domain)
+
+        if result['res'] == 0:
+            return result['stat']
+        else:
+            raise BackendError(result.get('text', 'Unknown Error'))

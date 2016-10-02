@@ -130,3 +130,7 @@ class DummyBackend(XmppBackendBase):
         log.debug('Remove: %s', user)
 
         self.module.delete(user)
+
+    def stats(self, stat, domain=None):
+        """Always returns 0."""
+        return 0
