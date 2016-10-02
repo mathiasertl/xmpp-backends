@@ -152,6 +152,15 @@ class XmppBackendBase(object):
         """
         raise NotImplementedError
 
+    def get_last_activity(self, username, domain):
+        """Get the last activity of the user.
+
+        :param  username: The username of the new user.
+        :param    domain: The selected domain, may be any domain provided
+                         in :ref:`settings-XMPP_HOSTS`.
+        """
+        raise NotImplementedError
+
     def set_last_activity(self, username, domain, status, timestamp=None):
         """Set the last activity of the user.
 
