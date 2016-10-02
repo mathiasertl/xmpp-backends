@@ -30,6 +30,10 @@ pip install xmpp-backends
 
 ## ChangeLog
 
+### 0.3 (to be released)
+
+* Add the ``stats`` and ``get_last_activity`` commands.
+
 ### 0.2.1 (2016-09-03)
 
 * ejabberd_xmlrpc backend: Ignore the ``context`` parameter in Python3. The
