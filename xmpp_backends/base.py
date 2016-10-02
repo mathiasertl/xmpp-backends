@@ -158,6 +158,7 @@ class XmppBackendBase(object):
         :param  username: The username of the new user.
         :param    domain: The selected domain, may be any domain provided
                          in :ref:`settings-XMPP_HOSTS`.
+        :return: A tuple with the timestamp and last status.
         """
         raise NotImplementedError
 

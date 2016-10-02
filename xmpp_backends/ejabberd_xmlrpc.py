@@ -19,6 +19,8 @@ import logging
 import socket
 import time
 
+from datetime import datetime
+
 import six
 
 from six.moves.http_client import BadStatusLine
@@ -29,9 +31,9 @@ else:  # use the default for Python3 (god save us all!)
     from xmlrpc import client as xmlrpclib
 
 
-from xmpp_backends.base import XmppBackendBase
-from xmpp_backends.base import BackendError
-from xmpp_backends.base import UserExists
+from xmpp_backends.base import XmppBackendBase  # NOQA
+from xmpp_backends.base import BackendError  # NOQA
+from xmpp_backends.base import UserExists  # NOQA
 
 log = logging.getLogger(__name__)
 
@@ -125,6 +127,20 @@ class EjabberdXMLRPCBackend(XmppBackendBase):
             raise UserExists()
         else:
             raise BackendError(result.get('text', 'Unknown Error'))
+
+    def get_last_activity(self, username, domain):
+        result = self.rpc('get_last', username, domain)
+
+        if result['res'] != 0:
+            raise BackendError(result['res'])
+
+        activity = result['last_activity']
+        if activity == 'Online':
+            return datetime.utcnow()
+        elif activity == 'Never':
+            return None
+        else:
+            return datetime.strptime(activity, '%Y-%m-%d %H:%M:%S')
 
     def set_last_activity(self, username, domain, status, timestamp=None):
         if timestamp is None:

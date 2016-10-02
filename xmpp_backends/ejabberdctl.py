@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 import logging
 import time
 
+from datetime import datetime
 from subprocess import PIPE
 from subprocess import Popen
 
@@ -87,6 +88,19 @@ class EjabberdctlBackend(XmppBackendBase):
             raise UserExists()
         else:
             raise BackendError(code)  # TODO: 3 means nodedown.
+
+    def get_last_activity(self, username, domain):
+        code, out, err = self.ctl('get_last', username, domain)
+
+        if code != 0:
+            raise BackendError(code)
+
+        if out == 'Online':
+            return datetime.utcnow()
+        elif out == 'Never':
+            return None
+        else:
+            return datetime.strptime(out, '%Y-%m-%d %H:%M:%S')
 
     def set_last_activity(self, username, domain, status, timestamp=None):
         if timestamp is None:
