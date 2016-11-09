@@ -72,10 +72,12 @@ class EjabberdRestBackend(XmppBackendBase):
 
         self.uri = uri
         self.kwargs = kwargs
+        self.headers = kwargs.pop('headers', {})
+        self.headers.setdefault('X-Admin', 'true')
 
     def post(self, cmd, **payload):
         uri = '%s%s' % (self.uri, cmd)
-        response = requests.post(uri, json=payload, headers={'X-Admin': 'true', }, **self.kwargs)
+        response = requests.post(uri, json=payload, headers=self.headers, **self.kwargs)
         return response.json()
 
     def create_user(self, username, domain, password, email=None):
