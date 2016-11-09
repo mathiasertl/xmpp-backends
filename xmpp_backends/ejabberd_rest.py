@@ -99,7 +99,7 @@ class EjabberdRestBackend(XmppBackendBase):
             raise BackendError(result.get('text', 'Unknown Error'))
 
     def get_last_activity(self, username, domain):
-        result = self.post('get_last', username, domain)['last_activity'].lower().strip()
+        result = self.post('get_last', user=username, host=domain)['last_activity'].lower().strip()
 
         if result == 'never':
             return None
