@@ -75,21 +75,23 @@ class EjabberdRestBackend(XmppBackendBase):
         self.headers = kwargs.pop('headers', {})
         self.headers.setdefault('X-Admin', 'true')
 
-    def post(self, cmd, **payload):
+    def post(self, cmd, allowed_status=None, **payload):
+        if allowed_status is None:
+            allowed_status = [200]
+
         uri = '%s%s' % (self.uri, cmd)
         response = requests.post(uri, json=payload, headers=self.headers, **self.kwargs)
         print('### HTTP %s: %s' % (response.status_code, response.content))
 
-        if response.status_code != 200:
+        if response.status_code not in allowed_status:
             raise BackendError('HTTP %s: %s' % (response.status_code, response.content))
         return response
 
     def create_user(self, username, domain, password, email=None):
-        # TODO: Does not work with our current config...
+        result = self.post('register', user=username, host=domain, password=password,
+                           allowed_status=[200, 409])
 
-        result = self.post('register', user=username, host=domain, password=password)
-
-        if result['res'] == 0:
+        if result.status_code == 200:
             try:
                 # we ignore errors here because not setting last activity is only a problem in
                 # edge-cases.
@@ -99,9 +101,10 @@ class EjabberdRestBackend(XmppBackendBase):
 
             if email is not None:
                 self.set_email(username, domain, email)
-        elif result['res'] == 1:
+        elif result.status_code == 409:
             raise UserExists()
         else:
+            # NOTE: This really should never happen, only 200 and 409 don't raise an exception.
             raise BackendError(result.get('text', 'Unknown Error'))
 
     def get_last_activity(self, username, domain):
@@ -171,7 +174,7 @@ class EjabberdRestBackend(XmppBackendBase):
         self.post('send_message', **kwargs)
 
     def all_users(self, domain):
-        return self.post('registered_users', host=domain)['users'].json()
+        return self.post('registered_users', host=domain).json()
 
     def remove_user(self, username, domain):
         response = self.post('unregister', user=username, host=domain)
