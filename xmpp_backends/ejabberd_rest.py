@@ -116,7 +116,7 @@ class EjabberdRestBackend(XmppBackendBase):
         elif result == 'online':
             return datetime.now()
 
-        return datetime.strptime(result, '%Y-%m-%d %H:%M:%S')
+        return datetime.strptime(result[:19], '%Y-%m-%d %H:%M:%S')
 
     def set_last_activity(self, username, domain, status, timestamp=None):
         if timestamp is None:
@@ -178,7 +178,7 @@ class EjabberdRestBackend(XmppBackendBase):
 
     def remove_user(self, username, domain):
         response = self.post('unregister', user=username, host=domain)
-        if response.content == b'0':
+        if response.content == b'""':
             return True
         else:
             raise BackendError('Unknown Error')
