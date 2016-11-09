@@ -79,7 +79,10 @@ class EjabberdRestBackend(XmppBackendBase):
         uri = '%s%s' % (self.uri, cmd)
         response = requests.post(uri, json=payload, headers=self.headers, **self.kwargs)
         print('### HTTP %s: %s' % (response.status_code, response.content))
-        return response.json()
+
+        if response.status_code != 200:
+            raise BackendError('HTTP %s: %s' % (response.status_code, response.content))
+        return response
 
     def create_user(self, username, domain, password, email=None):
         # TODO: Does not work with our current config...
@@ -102,7 +105,8 @@ class EjabberdRestBackend(XmppBackendBase):
             raise BackendError(result.get('text', 'Unknown Error'))
 
     def get_last_activity(self, username, domain):
-        result = self.post('get_last', user=username, host=domain)['last_activity'].lower().strip()
+        response = self.post('get_last', user=username, host=domain)
+        result = response.json()['last_activity'].lower().strip()
 
         if result == 'never':
             return None
@@ -118,29 +122,29 @@ class EjabberdRestBackend(XmppBackendBase):
         self.post('set_last', user=username, host=domain, timestamp=timestamp, status=status)
 
     def user_exists(self, username, domain):
-        result = self.post('check_account', user=username, host=domain)
-        if result['res'] == 0:
+        response = self.post('check_account', user=username, host=domain)
+        if response.content == b'0':
             return True
-        elif result['res'] == 1:
+        elif response.content == b'1':
             return False
         else:
-            raise BackendError(result.get('text', 'Unknown Error'))
+            raise BackendError('Unknown Error')
 
     def check_password(self, username, domain, password):
-        result = self.post('check_password', user=username, host=domain, password=password)
-        if result['res'] == 0:
+        response = self.post('check_password', user=username, host=domain, password=password)
+        if response.content == b'0':
             return True
-        elif result['res'] == 1:
+        elif response.content == b'1':
             return False
         else:
-            raise BackendError(result.get('text', 'Unknown Error'))
+            raise BackendError('Unknown Error')
 
     def set_password(self, username, domain, password):
-        result = self.post('change_password', user=username, host=domain, newpass=password)
-        if result['res'] == 0:
+        response = self.post('change_password', user=username, host=domain, newpass=password)
+        if response.content == b'0':
             return True
         else:
-            raise BackendError(result.get('text', 'Unknown Error'))
+            raise BackendError('Unknown Error')
 
     def has_usable_password(self, username, domain):
         return True
@@ -167,15 +171,14 @@ class EjabberdRestBackend(XmppBackendBase):
         self.post('send_message', **kwargs)
 
     def all_users(self, domain):
-        users = self.post('registered_users', host=domain)['users']
-        return set([e['username'] for e in users])
+        return self.post('registered_users', host=domain)['users'].json()
 
     def remove_user(self, username, domain):
-        result = self.post('unregister', user=username, host=domain)
-        if result['res'] == 0:
+        response = self.post('unregister', user=username, host=domain)
+        if response.content == b'0':
             return True
         else:
-            raise BackendError(result.get('text', 'Unknown Error'))
+            raise BackendError('Unknown Error')
 
     def stats(self, stat, domain=None):
         if stat == 'registered_users':
@@ -186,9 +189,9 @@ class EjabberdRestBackend(XmppBackendBase):
             raise ValueError("Unknown stat %s" % stat)
 
         if domain is None:
-            result = self.post('stats', name=stat)
+            result = self.post('stats', name=stat).json()
         else:
-            result = self.post('stats_host', name=stat, host=domain)
+            result = self.post('stats_host', name=stat, host=domain).json()
 
         if result['res'] == 0:
             return result['stat']
