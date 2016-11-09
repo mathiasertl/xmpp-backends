@@ -78,6 +78,7 @@ class EjabberdRestBackend(XmppBackendBase):
     def post(self, cmd, **payload):
         uri = '%s%s' % (self.uri, cmd)
         response = requests.post(uri, json=payload, headers=self.headers, **self.kwargs)
+        print('### HTTP %s: %s' % (response.status_code, response.content))
         return response.json()
 
     def create_user(self, username, domain, password, email=None):
