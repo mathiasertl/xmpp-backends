@@ -12,6 +12,7 @@ Contents:
    :maxdepth: 2
 
    xmpp_backends/base
+   xmpp_backends/django
 
 
 Indices and tables

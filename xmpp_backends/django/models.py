@@ -15,31 +15,39 @@
 
 from __future__ import unicode_literals, absolute_import
 
-from . import backend
+from . import xmpp_backend
 from django.contrib.auth.models import AbstractBaseUser
 from django.utils.translation import ugettext_lazy as _
 
 
 class XmppBackendUser(AbstractBaseUser):
+    """An abstract base model using xmpp as backend for various functions.
+
+    The model assumes that the username as returned by :py:func:`get_username` is the full JID of
+    the user.
+    """
+
     class Meta:
         verbose_name = _('user')
         verbose_name_plural = _('users')
         abstract = True
 
     def exists(self):
-        return backend.user_exists(self.node, self.domain)
+        return xmpp_backend.user_exists(self.node, self.domain)
 
     def set_password(self, raw_password):
         if raw_password is None:
             self.set_unusable_password()
         else:
-            backend.set_password(self.node, self.domain, raw_password)
+            xmpp_backend.set_password(self.node, self.domain, raw_password)
 
     def check_password(self, raw_password):
-        return backend.check_password(self.node, self.domain, raw_password)
+        return xmpp_backend.check_password(self.node, self.domain, raw_password)
 
     def set_unusable_password(self):
-        backend.block_user(self.node, self.domain)
+        """Calls :py:func:`~xmpp_backends.base.XmppBackendBase.ban_account` for the user."""
+
+        xmpp_backend.block_user(self.node, self.domain)
 
     def get_short_name(self):
         return self.node
