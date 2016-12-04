@@ -121,8 +121,8 @@ class XmppBackendBase(object):
         no longer be registered by anybody else but the user cannot yet log in either. This is
         useful if e.g. an email confirmation is still pending.
 
-        The default implementation calls :py:func:`~xmpp_backends.base.XmppBackendBase.create` with
-        a random password.
+        The default implementation calls :py:func:`~xmpp_backends.base.XmppBackendBase.create_user`
+        with a random password.
 
         :param username: The username of the user.
         :type  username: str
@@ -137,7 +137,9 @@ class XmppBackendBase(object):
     def confirm_reservation(self, username, domain, password, email=None):
         """Confirm a reservation for a username.
 
-        The default implementation just calls `set_password()` and optionally `set_email()`.
+        The default implementation just calls
+        :py:func:`~xmpp_backends.base.XmppBackendBase.set_password` and optionally
+        :py:func:`~xmpp_backends.base.XmppBackendBase.set_email`.
         """
         self.set_password(username=username, domain=domain, password=password)
         if email is not None:
@@ -235,15 +237,15 @@ class XmppBackendBase(object):
         """Expire a username reservation.
 
         This method is called when a reservation expires. The default implementation just calls
-        :py:func:`~backends.base.XmppBackendBase.remove`. This is fine if you do not override
-        :py:func:`~backends.base.XmppBackendBase.reserve`.
+        :py:func:`~xmpp_backends.base.XmppBackendBase.remove_user`. This is fine if you do not
+        override :py:func:`~xmpp_backends.base.XmppBackendBase.create_reservation`.
 
         :param username: The username of the user.
         :type  username: str
         :param   domain: The domain of the user.
         :type    domain: str
         """
-        self.remove(username, domain)
+        self.remove_user(username, domain)
 
     def message_user(self, username, domain, subject, message):
         """Send a message to the given user.
