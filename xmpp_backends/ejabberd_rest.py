@@ -186,8 +186,8 @@ class EjabberdRestBackend(XmppBackendBase):
     def stats(self, stat, domain=None):
         if stat == 'registered_users':
             stat = 'registeredusers'
-        elif stat == 'onlineusers':
-            stat = 'online_users'
+        elif stat == 'online_users':
+            stat = 'onlineusers'
         else:
             raise ValueError("Unknown stat %s" % stat)
 
