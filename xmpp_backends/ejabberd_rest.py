@@ -196,7 +196,7 @@ class EjabberdRestBackend(XmppBackendBase):
         else:
             result = self.post('stats_host', name=stat, host=domain).json()
 
-        if result['res'] == 0:
+        try:
             return result['stat']
-        else:
+        except KeyError:
             raise BackendError(result.get('text', 'Unknown Error'))
