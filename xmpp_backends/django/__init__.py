@@ -79,7 +79,7 @@ class BackendHandler(object):
         return getattr(self._backends, 'backends', {}).values()
 
 
-backends = BackendHandler()
+xmpp_backends = BackendHandler()
 
 
 class DefaultBackendProxy(object):
@@ -90,22 +90,22 @@ class DefaultBackendProxy(object):
     This implementation is an adaption of django.core.cache.DefaultCacheProxy.
     """
     def __getattr__(self, name):
-        return getattr(backends[DEFAULT_BACKEND_ALIAS], name)
+        return getattr(xmpp_backends[DEFAULT_BACKEND_ALIAS], name)
 
     def __setattr__(self, name, value):
-        return setattr(backends[DEFAULT_BACKEND_ALIAS], name, value)
+        return setattr(xmpp_backends[DEFAULT_BACKEND_ALIAS], name, value)
 
     def __delattr__(self, name):
-        return delattr(backends[DEFAULT_BACKEND_ALIAS], name)
+        return delattr(xmpp_backends[DEFAULT_BACKEND_ALIAS], name)
 
     def __contains__(self, key):
-        return key in backends[DEFAULT_BACKEND_ALIAS]
+        return key in xmpp_backends[DEFAULT_BACKEND_ALIAS]
 
     def __eq__(self, other):
-        return backends[DEFAULT_BACKEND_ALIAS] == other
+        return xmpp_backends[DEFAULT_BACKEND_ALIAS] == other
 
     def __ne__(self, other):
-        return backends[DEFAULT_BACKEND_ALIAS] != other
+        return xmpp_backends[DEFAULT_BACKEND_ALIAS] != other
 
 
-backend = DefaultBackendProxy()
+xmpp_backend = DefaultBackendProxy()
