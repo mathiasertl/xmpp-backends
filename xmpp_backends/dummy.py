@@ -122,6 +122,10 @@ class DummyBackend(XmppBackendBase):
             data['last_status'] = (time.time(), status)
             self.module.set(user, data)
 
+    def block_user(self, username, domain):
+        # overwritten so we pass tests
+        self.set_password(username, domain, self.get_random_password())
+
     def all_users(self, domain):
         return set()
 

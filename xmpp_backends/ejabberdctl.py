@@ -108,6 +108,9 @@ class EjabberdctlBackend(XmppBackendBase):
 
         self.ctl('set_last', username, domain, timestamp, status)
 
+    def block_user(self, username, domain):
+        self.ctl('ban_account', username, domain, 'Blocked')
+
     def check_password(self, username, domain, password):
         code, out, err = self.ctl('check_password', username, domain, password)
 
