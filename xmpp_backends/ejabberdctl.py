@@ -162,17 +162,17 @@ class EjabberdctlBackend(XmppBackendBase):
     def stats(self, stat, domain=None):
         if stat == 'registered_users':
             stat = 'registeredusers'
-        elif stat == 'onlineusers':
-            stat = 'online_users'
+        elif stat == 'online_users':
+            stat = 'onlineusers'
         else:
             raise ValueError("Unknown stat %s" % stat)
 
         if domain is None:
-            code, out, err = self.rpc('stats', name=stat)
+            code, out, err = self.ctl('stats', name=stat)
         else:
-            code, out, err = self.rpc('stats_host', name=stat, host=domain)
+            code, out, err = self.ctl('stats_host', name=stat, host=domain)
 
         if code == 0:
-            return out
+            return int(out)
         else:
             raise BackendError(code)
