@@ -9,7 +9,10 @@ setup(
     author='Mathias Ertl',
     author_email='mati@jabber.at',
     url='https://github.com/mathiasertl/xmpp-backends',
-    packages=['xmpp_backends'],
+    packages=[
+        'xmpp_backends',
+        'xmpp_backends.django',
+    ],
     license="GNU General Public License (GPL) v3",
     install_requires=[
         'six>=1.10.0',
