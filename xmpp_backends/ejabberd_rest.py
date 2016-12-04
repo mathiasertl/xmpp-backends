@@ -152,6 +152,9 @@ class EjabberdRestBackend(XmppBackendBase):
     def has_usable_password(self, username, domain):
         return True
 
+    def block_user(self, username, domain):
+        self.post('ban_account', user=username, host=domain, reason='Blocked.')
+
     def set_email(self, username, domain, email):
         """Not yet implemented."""
         pass
