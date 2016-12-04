@@ -17,18 +17,30 @@ from __future__ import unicode_literals, absolute_import
 
 from django.contrib.auth import get_user_model
 
-from . import backend
+from . import xmpp_backend
 
 User = get_user_model()
 
 
 class XmppBackendBackend(object):
+    """Authentication backend to authenticate against your XMPP server.
+
+    To use this backend, simply configure the ``AUTHENTICATION_BACKENDS`` setting::
+
+        AUTHENTICATION_BACKENDS = [
+            'xmpp_backends.django.auth_backends.XmppBackendBackend',
+        ]
+
+    This authentication backend assumes that you store the full JID, including
+    the domain, in the username field.
+    """
+
     def authenticate(self, username, password):
         try:
             user = User.objects.get(**{User.USERNAME_FIELD: username, })
 
             node, domain = username.split('@', 1)
-            if backend.check_password(node, domain, password):
+            if xmpp_backend.check_password(node, domain, password):
                 return user
         except User.DoesNotExist:
             pass
