@@ -78,6 +78,7 @@ class BackendHandler(object):
     def all(self):
         return getattr(self._backends, 'backends', {}).values()
 
+
 backends = BackendHandler()
 
 
@@ -105,5 +106,6 @@ class DefaultBackendProxy(object):
 
     def __ne__(self, other):
         return backends[DEFAULT_BACKEND_ALIAS] != other
+
 
 backend = DefaultBackendProxy()
