@@ -221,7 +221,7 @@ class EjabberdXMLRPCBackend(XmppBackendBase):
         else:
             result = self.rpc('stats_host', name=stat, host=domain)
 
-        if result['res'] == 0:
+        try:
             return result['stat']
-        else:
+        except KeyError:
             raise BackendError(result.get('text', 'Unknown Error'))
