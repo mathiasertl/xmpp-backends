@@ -32,7 +32,9 @@ pip install xmpp-backends
 
 ### 0.3 (to be released)
 
-* Add the ``stats`` and ``get_last_activity`` commands.
+* Add the `stats` and `get_last_activity` commands.
+* Implement ``block_user`` for ejabberd backends using the `ban_account`
+  command.
 
 ### 0.2.1 (2016-09-03)
 
