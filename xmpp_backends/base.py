@@ -80,26 +80,37 @@ class XmppBackendBase(object):
         """Helper function that gets a random password.
 
         :param length: The length of the random password.
+        :type  length: int
         :param  chars: A string with characters to choose from. Defaults to all
             ASCII letters and digits.
+        :type   chars: str
         """
         if chars is None:
             chars = string.ascii_letters + string.digits
         return ''.join(random.choice(chars) for x in range(length))
 
     def user_exists(self, username, domain):
-        """Return `True` if the user exists, `False` otherwise."""
+        """Verify that the given user exists.
+
+        :param username: The username of the user.
+        :type  username: str
+        :param   domain: The domain of the user.
+        :type    domain: str
+        :return: ``True`` if the user exists, ``False`` if not.
+        :rtype: bool
+        """
 
         raise NotImplementedError
 
     def create_user(self, username, domain, password, email=None):
         """Create a new user.
 
-        :param    username: The username of the new user.
-        :param      domain: The selected domain, may be any domain provided
-                            in :ref:`settings-XMPP_HOSTS`.
-        :param    password: The password of the new user.
-        :param       email: The email address provided by the user.
+        :param username: The username of the new user.
+        :type  username: str
+        :param   domain: The domain of the new user.
+        :type    domain: str
+        :param password: The password of the new user.
+        :param    email: The email address provided by the user.
         """
         raise NotImplementedError
 
@@ -113,9 +124,10 @@ class XmppBackendBase(object):
         The default implementation calls :py:func:`~xmpp_backends.base.XmppBackendBase.create` with
         a random password.
 
-        :param username: The username of the new user.
-        :param   domain: The selected domain, may be any domain provided
-                         in :ref:`settings-XMPP_HOSTS`.
+        :param username: The username of the user.
+        :type  username: str
+        :param   domain: The domain of the user.
+        :type    domain: str
         :param    email: The email address provided by the user. Note that at this point it is not
                          confirmed. You are free to ignore this parameter.
         """
@@ -134,50 +146,72 @@ class XmppBackendBase(object):
     def check_password(self, username, domain, password):
         """Check the password of a user.
 
-        :param username: The username of the new user.
-        :param   domain: The selected domain, may be any domain provided
-                         in :ref:`settings-XMPP_HOSTS`.
+        :param username: The username of the user.
+        :type  username: str
+        :param   domain: The domain of the user.
+        :type    domain: str
         :param password: The password to check.
-        :return: ``True`` if the password is correct, ``False`` otherwise.
+        :type  password: str
+        :return: ``True`` if the password is correct, ``False`` if not.
+        :rtype: bool
         """
         raise NotImplementedError
 
     def set_password(self, username, domain, password):
         """Set the password of a user.
 
-        :param username: The username of the new user.
-        :param   domain: The selected domain, may be any domain provided
-                         in :ref:`settings-XMPP_HOSTS`.
+        :param username: The username of the user.
+        :type  username: str
+        :param   domain: The domain of the user.
+        :type    domain: str
         :param password: The password to set.
+        :type  password: str
         """
         raise NotImplementedError
 
     def get_last_activity(self, username, domain):
         """Get the last activity of the user.
 
-        :param  username: The username of the new user.
-        :param    domain: The selected domain, may be any domain provided
-                         in :ref:`settings-XMPP_HOSTS`.
+        :param username: The username of the user.
+        :type  username: str
+        :param   domain: The domain of the user.
+        :type    domain: str
         :return: A tuple with the timestamp and last status.
+        :rtype: tuple
         """
         raise NotImplementedError
 
     def set_last_activity(self, username, domain, status, timestamp=None):
         """Set the last activity of the user.
 
-        :param  username: The username of the new user.
-        :param    domain: The selected domain, may be any domain provided
-                         in :ref:`settings-XMPP_HOSTS`.
+        .. NOTE::
+
+            When implementing a backend, make sure that you also handle ``float`` values for the
+            ``timestamp`` parameter correctly.
+
+
+        :param  username: The username of the user.
+        :type   username: str
+        :param    domain: The domain of the user.
+        :type     domain: str
         :param    status: The status text.
-        :param timestamp: The timestamp as returned by `time.time()`. If omitted, the current time
-            is used.
+        :type     status: str
+        :param timestamp: The timestamp as returned by ``time.time()``. If omitted, the current
+                          time is used.
+        :type  timestamp: int
         """
         raise NotImplementedError
 
     def block_user(self, username, domain):
-        """Called when a user is blocked.
+        """Block the specified user.
 
-        The default implementation calls :py:func:`set_password` with a random password.
+        The default implementation calls
+        :py:func:`~xmpp_backends.base.XmppBackendBase.set_password` with a random password.
+
+        :param username: The username of the user.
+        :type  username: str
+        :param   domain: The domain of the user.
+        :type    domain: str
         """
         self.set_password(username, domain, self.get_random_password())
 
@@ -186,7 +220,15 @@ class XmppBackendBase(object):
         raise NotImplementedError
 
     def check_email(self, username, domain, email):
-        """Check the email address of a user."""
+        """Check the email address of a user.
+
+        **Note:** Most backends don't implement this feature.
+
+        :param username: The username of the user.
+        :type  username: str
+        :param   domain: The domain of the user.
+        :type    domain: str
+        """
         raise NotImplementedError
 
     def expire_reservation(self, username, domain):
@@ -195,19 +237,34 @@ class XmppBackendBase(object):
         This method is called when a reservation expires. The default implementation just calls
         :py:func:`~backends.base.XmppBackendBase.remove`. This is fine if you do not override
         :py:func:`~backends.base.XmppBackendBase.reserve`.
+
+        :param username: The username of the user.
+        :type  username: str
+        :param   domain: The domain of the user.
+        :type    domain: str
         """
         self.remove(username, domain)
 
     def message_user(self, username, domain, subject, message):
-        """Send a message to the given user."""
+        """Send a message to the given user.
+
+        :param username: The username of the user.
+        :type  username: str
+        :param   domain: The domain of the user.
+        :type    domain: str
+        :param  subject: The subject of the message.
+        :param  message: The content of the message.
+        """
         pass
 
     def all_users(self, domain):
         """Get all users for a given domain.
 
         :param   domain: The domain of interest.
-        :returns: A set of all users. The usernames do not include the domain, so
-            `user@example.com` will just be `user`.
+        :type    domain: str
+        :return: A set of all users. The usernames do not include the domain, so
+                 ``user@example.com`` will just be ``"user"``.
+        :rtype: set of str
         """
         raise NotImplementedError
 
@@ -217,8 +274,9 @@ class XmppBackendBase(object):
         This method is called when the user explicitly wants to remove her/his account.
 
         :param username: The username of the new user.
-        :param   domain: The domainname selected, may be any domainname
-                         provided in :ref:`settings-XMPP_HOSTS`.
+        :type  username: str
+        :param   domain: The domain of the user.
+        :type    domain: str
         """
         raise NotImplementedError
 
@@ -229,7 +287,11 @@ class XmppBackendBase(object):
         ``"online_users"``. The specific backend might support additional stats.
 
         :param stat: The value of the statistic.
+        :type  stat: str
         :param domain: Limit statistic to the given domain. If not listed, give statistics
                        about all users.
+        :type  domain: str
+        :return: The current value of the requested statistic.
+        :rtype: int
         """
         raise NotImplementedError

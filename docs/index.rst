@@ -11,6 +11,7 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
+   xmpp_backends/base
 
 
 Indices and tables
