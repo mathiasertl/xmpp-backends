@@ -129,7 +129,7 @@ class EjabberdXMLRPCBackend(XmppBackendBase):
             raise BackendError(result.get('text', 'Unknown Error'))
 
     def get_last_activity(self, username, domain):
-        result = self.rpc('get_last', username, domain)
+        result = self.rpc('get_last', user=username, host=domain)
 
         if result['res'] != 0:
             raise BackendError(result['res'])
