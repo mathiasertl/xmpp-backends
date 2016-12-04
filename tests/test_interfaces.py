@@ -17,6 +17,7 @@ import inspect
 import unittest
 
 from xmpp_backends.base import XmppBackendBase
+from xmpp_backends.ejabberd_rest import EjabberdRestBackend
 from xmpp_backends.ejabberd_xmlrpc import EjabberdXMLRPCBackend
 from xmpp_backends.ejabberdctl import EjabberdctlBackend
 from xmpp_backends.dummy import DummyBackend
@@ -47,21 +48,27 @@ class TestInterfaces(unittest.TestCase):
 class TestImplemented(unittest.TestCase):
     not_implemented = [
         'all_users',
+        'block_user',
         'check_email',
         'check_password',
         'create_user',
+        'get_last_activity',
         'remove_user',
         'set_email',
         'set_last_activity',
         'set_password',
+        'stats',
         'user_exists',
     ]
 
     def assertOverwritten(self, subclass):
         for name in self.not_implemented:
             self.assertNotEqual(getattr(XmppBackendBase, name).__func__,
-                             getattr(subclass, name).__func__,
-                             "%s.%s: Function is not overwritten." % (subclass.__name__, name))
+                                getattr(subclass, name).__func__,
+                                "%s.%s: Function is not overwritten." % (subclass.__name__, name))
+
+    def test_ejabberd_rest(self):
+        self.assertOverwritten(EjabberdRestBackend)
 
     def test_ejabberd_xmlrpc(self):
         self.assertOverwritten(EjabberdXMLRPCBackend)
