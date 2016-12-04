@@ -36,12 +36,18 @@ class XmppBackendUser(AbstractBaseUser):
         return xmpp_backend.user_exists(self.node, self.domain)
 
     def set_password(self, raw_password):
+        """Calls :py:func:`~xmpp_backends.base.XmppBackendBase.set_password` for the user.
+
+        If password is ``None``, calls
+        :py:func:`~xmpp_backends.base.XmppBackendBase.set_unusable_password`.
+        """
         if raw_password is None:
             self.set_unusable_password()
         else:
             xmpp_backend.set_password(self.node, self.domain, raw_password)
 
     def check_password(self, raw_password):
+        """Calls :py:func:`~xmpp_backends.base.XmppBackendBase.check_password` for the user."""
         return xmpp_backend.check_password(self.node, self.domain, raw_password)
 
     def set_unusable_password(self):
@@ -50,12 +56,30 @@ class XmppBackendUser(AbstractBaseUser):
         xmpp_backend.block_user(self.node, self.domain)
 
     def get_short_name(self):
+        """An alias for ``node``."""
+
         return self.node
 
     @property
     def node(self):
+        """The node-part of the username.
+
+        Example::
+
+            >>> u = XmppBackendUser(username='user@example.com')
+            >>> u.node
+            'user'
+        """
         return self.get_username().split('@', 1)[0]
 
     @property
     def domain(self):
+        """The domain-part of the username.
+
+        Example::
+
+            >>> u = XmppBackendUser(username='user@example.com')
+            >>> u.domain
+            'example.com'
+        """
         return self.get_username().split('@', 1)[1]
