@@ -212,9 +212,9 @@ class XmppBackendBase(object):
 
         .. NOTE::
 
-            When implementing a backend, make sure that you also handle ``float`` values for the
-            ``timestamp`` parameter correctly.
-
+           If your backend requires a Unix timestamp (seconds since 1970-01-01), you can use the
+           :py:func:`~xmpp_backends.base.XmppBackendBase.datetime_to_timestamp` convenience
+           function to convert it to an integer.
 
         :param  username: The username of the user.
         :type   username: str
@@ -222,9 +222,10 @@ class XmppBackendBase(object):
         :type     domain: str
         :param    status: The status text.
         :type     status: str
-        :param timestamp: The timestamp as returned by ``time.time()``. If omitted, the current
-                          time is used.
-        :type  timestamp: int
+        :param timestamp: A datetime object representing the last activity. If the object is not
+            timezone-aware, assume UTC. If ``timestamp`` is ``None``, assume the current date and
+            time.
+        :type  timestamp: datetime
         """
         raise NotImplementedError
 
