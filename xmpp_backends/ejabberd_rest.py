@@ -63,7 +63,7 @@ class EjabberdRestBackend(XmppBackendBase):
     """
     credentials = None
 
-    def __init__(self, uri='http://127.0.0.1:5280/api/', **kwargs):
+    def __init__(self, uri='http://127.0.0.1:5280/api/', user=None, password=None, **kwargs):
         super(EjabberdRestBackend, self).__init__()
 
         if not uri.endswith('/'):
@@ -73,6 +73,8 @@ class EjabberdRestBackend(XmppBackendBase):
         self.kwargs = kwargs
         self.headers = kwargs.pop('headers', {})
         self.headers.setdefault('X-Admin', 'true')
+        if user:
+            self.kwargs['auth'] = (user, password)
 
     def post(self, cmd, allowed_status=None, **payload):
         if allowed_status is None:
