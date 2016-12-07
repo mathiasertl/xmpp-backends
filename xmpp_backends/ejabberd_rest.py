@@ -81,6 +81,7 @@ class EjabberdRestBackend(XmppBackendBase):
             allowed_status = [200]
 
         uri = '%s%s' % (self.uri, cmd)
+        print(self.kwargs)
         response = requests.post(uri, json=payload, headers=self.headers, **self.kwargs)
         print('### HTTP %s: %s' % (response.status_code, response.content))
 
