@@ -16,7 +16,6 @@
 from __future__ import unicode_literals
 
 import logging
-import time
 
 from datetime import datetime
 
@@ -119,9 +118,7 @@ class EjabberdRestBackend(XmppBackendBase):
         return datetime.strptime(result[:19], '%Y-%m-%d %H:%M:%S')
 
     def set_last_activity(self, username, domain, status, timestamp=None):
-        if timestamp is None:
-            timestamp = int(time.time())
-
+        timestamp = self.datetime_to_timestamp(timestamp)
         self.post('set_last', user=username, host=domain, timestamp=timestamp, status=status)
 
     def user_exists(self, username, domain):

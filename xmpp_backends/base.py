@@ -201,12 +201,15 @@ class XmppBackendBase(object):
     def get_last_activity(self, username, domain):
         """Get the last activity of the user.
 
+        The datetime object returned should be a naive datetime object representing the time in
+        UTC.
+
         :param username: The username of the user.
         :type  username: str
         :param   domain: The domain of the user.
         :type    domain: str
-        :return: A tuple with the timestamp and last status.
-        :rtype: tuple
+        :return: A naive datetime object in UTC representing the last activity.
+        :rtype: datetime
         """
         raise NotImplementedError
 

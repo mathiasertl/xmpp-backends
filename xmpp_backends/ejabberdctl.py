@@ -16,7 +16,6 @@
 from __future__ import unicode_literals
 
 import logging
-import time
 
 from datetime import datetime
 from subprocess import PIPE
@@ -103,9 +102,7 @@ class EjabberdctlBackend(XmppBackendBase):
             return datetime.strptime(out, '%Y-%m-%d %H:%M:%S')
 
     def set_last_activity(self, username, domain, status, timestamp=None):
-        if timestamp is None:
-            timestamp = int(time.time())
-
+        timestamp = self.datetime_to_timestamp(timestamp)
         self.ctl('set_last', username, domain, timestamp, status)
 
     def block_user(self, username, domain):
