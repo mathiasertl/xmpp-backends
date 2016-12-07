@@ -1,3 +1,4 @@
 {
-    "auth": ["api@example.com", "example"]
+    "user": "api@example.com", 
+    "password": "example"
 }
