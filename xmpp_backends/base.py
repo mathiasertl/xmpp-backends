@@ -17,8 +17,9 @@
 
 from __future__ import unicode_literals
 
-import string
 import random
+import string
+import time
 
 from datetime import datetime
 from importlib import import_module
@@ -87,11 +88,13 @@ class XmppBackendBase(object):
 
         Note that the function always returns an int, even in Python 3.
 
-        :param dt: The datetime object to convert.
+        :param dt: The datetime object to convert. If ``None``, returns the current time.
         :type  dt: datetime
         :return: The seconds in UTC.
         :rtype: int
         """
+        if dt is None:
+            return int(time.time())
 
         if six.PY3:
             return int(dt.timestamp())
