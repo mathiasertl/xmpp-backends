@@ -20,7 +20,10 @@ from __future__ import unicode_literals
 import string
 import random
 
+from datetime import datetime
 from importlib import import_module
+
+import six
 
 
 class BackendError(Exception):
@@ -75,6 +78,27 @@ class XmppBackendBase(object):
                 raise ValueError("Couldn't load %s backend library" % cls_name)
 
         return self._module
+
+    def datetime_to_timestamp(self, dt):
+        """Helper function to convert a datetime object to a timestamp.
+
+        In Python 3, this just calls ``datetime.timestamp()`, in Python 2, it substracts any
+        timezone offset and returns the difference since 1970-01-01 00:00:00.
+
+        Note that the function always returns an int, even in Python 3.
+
+        :param dt: The datetime object to convert.
+        :type  dt: datetime
+        :return: The seconds in UTC.
+        :rtype: int
+        """
+
+        if six.PY3:
+            return int(dt.timestamp())
+        else:
+            if dt.tzinfo:
+                dt = dt.replace(tzinfo=None) - dt.utcoffset()
+            return (dt - datetime(1970, 1, 1)).total_seconds()
 
     def get_random_password(self, length=32, chars=None):
         """Helper function that gets a random password.
