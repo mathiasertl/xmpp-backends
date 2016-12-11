@@ -20,10 +20,11 @@ config_path = args.config or os.path.join('config', '%s.json' % mod.__name__.rsp
 with open(config_path) as stream:
     config = json.load(stream)
 
-backend = cls(**config)
+backend = cls(**config.get('kwargs', {}))
 
 # no initial users
-assert backend.all_users(args.domain) == [], 'Found initial users.'
+expected = config['expected_users']
+assert backend.all_users(args.domain) == expected, 'Found initial users.'
 
 # Create a user
 username, password, new_password = 'user1', 'password', 'new_password'
@@ -43,4 +44,4 @@ assert backend.get_last_activity(username, args.domain, now) == now
 
 # Remove user, verify that it's gone
 backend.remove_user(args.username, args.domain)
-assert backend.all_users(args.domain) == []
+assert backend.all_users(args.domain) == expected

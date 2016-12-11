@@ -1,4 +1,7 @@
 {
-    "user": "api@example.com", 
-    "password": "example"
+    "expected_users": ["api"],
+    "kwargs": {
+        "user": "api@example.com", 
+        "password": "example"
+    }
 }
