@@ -130,16 +130,13 @@ class EjabberdXMLRPCBackend(XmppBackendBase):
     def get_last_activity(self, username, domain):
         result = self.rpc('get_last', user=username, host=domain)
 
-        if result['res'] != 0:
-            raise BackendError(result['res'])
-
         activity = result['last_activity']
         if activity == 'Online':
             return datetime.utcnow()
         elif activity == 'Never':
             return None
         else:
-            return datetime.strptime(activity, '%Y-%m-%d %H:%M:%S')
+            return datetime.strptime(activity[:19], '%Y-%m-%d %H:%M:%S')
 
     def set_last_activity(self, username, domain, status, timestamp=None):
         timestamp = self.datetime_to_timestamp(timestamp)
