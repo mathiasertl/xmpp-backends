@@ -101,7 +101,7 @@ class XmppBackendBase(object):
         else:
             if dt.tzinfo:
                 dt = dt.replace(tzinfo=None) - dt.utcoffset()
-            return (dt - datetime(1970, 1, 1)).total_seconds()
+            return int((dt - datetime(1970, 1, 1)).total_seconds())
 
     def get_random_password(self, length=32, chars=None):
         """Helper function that gets a random password.
