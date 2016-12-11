@@ -177,7 +177,7 @@ class EjabberdRestBackend(XmppBackendBase):
         self.post('send_message', **kwargs)
 
     def all_users(self, domain):
-        return self.post('registered_users', host=domain).json()
+        return set(self.post('registered_users', host=domain).json())
 
     def remove_user(self, username, domain):
         response = self.post('unregister', user=username, host=domain)
