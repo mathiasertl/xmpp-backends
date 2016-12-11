@@ -44,7 +44,8 @@ assert not backend.check_password(username, args.domain, password)
 # set last activity
 now = datetime.utcnow()
 backend.set_last_activity(username, args.domain, 'whatever', now)
-assert backend.get_last_activity(username, args.domain, now) == now
+got = backend.get_last_activity(username, args.domain)
+assert got == now, 'Last activity changed: %s -> %s' % (now, got)
 
 # Remove user, verify that it's gone
 backend.remove_user(args.username, args.domain)
