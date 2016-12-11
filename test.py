@@ -31,7 +31,7 @@ assert got == expected, 'Found initial users: %s vs %s' % (got, expected)
 username, password, new_password = 'user1', 'password', 'new_password'
 backend.create_user(username, args.domain, password, 'user@example.net')
 got = backend.all_users(args.domain)
-expected2 = {'user1', } & expected
+expected2 = {'user1', } | expected
 assert got == expected2, 'Did not find correct users: %s vs %s' % (got, expected2)
 assert backend.check_password(username, args.domain, password)
 
