@@ -48,6 +48,6 @@ got = backend.get_last_activity(username, args.domain)
 assert got == now, 'Last activity changed: %s -> %s' % (now, got)
 
 # Remove user, verify that it's gone
-backend.remove_user(args.username, args.domain)
+backend.remove_user(username, args.domain)
 got = backend.all_users(args.domain)
 assert got == expected
