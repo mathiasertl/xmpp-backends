@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 
 import argparse
-import datetime
 import importlib
 import json
 import os
+
+from datetime import datetime
 
 parser = argparse.ArgumentParser('Testscript for testing a backend.')
 parser.add_argument('-c', '--config', help='Path to configuration file.')
