@@ -28,8 +28,13 @@ expected = set(config['expected_users'])
 got = backend.all_users(args.domain)
 assert got == expected, 'Found initial users: %s vs %s' % (got, expected)
 
-# Create a user
+# userdata
 username, password, new_password = 'user1', 'password', 'new_password'
+
+# check that the user doesn't exist
+assert backend.user_exists(username, args.domain) is False
+
+# Create a user
 backend.create_user(username, args.domain, password, 'user@example.net')
 got = backend.all_users(args.domain)
 expected2 = {'user1', } | expected
@@ -46,6 +51,15 @@ now = datetime.utcnow().replace(microsecond=0)
 backend.set_last_activity(username, args.domain, 'whatever', now)
 got = backend.get_last_activity(username, args.domain)
 assert got == now, 'Last activity changed: %s -> %s' % (now, got)
+
+# check that the user exists
+assert backend.user_exists(username, args.domain) is True
+
+# check some stats
+assert backend.stats('registered_users') == len(expected2)
+assert backend.stats('registered_users', 'example.com') == len(expected2)
+assert backend.stats('online_users') == 0
+assert backend.stats('online_users', 'example.com') == 0
 
 # Remove user, verify that it's gone
 backend.remove_user(username, args.domain)
