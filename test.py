@@ -42,7 +42,7 @@ assert backend.check_password(username, args.domain, new_password)
 assert not backend.check_password(username, args.domain, password)
 
 # set last activity
-now = datetime.utcnow()
+now = datetime.utcnow().replace(microsecond=0)
 backend.set_last_activity(username, args.domain, 'whatever', now)
 got = backend.get_last_activity(username, args.domain)
 assert got == now, 'Last activity changed: %s -> %s' % (now, got)
