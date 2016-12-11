@@ -29,7 +29,7 @@ assert backend.all_users(args.domain) == expected, 'Found initial users.'
 # Create a user
 username, password, new_password = 'user1', 'password', 'new_password'
 backend.create_user(username, args.domain, password, 'user@example.net')
-assert backend.all_users(args.domain) == ['user1'], 'Did not find correct users'
+assert backend.all_users(args.domain) == {'user1', }, 'Did not find correct users'
 assert backend.check_password(username, args.domain, password)
 
 # set a new password
