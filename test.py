@@ -24,12 +24,15 @@ backend = cls(**config.get('kwargs', {}))
 
 # no initial users
 expected = set(config['expected_users'])
-assert backend.all_users(args.domain) == expected, 'Found initial users.'
+got = backend.all_users(args.domain)
+assert got == expected, 'Found initial users: %s vs %s' % (got, expected)
 
 # Create a user
 username, password, new_password = 'user1', 'password', 'new_password'
 backend.create_user(username, args.domain, password, 'user@example.net')
-assert backend.all_users(args.domain) == {'user1', }, 'Did not find correct users'
+got = backend.all_users(args.domain)
+expected2 = {'user1', } + expected
+assert got == expected2, 'Did not find correct users: %s vs %s' % (got, expected2)
 assert backend.check_password(username, args.domain, password)
 
 # set a new password
@@ -44,4 +47,5 @@ assert backend.get_last_activity(username, args.domain, now) == now
 
 # Remove user, verify that it's gone
 backend.remove_user(args.username, args.domain)
-assert backend.all_users(args.domain) == expected
+got = ackend.all_users(args.domain)
+assert got == expected
