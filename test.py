@@ -23,13 +23,13 @@ with open(config_path) as stream:
 backend = cls(**config.get('kwargs', {}))
 
 # no initial users
-expected = config['expected_users']
+expected = set(config['expected_users'])
 assert backend.all_users(args.domain) == expected, 'Found initial users.'
 
 # Create a user
 username, password, new_password = 'user1', 'password', 'new_password'
 backend.create_user(username, args.domain, password, 'user@example.net')
-assert backend.all_users(args.domain) == ['user1'], 'Did not find correct users.'
+assert backend.all_users(args.domain) == ['user1'], 'Did not find correct users'
 assert backend.check_password(username, args.domain, password)
 
 # set a new password
