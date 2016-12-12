@@ -4,6 +4,7 @@ import argparse
 import importlib
 import json
 import os
+import time
 
 from datetime import datetime
 
@@ -88,8 +89,13 @@ bot = TestBot(jid, new_password)
 print('Connecting...')
 if bot.connect(address=(args.host, args.port, )):
     print('Connected')
-    bot.process(block=True)
+    bot.process(block=False)
     print('Processed.')
+
+time.sleep(1)
+
+assert backend.stats('online_users') == 1
+assert backend.stats('online_users', 'example.com') == 1
 
 # Remove user, verify that it's gone
 backend.remove_user(username, args.domain)
