@@ -43,6 +43,51 @@ class DummyBackend(XmppBackendBase):
         user = '%s@%s' % (username, domain)
         return self.module.get(user) is not None
 
+    def user_sessions(self, username, domain):
+        user = '%s@%s' % (username, domain)
+        return self.module.get(user).get('sessions', [])
+
+    def start_user_session(self, username, domain, resource, ip='127.0.0.1', priority=0,
+                           started=None, status='available', statustext=''):
+        """Method to add a user session for debugging.
+
+                :param username: The username of the user.
+        :type    username: str
+        :param     domain: The domain of the user.
+        :type      domain: str
+        :param   resource: The resource for the connection. This identifies the session.
+        :param         ip: The IP the user connects from, defaults to ``"127.0.0.1"``.
+        :type          ip: str
+        :param   priority: The priority of the connection, defaults to ``0``.
+        :type    priority: int
+        :param    started: When the connection was started, defaults to "now".
+        :type     started: datetime
+        :param     status: The status used, defaults to ``"available"``.
+        :param statustext: The status text, defaults to ``""``.
+        """
+
+        if started is None:
+            started = datetime.utcnow()
+
+        user = '%s@%s' % (username, domain)
+        data = self.module.get(user)
+        sessions = data.get('sessions', [])
+
+        sessions.append({
+            'ip': ip,
+            'priority': priority,
+            'started': started,
+            'status': status,
+            'resource': resource,
+            'statustext': statustext,
+        })
+
+    def stop_user_session(self, username, domain, resource, reason=''):
+        user = '%s@%s' % (username, domain)
+        data = self.module.get(user)
+        data['sessions'] = [d for d in data.get('sessions', []) if d['resource'] != resource]
+        self.module.set(user, data)
+
     def create_user(self, username, domain, password, email=None):
         user = '%s@%s' % (username, domain)
         log.debug('Create user: %s (%s)', user, password)
@@ -52,6 +97,7 @@ class DummyBackend(XmppBackendBase):
             data = {
                 'pass': password,
                 'last_status': (time.time(), 'Registered'),
+                'sessions': [],
             }
             if email is not None:
                 data['email'] = email

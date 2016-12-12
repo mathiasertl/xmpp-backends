@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 import logging
 
 from datetime import datetime
+from datetime import timedelta
 from subprocess import PIPE
 from subprocess import Popen
 
@@ -71,6 +72,34 @@ class EjabberdctlBackend(XmppBackendBase):
             return False
         else:
             raise BackendError(code)  # TODO: 3 means nodedown.
+
+    def user_sessions(self, username, domain):
+        code, out, err = self.ctl('user_sessions_info', username, domain)
+        sessions = []
+
+        for line in out.splitlines():
+            statustext = ''
+            _c, ip, _p, prio, _n, uptime, status, resource = line.split(None, 7)
+            if ip.startswith('::FFFF:'):
+                ip = ip[7:]
+            started = datetime.utcnow() - timedelta(int(uptime))
+
+            if ' ' in resource:
+                resource, statustext = resource.split(None, 1)
+
+            sessions.append({
+                'ip': ip,
+                'priority': prio,
+                'resource': resource,
+                'started': started,
+                'status': status,
+                'statustext': statustext,
+            })
+
+        return sessions
+
+    def stop_user_session(self, username, domain, resource, reason=''):
+        self.ctl('kick_session', username, domain, resource, reason)
 
     def create_user(self, username, domain, password, email=None):
         code, out, err = self.ctl('register', username, domain, password)

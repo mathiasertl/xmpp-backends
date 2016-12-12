@@ -131,6 +131,15 @@ class EjabberdRestBackend(XmppBackendBase):
         else:
             raise BackendError('Unknown Error')
 
+    def user_sessions(self, username, domain):
+        response = self.post('user_sessions_info', user=username, host=domain)
+        return response
+
+    def stop_user_session(self, username, domain, resource, reason=''):
+        response = self.post('kick_session', user=username, host=domain, resource=resource,
+                             reason=reason)
+        return response
+
     def check_password(self, username, domain, password):
         response = self.post('check_password', user=username, host=domain, password=password)
         if response.content == b'0':

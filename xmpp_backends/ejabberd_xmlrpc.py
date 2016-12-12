@@ -151,6 +151,15 @@ class EjabberdXMLRPCBackend(XmppBackendBase):
         else:
             raise BackendError(result.get('text', 'Unknown Error'))
 
+    def user_sessions(self, username, domain):
+        result = self.rpc('user_sessions_info', user=username, host=domain)
+        return result
+
+    def stop_user_session(self, username, domain, resource, reason=''):
+        result = self.rpc('kick_session', user=username, host=domain, resource=resource,
+                          reason=reason)
+        return result
+
     def check_password(self, username, domain, password):
         result = self.rpc('check_password', user=username, host=domain, password=password)
         if result['res'] == 0:
