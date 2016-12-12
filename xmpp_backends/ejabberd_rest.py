@@ -135,7 +135,6 @@ class EjabberdRestBackend(XmppBackendBase):
     def user_sessions(self, username, domain):
         response = self.post('user_sessions_info', user=username, host=domain)
         data = response.json()
-        print('user_sessions: ', data)
         sessions = []
         for d in data:
             started = datetime.utcnow() - timedelta(seconds=d['uptime'])

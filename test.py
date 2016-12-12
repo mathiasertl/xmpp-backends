@@ -90,6 +90,7 @@ if bot.connect(address=(args.host, args.port, ), reattempt=False):
 
 time.sleep(1)
 
+# Now one user is online according to stats
 assert backend.stats('online_users') == 1
 assert backend.stats('online_users', 'example.com') == 1
 
@@ -101,6 +102,10 @@ assert got[0] == {'status': 'available', 'resource': 'resource', 'ip': '::1', 'p
 
 # stop the session again
 backend.stop_user_session(username, args.domain, 'resource')
+
+# Now we have 0 users online again
+assert backend.stats('online_users') == 0
+assert backend.stats('online_users', 'example.com') == 0
 
 # Remove user, verify that it's gone
 backend.remove_user(username, args.domain)

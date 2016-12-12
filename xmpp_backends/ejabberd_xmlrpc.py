@@ -154,7 +154,6 @@ class EjabberdXMLRPCBackend(XmppBackendBase):
 
     def user_sessions(self, username, domain):
         result = self.rpc('user_sessions_info', user=username, host=domain)
-        print('user_sessions: ', result)
         raw_sessions = result.get('sessions_info', [])
         sessions = []
         for data in raw_sessions:
@@ -163,7 +162,6 @@ class EjabberdXMLRPCBackend(XmppBackendBase):
             session = [d.items() for d in data['session']]
             session = dict([item for sublist in session for item in sublist])
 
-            print('session: %s' % session)
             started = datetime.utcnow() - timedelta(seconds=session['uptime'])
             sessions.append({
                 'ip': session['ip'],
