@@ -83,7 +83,7 @@ assert backend.stats('registered_users', 'example.com') == len(expected2)
 assert backend.stats('online_users') == 0
 assert backend.stats('online_users', 'example.com') == 0
 
-jid = '%s@%s' % (username, args.domain)
+jid = '%s@%s/resource' % (username, args.domain)
 print('Calling bot...')
 bot = TestBot(jid, new_password)
 print('Connecting...')
@@ -98,8 +98,12 @@ assert backend.stats('online_users') == 1
 assert backend.stats('online_users', 'example.com') == 1
 
 got = backend.user_sessions(username, args.domain)
-started = got.pop('started')
+assert len(got) == 1, got
+started = got[0].pop('started')
 print(backend.user_sessions(username, args.domain))
+
+# stop the session again
+backend.stop_user_session(username, args.domain, 'resource')
 
 # Remove user, verify that it's gone
 backend.remove_user(username, args.domain)
