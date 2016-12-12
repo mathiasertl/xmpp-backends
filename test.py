@@ -74,12 +74,12 @@ assert got == [], got
 
 # check some stats
 got = backend.stats('registered_users')
-assert got == len(expected2), expected2
+assert got == len(expected2), got
 assert backend.stats('registered_users', 'example.com') == len(expected2)
 assert backend.stats('online_users') == 0
 assert backend.stats('online_users', 'example.com') == 0
 
-jid = '%s@%s' % (args.username, args.domain)
+jid = '%s@%s' % (username, args.domain)
 print('Calling bot...')
 bot = TestBot(jid, new_password)
 print('Connecting...')
