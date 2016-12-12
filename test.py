@@ -7,6 +7,19 @@ import os
 
 from datetime import datetime
 
+import sleekxmpp
+
+
+class TestBot(sleekxmpp.ClientXMPP):
+    def __init__(self, jid, password):
+        sleekxmpp.ClientXMPP.__init__(self, jid, password)
+        self.add_event_handler("session_start", self.start)
+
+    def start(self, event):
+        self.send_presence()
+        self.get_roster()
+
+
 parser = argparse.ArgumentParser('Testscript for testing a backend.')
 parser.add_argument('-c', '--config', help='Path to configuration file.')
 parser.add_argument('-d', '--domain', default='example.com', help='Test-domain to use.')
@@ -64,6 +77,15 @@ assert backend.stats('registered_users') == len(expected2)
 assert backend.stats('registered_users', 'example.com') == len(expected2)
 assert backend.stats('online_users') == 0
 assert backend.stats('online_users', 'example.com') == 0
+
+jid = '%s@%s' % (args.username, args.domain)
+print('Calling bot...')
+bot = TestBot(jid, new_password)
+print('Connecting...')
+if bot.connect():
+    print('Connected')
+    bot.process(block=True)
+    print('Processed.')
 
 # Remove user, verify that it's gone
 backend.remove_user(username, args.domain)
