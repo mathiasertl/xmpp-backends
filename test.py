@@ -97,6 +97,8 @@ time.sleep(1)
 assert backend.stats('online_users') == 1
 assert backend.stats('online_users', 'example.com') == 1
 
+print(backend.user_sessions(username, args.domain))
+
 # Remove user, verify that it's gone
 backend.remove_user(username, args.domain)
 got = backend.all_users(args.domain)
