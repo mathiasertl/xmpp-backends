@@ -129,6 +129,49 @@ class XmppBackendBase(object):
 
         raise NotImplementedError
 
+    def user_sessions(self, username, domain):
+        """Get a list of user sessions.
+
+        The function returns a list of dictionaries each describing a presence connection.
+
+        ========== ===============================================================================
+        key        Description
+        ========== ===============================================================================
+        ip         The IP the user is connected with, as a ``str``.
+        priority   The users priority, an ``int``.
+        started    When the session was started, a ``datetime`` in the UTC timezone.
+        status     The current status, e.g. ``"available"``.
+        resource   The resource used in the connection.
+        statustext The status text, if any. If the user does not have a presence text, the value
+                   is an empty string.
+        ========== ===============================================================================
+
+        :param username: The username of the user.
+        :type  username: str
+        :param   domain: The domain of the user.
+        :type    domain: str
+        :return: A list of connections, each list element is a dictionary with the keys ``"ip"``,
+            ``"priority"``, ``"uptime"``, ``"status"``, ``"resource"`` and ``"statustext"``.
+            See above for more information.
+        """
+
+        raise NotImplementedError
+
+    def stop_user_session(self, username, domain, resource, reason=''):
+        """Stop a specific user session, identified by its resource.
+
+        A resource uniquely identifies a connection by a specific client.
+
+        :param   username: The username of the user.
+        :type    username: str
+        :param     domain: The domain of the user.
+        :type      domain: str
+        :param   resource: The resource of the connection
+        :type    resource: str
+        """
+
+        raise NotImplementedError
+
     def create_user(self, username, domain, password, email=None):
         """Create a new user.
 

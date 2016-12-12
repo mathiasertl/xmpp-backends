@@ -35,7 +35,8 @@ pip install xmpp-backends
 * Move
   [django-xmpp-backends](https://github.com/mathiasertl/django-xmpp-backends)
   to the `xmpp_backends.django` module.
-* Add the `stats` and `get_last_activity` commands.
+* Add new commands: `stats`, `get_last_activity`, `user_sessions` and
+  `stop_user_session`.
 * Implement ``block_user`` for ejabberd backends using the `ban_account`
   command.
 
