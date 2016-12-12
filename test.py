@@ -24,7 +24,7 @@ parser = argparse.ArgumentParser('Testscript for testing a backend.')
 parser.add_argument('-c', '--config', help='Path to configuration file.')
 parser.add_argument('-d', '--domain', default='example.com', help='Test-domain to use.')
 parser.add_argument('--host', default='localhost', help='Host for the client to connect to.')
-parser.add_argument('-p', '--porthost', type=int, default=5222,
+parser.add_argument('-p', '--port', type=int, default=5222,
                     help='Port for the client to connect to.')
 parser.add_argument('backend', help='Backend to use.')
 args = parser.parse_args()
