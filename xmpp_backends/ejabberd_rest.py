@@ -13,17 +13,18 @@
 # You should have received a copy of the GNU General Public License along with xmpp-backends.  If
 # not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import unicode_literals
+from __future__ import unicode_literals, absolute_import
 
 import logging
 
 from datetime import datetime
+from datetime import timedelta
 
 import requests
 
-from xmpp_backends.base import XmppBackendBase  # NOQA
-from xmpp_backends.base import BackendError  # NOQA
-from xmpp_backends.base import UserExists  # NOQA
+from .base import XmppBackendBase
+from .base import BackendError
+from .base import UserExists
 
 log = logging.getLogger(__name__)
 
@@ -134,7 +135,19 @@ class EjabberdRestBackend(XmppBackendBase):
     def user_sessions(self, username, domain):
         response = self.post('user_sessions_info', user=username, host=domain)
         data = response.json()
-        return data
+        print('user_sessions: ', data)
+        sessions = []
+        for d in data:
+            started = datetime.utcnow() - timedelta(seconds=d['started'])
+            sessions.append({
+                'ip': d['ip'],
+                'priority': d['priority'],
+                'started': started,
+                'status': d['status'],
+                'resource': d['resource'],
+                'statustext': d['statustext'],
+            })
+        return sessions
 
     def stop_user_session(self, username, domain, resource, reason=''):
         response = self.post('kick_session', user=username, host=domain, resource=resource,

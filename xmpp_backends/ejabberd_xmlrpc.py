@@ -19,6 +19,7 @@ import logging
 import socket
 
 from datetime import datetime
+from datetime import timedelta
 
 import six
 
@@ -153,7 +154,21 @@ class EjabberdXMLRPCBackend(XmppBackendBase):
 
     def user_sessions(self, username, domain):
         result = self.rpc('user_sessions_info', user=username, host=domain)
-        return result.get('sessions_info', [])
+        print('user_sessions: ', result)
+        raw_sessions = result.get('sessions_info', [])
+        sessions = []
+        for data in raw_sessions:
+            session = data['session']
+            started = datetime.utcnow() - timedelta(seconds=session['uptime'])
+            sessions.append({
+                'ip': session['ip'],
+                'priority': session['priority'],
+                'started': started,
+                'status': session['status'],
+                'resource': session['resource'],
+                'statustext': session['statustext'],
+            })
+        return sessions
 
     def stop_user_session(self, username, domain, resource, reason=''):
         result = self.rpc('kick_session', user=username, host=domain, resource=resource,
