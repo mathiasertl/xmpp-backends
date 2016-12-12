@@ -100,7 +100,9 @@ assert backend.stats('online_users', 'example.com') == 1
 got = backend.user_sessions(username, args.domain)
 assert len(got) == 1, got
 started = got[0].pop('started')
-print(backend.user_sessions(username, args.domain))
+print(got[0])
+assert got[0] == {'status': 'available', 'resource': 'resource', 'ip': '::1', 'priority': 0,
+                  'statustext': ''}
 
 # stop the session again
 backend.stop_user_session(username, args.domain, 'resource')
