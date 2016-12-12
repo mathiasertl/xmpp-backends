@@ -158,7 +158,7 @@ class EjabberdXMLRPCBackend(XmppBackendBase):
         raw_sessions = result.get('sessions_info', [])
         sessions = []
         for data in raw_sessions:
-            session = data['session']
+            session = data['session'][0]
             print('session: %s' % session)
             started = datetime.utcnow() - timedelta(seconds=session['uptime'])
             sessions.append({
