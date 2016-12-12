@@ -56,7 +56,7 @@ assert got == now, 'Last activity changed: %s -> %s' % (now, got)
 assert backend.user_exists(username, args.domain) is True
 
 # check that there are no sessions
-got = backend.user_sessions(username, args.domain)
+got = backend.user_sessions(username, args.domain), got
 assert got == []
 
 # check some stats

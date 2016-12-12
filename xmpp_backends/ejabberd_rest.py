@@ -133,7 +133,8 @@ class EjabberdRestBackend(XmppBackendBase):
 
     def user_sessions(self, username, domain):
         response = self.post('user_sessions_info', user=username, host=domain)
-        return response
+        data = response.json()
+        return data
 
     def stop_user_session(self, username, domain, resource, reason=''):
         response = self.post('kick_session', user=username, host=domain, resource=resource,

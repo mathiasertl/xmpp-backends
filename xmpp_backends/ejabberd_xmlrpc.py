@@ -153,7 +153,7 @@ class EjabberdXMLRPCBackend(XmppBackendBase):
 
     def user_sessions(self, username, domain):
         result = self.rpc('user_sessions_info', user=username, host=domain)
-        return result
+        return result.get('sessions_info', [])
 
     def stop_user_session(self, username, domain, resource, reason=''):
         result = self.rpc('kick_session', user=username, host=domain, resource=resource,
