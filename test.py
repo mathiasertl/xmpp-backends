@@ -87,7 +87,7 @@ jid = '%s@%s' % (username, args.domain)
 print('Calling bot...')
 bot = TestBot(jid, new_password)
 print('Connecting...')
-if bot.connect(address=(args.host, args.port, )):
+if bot.connect(address=(args.host, args.port, ), reattempt=False):
     print('Connected')
     bot.process(block=False)
     print('Processed.')
@@ -97,6 +97,8 @@ time.sleep(1)
 assert backend.stats('online_users') == 1
 assert backend.stats('online_users', 'example.com') == 1
 
+got = backend.user_sessions(username, args.domain)
+started = got.pop('started')
 print(backend.user_sessions(username, args.domain))
 
 # Remove user, verify that it's gone
