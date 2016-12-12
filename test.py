@@ -84,13 +84,9 @@ assert backend.stats('online_users') == 0
 assert backend.stats('online_users', 'example.com') == 0
 
 jid = '%s@%s/resource' % (username, args.domain)
-print('Calling bot...')
 bot = TestBot(jid, new_password)
-print('Connecting...')
 if bot.connect(address=(args.host, args.port, ), reattempt=False):
-    print('Connected')
     bot.process(block=False)
-    print('Processed.')
 
 time.sleep(1)
 
@@ -100,7 +96,6 @@ assert backend.stats('online_users', 'example.com') == 1
 got = backend.user_sessions(username, args.domain)
 assert len(got) == 1, got
 started = got[0].pop('started')
-print(got[0])
 assert got[0] == {'status': 'available', 'resource': 'resource', 'ip': '::1', 'priority': 0,
                   'statustext': ''}
 
