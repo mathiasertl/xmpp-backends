@@ -178,9 +178,9 @@ class EjabberdctlBackend(EjabberdBackendBase):
             raise ValueError("Unknown stat %s" % stat)
 
         if domain is None:
-            code, out, err = self.ctl('stats', name=stat)
+            code, out, err = self.ctl('stats', stat)
         else:
-            code, out, err = self.ctl('stats_host', name=stat, host=domain)
+            code, out, err = self.ctl('stats_host', stat, host)
 
         if code == 0:
             return int(out)
