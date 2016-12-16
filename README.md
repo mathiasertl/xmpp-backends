@@ -1,15 +1,9 @@
 # xmpp-backends
 
 **xmpp-backends** provides a set of classes with a common interface to
-communicate with admin interfaces of various XMPP servers. This project was
-born out of
-[django-xmpp-account](https://github.com/mathiasertl/django-xmpp-account/) and
-the methods provided are therefor centered around user management. Currently
-only ejabberd is supported with communication via the `ejabberdctl` command
-line utitlity and via `mod_xmlrpc`.
+communicate with admin interfaces of various XMPP servers. 
 
-If you need more functionality and/or other backends please file an issue or
-better yet do a pull request.
+Detailed documentation is available at http://xmpp-backends.rtfd.org/.
 
 ## Installation
 
