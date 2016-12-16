@@ -67,8 +67,10 @@ ejabberd TLS setup
 ==================
 
 **xmpp-backends** is written for https://jabber.at, which prides itself in a good TLS setup. Our
-full configuration is available `on github <https://github.com/jabber-at/config>`_. In short, this
-is what you should do::
+full configuration is available `on github <https://github.com/jabber-at/config>`_.
+
+At present, we essentially do what is listed in the example below, but please also check our github
+config for the most recent version::
 
    define_macro:
      # check most recent version from github:
