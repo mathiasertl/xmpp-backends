@@ -36,7 +36,8 @@
 ## 4: Info
 ## 5: Debug
 ##
-loglevel: 4
+loglevel: 5
+hide_sensitive_log_data: false
 
 ##
 ## rotation: Disable ejabberd's internal log rotation, as the Debian package
@@ -92,11 +93,12 @@ hosts:
 
 commands_admin_access: api
 commands:
-  - add_commands
+  - add_commands:
     - change_password
     - check_account
     - check_password
     - get_last
+    - kick_session
     - register
     - registered_users
     - send_message
@@ -104,6 +106,7 @@ commands:
     - stats
     - stats_host
     - unregister
+    - user_sessions_info
 
 ###.  ===============
 ###'  LISTENING PORTS
@@ -118,21 +121,7 @@ listen:
     module: ejabberd_xmlrpc
     maxsessions: 10
     timeout: 5000
-    access_commands:
-      api:
-        commands:
-          - change_password
-          - check_account
-          - check_password
-          - get_last
-          - register
-          - registered_users
-          - send_message
-          - set_last
-          - stats
-          - stats_host
-          - unregister
-        options: []
+    access_commands: {}
   - ip: "::"
     port: 5280
     module: ejabberd_http
@@ -262,57 +251,18 @@ max_fsm_queue: 1000
 ###.   ====================
 ###'   ACCESS CONTROL LISTS
 acl:
-  ##
-  ## The 'admin' ACL grants administrative privileges to XMPP accounts.
-  ## You can put here as many accounts as you want.
-  ##
   admin:
-     user:
-  ##     - "aleksey@localhost"
-
-  ##
-  ## Blocked users
-  ##
-  ## blocked:
-  ##   user:
-  ##     - "baduser@example.org"
-  ##     - "test"
-
-  ## Local users: don't modify this.
-  ##
+    user:
+      - "api": "example.com"
   local: 
-    user_regexp: ""
-
+    server: 
+      - "example.com"
   api:
     user:
       - "api": "example.com"
-  ##
-  ## More examples of ACLs
-  ##
-  ## jabberorg:
-  ##   server:
-  ##     - "jabber.org"
-  ## aleksey:
-  ##   user:
-  ##     - "aleksey@jabber.ru"
-  ## test:
-  ##   user_regexp: "^test"
-  ##   user_glob: "test*"
-
-  ##
-  ## Loopback network
-  ##
   loopback:
     ip:
       - "127.0.0.0/8"
-
-  ##
-  ## Bad XMPP servers
-  ##
-  ## bad_servers:
-  ##   server:
-  ##     - "xmpp.zombie.org"
-  ##     - "xmpp.spam.com"
 
 ##
 ## Define specific ACLs in a virtual host.
@@ -343,11 +293,17 @@ shaper_rules:
 
 ###.  ============
 ###'  ACCESS RULES
+#access:
+#  api:
+#    api: allow
+#    all: allow
+#  local:
+#    local: allow
+
+
 access_rules:
   api:
-    api: allow
-  xmlrpc:
-    api: allow
+    - allow: api
 
   ## This rule allows access only for local users:
   local:
