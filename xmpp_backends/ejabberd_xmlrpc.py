@@ -41,41 +41,42 @@ log = logging.getLogger(__name__)
 class EjabberdXMLRPCBackend(EjabberdBackendBase):
     """This backend uses the Ejabberd XMLRPC interface.
 
-    In addition to `mod_xmlrpc`, this backend requires `mod_admin_extra` to be installed.
+    In addition to an XMLRPC endpoint, this backend requires ``mod_admin_extra`` to be installed.
 
-    .. WARNING:: If you use ejabberd <= 14.07, please take special care of the `utf8_encoding`
-        parameter.
+    .. WARNING::
+
+        The backend does not handle UTF-8 characters correctly if you use ejabberd <= 14.07 and
+        Python 3.
 
     **ejabberd configuration:** The ``xmlrpc`` module is included with ejabberd_ since version
     13.12. If you use an earlier version, please get and run the module from the
-    ``ejabberd-contrib`` repository. Configuring the interface is simple::
+    `ejabberd-contrib <https://github.com/processone/ejabberd-contrib>`_ repository. Configuring
+    the interface is simple::
 
         listen:
             - ip: "127.0.0.1"
               port: 4560
               module: ejabberd_xmlrpc
 
-    :param           uri: Directly passed to xmlrpclib, defaults to `http://127.0.0.1:4560`.
-    :param     transport: Directly passed to xmlrpclib.
-    :param      encoding: Directly passed to xmlrpclib.
-    :param       verbose: Directly passed to xmlrpclib.
-    :param    allow_none: Directly passed to xmlrpclib.
-    :param  use_datetime: Directly passed to xmlrpclib.
-    :param       context: Directly passed to xmlrpclib. Note that this parameter is ignored in
-        in Python3. It's still documented but no longer accepted by the ServerProxy constructor.
-    :param          user: Username of the JID used for authentication.
-    :param        server: Server of the JID used for authenticiation.
-    :param      password: The password of the given JID.
-    :param utf8_encoding: How utf-8 characters are encoded. Valid values are `standard`, `php`,
-        `python2` and `none`. Use `standard` for ejabberd > 14.07 and `php` for ejabberd <= 14.07.
-        Please see comments in `xmpp_backends.xmlrpclib` if you care (don't!) about the details of
-        this value. This parameter is ignored in Python3.
+    :param          uri: Directly passed to xmlrpclib, defaults to ``"http://127.0.0.1:4560"``.
+    :param    transport: Directly passed to xmlrpclib.
+    :param     encoding: Directly passed to xmlrpclib.
+    :param      verbose: Directly passed to xmlrpclib.
+    :param   allow_none: Directly passed to xmlrpclib.
+    :param use_datetime: Directly passed to xmlrpclib.
+    :param      context: Directly passed to xmlrpclib. Ignored in in Python3, where the parameter
+        is still documented but no longer accepted by the ServerProxy constructor.
+    :param         user: Username of the JID used for authentication.
+    :param       server: Server of the JID used for authenticiation.
+    :param     password: The password of the given JID.
+    :param      version: A tuple describing the ejabberd version used, e.g. ``(16, 12,)``. See
+        :ref:`version parameter <ejabberd_version>` for a more detailed explanation.
     """
     credentials = None
 
     def __init__(self, uri='http://127.0.0.1:4560', transport=None, encoding=None, verbose=0,
-                 allow_none=0, use_datetime=0, context=None,
-                 user=None, server=None, password=None, utf8_encoding='standard'):
+                 allow_none=0, use_datetime=0, context=None, user=None, server=None, password=None,
+                 version=None):
         super(EjabberdXMLRPCBackend, self).__init__()
 
         kwargs = {
@@ -85,8 +86,8 @@ class EjabberdXMLRPCBackend(EjabberdBackendBase):
             'allow_none': allow_none,
             'use_datetime': use_datetime,
         }
-        if six.PY2:
-            kwargs['utf8_encoding'] = utf8_encoding
+        if six.PY2 and version <= (14, 7, ):
+            kwargs['utf8_encoding'] = 'php'
             kwargs['context'] = context
 
         self.client = xmlrpclib.ServerProxy(uri, **kwargs)

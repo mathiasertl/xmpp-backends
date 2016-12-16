@@ -42,19 +42,20 @@ class EjabberdctlBackend(EjabberdBackendBase):
             #'EJABBERDCTL_PATH': '/usr/sbin/ejabberdctl',
         }
 
-    .. WARNING:: This backend is not very secure because ejabberdctl gets any
-       passwords in clear text via the commandline. The process list (and thus
-       the passwords) can usually be viewed by anyone that has shell-access to
-       your machine!
+    .. WARNING::
 
-    This backend uses the following settings:
+       This backend is not very secure because ejabberdctl gets any passwords in clear text via the
+       commandline. The process list (and thus the passwords) can usually be viewed by anyone that
+       has shell-access to your machine!
 
-    **EJABBERDCTL_PATH** (optional, default: :file:`/usr/sbin/ejabberdctl`)
-        The full path to the ejabberdctl utility.
+    :param    path: Optional path to the ``ejabberdctl`` script. The default is
+        ``"/usr/sbin/ejabberdctl"``.
+    :param version: A tuple describing the version used, e.g. ``(16, 12,)``. See
+        :ref:`version parameter <ejabberd_version>` for a more detailed explanation.
     """
 
-    def __init__(self, EJABBERDCTL_PATH='/usr/sbin/ejabberdctl'):
-        self.ejabberdctl = EJABBERDCTL_PATH
+    def __init__(self, path='/usr/sbin/ejabberdctl', version=None):
+        self.ejabberdctl = path
 
     def ex(self, *cmd):
         p = Popen(cmd, stdout=PIPE, stderr=PIPE)

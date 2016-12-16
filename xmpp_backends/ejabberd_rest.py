@@ -30,41 +30,45 @@ log = logging.getLogger(__name__)
 
 
 class EjabberdRestBackend(EjabberdBackendBase):
-    """This backend uses the Ejabberd XMLRPC interface.
+    """This backend uses the Ejabberd REST interface.
 
-    In addition to `mod_xmlrpc`, this backend requires `mod_admin_extra` to be installed.
+    The module implements ejabberds still somewhat sparsely documented `REST API
+    <https://docs.ejabberd.im/developer/ejabberd-api/>`_. Our current (16.9) configuration looks
+    as follows::
 
-    .. WARNING:: If you use ejabberd <= 14.07, please take special care of the `utf8_encoding`
-        parameter.
-
-    **ejabberd configuration:** The ``xmlrpc`` module is included with ejabberd_ since version
-    13.12. If you use an earlier version, please get and run the module from the
-    ``ejabberd-contrib`` repository. Configuring the interface is simple::
+        # "api" is an access_rules list
+        commands_admin_access: api
+        commands:
+          - add_commands:
+            - change_password
+            # ... other commands
 
         listen:
-            - ip: "127.0.0.1"
-              port: 4560
-              module: ejabberd_xmlrpc
+          # other ports here...
+          - ip: "127.0.0.1"
+            port: 5280
+            module: ejabberd_http
+            request_handlers:
+              "/oauth": ejabberd_oauth
+              "/api": mod_http_api
 
-    :param           uri: Directly passed to xmlrpclib, defaults to `http://127.0.0.1:4560`.
-    :param     transport: Directly passed to xmlrpclib.
-    :param      encoding: Directly passed to xmlrpclib.
-    :param       verbose: Directly passed to xmlrpclib.
-    :param    allow_none: Directly passed to xmlrpclib.
-    :param  use_datetime: Directly passed to xmlrpclib.
-    :param       context: Directly passed to xmlrpclib. Note that this parameter is ignored in
-        in Python3. It's still documented but no longer accepted by the ServerProxy constructor.
-    :param          user: Username of the JID used for authentication.
-    :param        server: Server of the JID used for authenticiation.
-    :param      password: The password of the given JID.
-    :param utf8_encoding: How utf-8 characters are encoded. Valid values are `standard`, `php`,
-        `python2` and `none`. Use `standard` for ejabberd > 14.07 and `php` for ejabberd <= 14.07.
-        Please see comments in `xmpp_backends.xmlrpclib` if you care (don't!) about the details of
-        this value. This parameter is ignored in Python3.
+            tls: true
+            certfile: 'LOCAL_CERT_LOCATION'
+            ciphers: 'TLS_CIPHERS'
+            protocol_options: 'TLS_OPTIONS'
+            dhfile: 'DHPARAM_LOCATION'
+
+    :param       uri: The URI of the API.
+    :param      user: User used in authenticating with the API.
+    :param  password: Password used in authenticating with the API.
+    :param   version: A tuple describing the version used, e.g. ``(16, 12,)``. See
+        :ref:`version parameter <ejabberd_version>` for a more detailed explanation.
+    :param \**kwargs: All keyword parameters are directly passed to the ``requests`` module.
     """
     credentials = None
 
-    def __init__(self, uri='http://127.0.0.1:5280/api/', user=None, password=None, **kwargs):
+    def __init__(self, uri='http://127.0.0.1:5280/api/', user=None, password=None, version=None,
+                 **kwargs):
         super(EjabberdRestBackend, self).__init__()
 
         if not uri.endswith('/'):
@@ -177,9 +181,6 @@ class EjabberdRestBackend(EjabberdBackendBase):
         self.post('ban_account', user=username, host=domain, reason='Blocked.')
 
     def message_user(self, username, domain, subject, message):
-        """Currently use send_message_chat and discard subject, because headline messages are not
-        stored by mod_offline."""
-
         kwargs = {
             'body': message,
             'from': domain,
