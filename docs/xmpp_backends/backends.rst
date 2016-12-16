@@ -34,9 +34,39 @@ ejabberdctl
 .. autoclass:: xmpp_backends.ejabberdctl.EjabberdctlBackend
    :members:
 
+*************
+Dummy backend
+*************
+
+.. autoclass:: xmpp_backends.dummy.DummyBackend
+   :members:
+
 ***********************
 ejabberd specific notes
 ***********************
+
+.. _ejabberd-required-commands:
+
+Required commands
+=================
+
+ejabberd allows you to restrict the commands usable at a specific endpoint.  **xmpp-backends**
+currently uses these commands:
+
+* change_password
+* check_account
+* check_password
+* get_last
+* kick_session
+* register
+* registered_users
+* send_message
+* set_last
+* stats
+* stats_host
+* status
+* unregister
+* user_sessions_info
 
 .. _ejabberd_version:
 

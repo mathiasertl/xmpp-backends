@@ -64,7 +64,8 @@ class EjabberdRestBackend(EjabberdBackendBase):
     :param  password: Password used in authenticating with the API.
     :param   version: A tuple describing the version used, e.g. ``(16, 12,)``. See
         :ref:`version parameter <ejabberd_version>` for a more detailed explanation.
-    :param \**kwargs: All keyword parameters are directly passed to the ``requests`` module.
+    :param \**kwargs: All keyword parameters are directly passed to the ``requests`` module. Please
+        see the documentation there for possible parameters (e.g. SSL validation, etc.).
     """
     credentials = None
 
