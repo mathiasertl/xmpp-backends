@@ -37,7 +37,7 @@ wether all interfaces actually implement all methods.
 Test script
 ===========
 
-To actually test a backend, there is a script called ``test.py`` in the root
+To actually test a backend, there is a script called ``test-commands.py`` in the root
 directory. It's a simple script that creates a backend instance and calls the
 most important functions and checks their return values.
 
@@ -51,9 +51,9 @@ access to everything.
 
 The only required argument is the full python path to the backend class::
 
-   python test.py xmpp_backends.ejabberdctl.EjabberdctlBackend
-   python test.py xmpp_backends.ejabberd_xmlrpc.EjabberdXMLRPCBackend
-   python test.py xmpp_backends.ejabberd_rest.EjabberdRestBackend
+   python test-commands.py xmpp_backends.ejabberdctl.EjabberdctlBackend
+   python test-commands.py xmpp_backends.ejabberd_xmlrpc.EjabberdXMLRPCBackend
+   python test-commands.py xmpp_backends.ejabberd_rest.EjabberdRestBackend
 
 The arguments the backend is instantiated with are in the ``config`` directory,
 you can override the file with the ``--config`` option. If your XMPP server is
