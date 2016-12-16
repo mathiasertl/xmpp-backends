@@ -81,8 +81,8 @@ class EjabberdctlBackend(EjabberdBackendBase):
                 resource, statustext = resource.split(None, 1)
 
             sessions.append({
-                'ip': int(ip),
-                'priority': prio,
+                'ip': ip,
+                'priority': int(prio),
                 'resource': resource.strip(),
                 'started': started,
                 'status': status,
