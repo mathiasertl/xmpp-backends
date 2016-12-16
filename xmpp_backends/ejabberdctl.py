@@ -180,7 +180,7 @@ class EjabberdctlBackend(EjabberdBackendBase):
         if domain is None:
             code, out, err = self.ctl('stats', stat)
         else:
-            code, out, err = self.ctl('stats_host', stat, host)
+            code, out, err = self.ctl('stats_host', stat, domain)
 
         if code == 0:
             return int(out)
