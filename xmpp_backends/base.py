@@ -371,3 +371,27 @@ class XmppBackendBase(object):
         :rtype: int
         """
         raise NotImplementedError
+
+
+class EjabberdBackendBase(XmppBackendBase):
+    """Base class for ejabberd related backends.
+
+    This class overwrites a few methods common to all ejabberd backends.
+    """
+    def has_usable_password(self, username, domain):
+        """Always return ``True``.
+
+        In ejabberd there is no such thing as a "banned" account or an unusable password. Even
+        ejabberd's ``ban_account`` command only sets a random password that the user could
+        theoretically guess.
+        """
+
+        return True
+
+    def set_email(self, username, domain, email):
+        """Not yet implemented."""
+        pass
+
+    def check_email(self, username, domain, email):
+        """Not yet implemented."""
+        pass
