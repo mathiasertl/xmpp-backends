@@ -124,7 +124,7 @@ class EjabberdctlBackend(EjabberdBackendBase):
             return datetime.strptime(out, '%Y-%m-%d %H:%M:%S')
 
     def set_last_activity(self, username, domain, status, timestamp=None):
-        timestamp = self.datetime_to_timestamp(timestamp)
+        timestamp = str(self.datetime_to_timestamp(timestamp))
         self.ctl('set_last', username, domain, timestamp, status)
 
     def block_user(self, username, domain):
