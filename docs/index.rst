@@ -11,9 +11,9 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   xmpp_backends/base
-   xmpp_backends/backends
-   xmpp_backends/django
+   usage
+   backends
+   django
 
 
 Indices and tables
