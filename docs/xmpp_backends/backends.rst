@@ -65,3 +65,35 @@ The :py:class:`~xmpp_backends.base.EjabberdBackendBase` class is the base class 
 
 ejabberd TLS setup
 ==================
+
+**xmpp-backends** is written for https://jabber.at, which prides itself in a good TLS setup. Our
+full configuration is available `on github <https://github.com/jabber-at/config>`_. In short, this
+is what you should do::
+
+   define_macro:
+     # check most recent version from github:
+     #    https://github.com/jabber-at/config/blob/master/ejabberd.yml
+     'TLS_OPTIONS':
+       - "no_sslv2"
+       - "no_sslv3"
+     'TLS_CIPHERS': "ECDH:DH:!CAMELLIA128:!3DES:!MD5:!RC4:!aNULL:!NULL:!EXPORT:!LOW:!MEDIUM"
+
+   s2s_access: authenticated
+   s2s_certfile: "/etc/..."
+   s2s_use_starttls: required
+   s2s_protocol_options: 'TLS_OPTIONS'
+   s2s_ciphers: 'TLS_CIPHERS'
+
+   # create dhfile with (takes a LONG time!):
+   #     openssl dhparam -out ... 4096
+   s2s_dhfile: "/etc/ejabberd/dhparams"
+
+   listen:
+     - ip: ...
+       # XMPP c2s connections:
+       #starttls_required: true
+       # Any HTTPS connections:
+       #tls: true
+       protocol_options: 'TLS_OPTIONS'
+       ciphers: 'TLS_CIPHERS'
+       dhfile: "/etc/ejabberd/dhparams"

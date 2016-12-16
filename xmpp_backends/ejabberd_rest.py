@@ -33,8 +33,10 @@ class EjabberdRestBackend(EjabberdBackendBase):
     """This backend uses the Ejabberd REST interface.
 
     The module implements ejabberds still somewhat sparsely documented `REST API
-    <https://docs.ejabberd.im/developer/ejabberd-api/>`_. Our current (16.9) configuration looks
-    as follows::
+    <https://docs.ejabberd.im/developer/ejabberd-api/>`_. It requires `requests
+    <http://docs.python-requests.org/en/master/>`_.
+
+    Our current (16.9) configuration looks as follows::
 
         # "api" is an access_rules list
         commands_admin_access: api
@@ -52,11 +54,10 @@ class EjabberdRestBackend(EjabberdBackendBase):
               "/oauth": ejabberd_oauth
               "/api": mod_http_api
 
-            tls: true
-            certfile: 'LOCAL_CERT_LOCATION'
-            ciphers: 'TLS_CIPHERS'
-            protocol_options: 'TLS_OPTIONS'
-            dhfile: 'DHPARAM_LOCATION'
+            # Please use TLS if you're not on localhost! Help:
+            #  http://xmpp-backends.readthedocs.io/en/latest/xmpp_backends/backends.html#ejabberd-tls-setup
+            #tls: true
+            #...
 
     :param       uri: The URI of the API.
     :param      user: User used in authenticating with the API.
