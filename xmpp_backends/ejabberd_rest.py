@@ -43,7 +43,8 @@ class EjabberdRestBackend(EjabberdBackendBase):
         commands:
           - add_commands:
             - change_password
-            # ... other commands
+            # ... other commands, see:
+            # http://xmpp-backends.readthedocs.io/en/latest/xmpp_backends/backends.html#required-commands
 
         listen:
           # other ports here...

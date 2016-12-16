@@ -32,15 +32,7 @@ log = logging.getLogger(__name__)
 class EjabberdctlBackend(EjabberdBackendBase):
     """This backend uses the ejabberdctl command line utility.
 
-    This backend requires ejabberd mod_admin_extra to be installed.
-
-    Example::
-
-        XMPP_BACKENDS = {
-            'BACKEND': 'backends.ejabberdctl.EjabberdctlBackend',
-            # optional:
-            #'EJABBERDCTL_PATH': '/usr/sbin/ejabberdctl',
-        }
+    This backend requires ejabberds ``mod_admin_extra`` to be installed.
 
     .. WARNING::
 
