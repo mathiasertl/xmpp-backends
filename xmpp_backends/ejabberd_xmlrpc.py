@@ -163,8 +163,12 @@ class EjabberdXMLRPCBackend(XmppBackendBase):
             session = dict([item for sublist in session for item in sublist])
 
             started = datetime.utcnow() - timedelta(seconds=session['uptime'])
+            ip = session['ip']
+            if ip.startswith('::FFFF:'):
+                ip = ip[7:]
+
             sessions.append({
-                'ip': session['ip'],
+                'ip': ip,
                 'priority': session['priority'],
                 'started': started,
                 'status': session['status'],
