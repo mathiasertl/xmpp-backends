@@ -22,14 +22,14 @@ from datetime import timedelta
 
 import requests
 
-from .base import XmppBackendBase
+from .base import EjabberdBackendBase
 from .base import BackendError
 from .base import UserExists
 
 log = logging.getLogger(__name__)
 
 
-class EjabberdRestBackend(XmppBackendBase):
+class EjabberdRestBackend(EjabberdBackendBase):
     """This backend uses the Ejabberd XMLRPC interface.
 
     In addition to `mod_xmlrpc`, this backend requires `mod_admin_extra` to be installed.
@@ -173,19 +173,8 @@ class EjabberdRestBackend(XmppBackendBase):
         else:
             raise BackendError('Unknown Error')
 
-    def has_usable_password(self, username, domain):
-        return True
-
     def block_user(self, username, domain):
         self.post('ban_account', user=username, host=domain, reason='Blocked.')
-
-    def set_email(self, username, domain, email):
-        """Not yet implemented."""
-        pass
-
-    def check_email(self, username, domain, email):
-        """Not yet implemented."""
-        pass
 
     def message_user(self, username, domain, subject, message):
         """Currently use send_message_chat and discard subject, because headline messages are not

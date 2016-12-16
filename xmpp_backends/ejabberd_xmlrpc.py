@@ -31,14 +31,14 @@ else:  # use the default for Python3 (god save us all!)
     from xmlrpc import client as xmlrpclib
 
 
-from xmpp_backends.base import XmppBackendBase  # NOQA
+from xmpp_backends.base import EjabberdBackendBase  # NOQA
 from xmpp_backends.base import BackendError  # NOQA
 from xmpp_backends.base import UserExists  # NOQA
 
 log = logging.getLogger(__name__)
 
 
-class EjabberdXMLRPCBackend(XmppBackendBase):
+class EjabberdXMLRPCBackend(EjabberdBackendBase):
     """This backend uses the Ejabberd XMLRPC interface.
 
     In addition to `mod_xmlrpc`, this backend requires `mod_admin_extra` to be installed.
@@ -198,19 +198,8 @@ class EjabberdXMLRPCBackend(XmppBackendBase):
         else:
             raise BackendError(result.get('text', 'Unknown Error'))
 
-    def has_usable_password(self, username, domain):
-        return True
-
     def block_user(self, username, domain):
         self.rpc('ban_account', user=username, host=domain, reason='Blocked.')
-
-    def set_email(self, username, domain, email):
-        """Not yet implemented."""
-        pass
-
-    def check_email(self, username, domain, email):
-        """Not yet implemented."""
-        pass
 
     def message_user(self, username, domain, subject, message):
         """Currently use send_message_chat and discard subject, because headline messages are not

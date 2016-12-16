@@ -22,14 +22,14 @@ from datetime import timedelta
 from subprocess import PIPE
 from subprocess import Popen
 
-from .base import UserExists
 from .base import BackendError
-from .base import XmppBackendBase
+from .base import EjabberdBackendBase
+from .base import UserExists
 
 log = logging.getLogger(__name__)
 
 
-class EjabberdctlBackend(XmppBackendBase):
+class EjabberdctlBackend(EjabberdBackendBase):
     """This backend uses the ejabberdctl command line utility.
 
     This backend requires ejabberd mod_admin_extra to be installed.
@@ -158,18 +158,6 @@ class EjabberdctlBackend(XmppBackendBase):
                                   'by django-xmpp-account')
         if code != 0:
             raise BackendError(code)
-
-    def has_usable_password(self, username, domain):
-        return True  # unfortunately we can't tell
-
-    def set_email(self, username, domain, email):
-        """Not yet implemented."""
-        # ejabberdctl get_vcard2 mati jabber.at EMAIL USERID
-        pass  # maybe as vcard field?
-
-    def check_email(self, username, domain, email):
-        """Not yet implemented."""
-        pass  # maybe as vcard field?
 
     def message_user(self, username, domain, subject, message):
         """Currently use send_message_chat and discard subject, because headline messages are not
