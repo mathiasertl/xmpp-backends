@@ -24,15 +24,24 @@ pip install xmpp-backends
 
 ## ChangeLog
 
-### 0.3 (to be released)
+### 0.3.0 (2016-12-26)
 
 * Move
   [django-xmpp-backends](https://github.com/mathiasertl/django-xmpp-backends)
   to the `xmpp_backends.django` module.
+* New XMPP backend accessing ejabberds REST API interface.
 * Add new commands: `stats`, `get_last_activity`, `user_sessions` and
   `stop_user_session`.
 * Implement ``block_user`` for ejabberd backends using the `ban_account`
   command.
+* Add a consistent `version` parameter to handle version-specific behaviour in
+  APIs. 
+* The `ejabberdctl` backend now accepts the `path` instead of
+  `EJABBERDCTL_PATH` for consistency with other backends.
+* Write documentation hosted on
+  [http://xmpp-backends.readthedocs.io/](http://xmpp-backends.readthedocs.io/en/latest/index.html).
+* Add a test-script that runs the most important commands against a live XMPP
+  server.
 
 ### 0.2.1 (2016-09-03)
 
