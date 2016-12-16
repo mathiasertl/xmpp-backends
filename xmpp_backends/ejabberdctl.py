@@ -121,7 +121,7 @@ class EjabberdctlBackend(EjabberdBackendBase):
         elif out == 'Never':
             return None
         else:
-            return datetime.strptime(out, '%Y-%m-%d %H:%M:%S')
+            return datetime.strptime(out[:19], '%Y-%m-%d %H:%M:%S')
 
     def set_last_activity(self, username, domain, status, timestamp=None):
         timestamp = str(self.datetime_to_timestamp(timestamp))
