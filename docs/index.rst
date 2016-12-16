@@ -14,6 +14,7 @@ Contents:
    usage
    backends
    django
+   development
 
 
 Indices and tables
