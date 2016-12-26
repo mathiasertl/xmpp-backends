@@ -24,6 +24,10 @@ pip install xmpp-backends
 
 ## ChangeLog
 
+### 0.3.1 (to be released)
+
+* Fix `start_user_session` in the dummy backend.
+
 ### 0.3.0 (2016-12-26)
 
 * Move

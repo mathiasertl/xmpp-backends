@@ -71,9 +71,9 @@ class DummyBackend(XmppBackendBase):
 
         user = '%s@%s' % (username, domain)
         data = self.module.get(user)
-        sessions = data.get('sessions', [])
+        data.setdefault('sessions', [])
 
-        sessions.append({
+        data['sessions'].append({
             'ip': ip,
             'priority': priority,
             'started': started,
@@ -81,6 +81,7 @@ class DummyBackend(XmppBackendBase):
             'resource': resource,
             'statustext': statustext,
         })
+        self.module.set(user, data)
 
     def stop_user_session(self, username, domain, resource, reason=''):
         user = '%s@%s' % (username, domain)
