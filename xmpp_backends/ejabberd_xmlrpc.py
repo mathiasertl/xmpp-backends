@@ -76,7 +76,7 @@ class EjabberdXMLRPCBackend(EjabberdBackendBase):
 
     def __init__(self, uri='http://127.0.0.1:4560', transport=None, encoding=None, verbose=0,
                  allow_none=0, use_datetime=0, context=None, user=None, server=None, password=None,
-                 version=None):
+                 version=(17, 7, )):
         super(EjabberdXMLRPCBackend, self).__init__()
 
         kwargs = {

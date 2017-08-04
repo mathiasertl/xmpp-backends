@@ -75,8 +75,8 @@ class EjabberdRestBackend(EjabberdBackendBase):
     """
     credentials = None
 
-    def __init__(self, uri='http://127.0.0.1:5280/api/', user=None, password=None, version=None,
-                 **kwargs):
+    def __init__(self, uri='http://127.0.0.1:5280/api/', user=None, password=None,
+                 version=(17, 7, ), **kwargs):
         super(EjabberdRestBackend, self).__init__()
 
         if not uri.endswith('/'):
@@ -127,14 +127,23 @@ class EjabberdRestBackend(EjabberdBackendBase):
 
     def get_last_activity(self, username, domain):
         response = self.post('get_last', user=username, host=domain)
-        result = response.json()['last_activity'].lower().strip()
+        version = self.get_version(response)
 
-        if result == 'never':
-            return None
-        elif result == 'online':
-            return datetime.now()
+        if version < (17, 4):
+            result = response.json()['last_activity'].lower().strip()
 
-        return datetime.strptime(result[:19], '%Y-%m-%d %H:%M:%S')
+            if result == 'never':
+                return None
+            elif result == 'online':
+                return datetime.now()
+
+            return datetime.strptime(result[:19], '%Y-%m-%d %H:%M:%S')
+
+        # ejabberd 17.04 introduced a change:
+        #       https://github.com/processone/ejabberd/issues/1565
+        else:
+            result = response.json()['timestamp']
+            return datetime.strptime(result, '%Y-%m-%dT%H:%M:%SZ')
 
     def set_last_activity(self, username, domain, status, timestamp=None):
         timestamp = self.datetime_to_timestamp(timestamp)
