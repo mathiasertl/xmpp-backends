@@ -36,7 +36,7 @@ class EjabberdRestBackend(EjabberdBackendBase):
     <https://docs.ejabberd.im/developer/ejabberd-api/>`_. It requires `requests
     <http://docs.python-requests.org/en/master/>`_.
 
-    Our current (16.9) configuration looks as follows::
+    Our current (17.07) configuration looks as follows::
 
         # "api" is an access_rules list
         commands_admin_access: api
@@ -54,6 +54,11 @@ class EjabberdRestBackend(EjabberdBackendBase):
             request_handlers:
               "/oauth": ejabberd_oauth
               "/api": mod_http_api
+
+            # Requires ejabberd 17.04 or later, otherwise you should pass a version in the
+            # constructor.
+            custom_headers:
+              "Ejabberd-Version": "@VERSION@"
 
             # Please use TLS if you're not on localhost! Help:
             #  http://xmpp-backends.readthedocs.io/en/latest/xmpp_backends/backends.html#ejabberd-tls-setup
