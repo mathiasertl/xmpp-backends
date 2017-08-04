@@ -81,6 +81,13 @@ Currently there are no version specific notes common to all backends, but in the
 be listed below. Any version-specific behaviour for a specific backend is noted in the backends own
 documentation.
 
+Version-specific notes
+======================
+
+* **ejabberd <= 17.03**: Ejabberd 17.03 and earlier return the timestamp for
+  ``get_last_activity`` in the system timezone, not UTC. See `this github issue
+  <https://github.com/processone/ejabberd/issues/1565>`_.
+
 ``EjabberdBackendBase``
 =======================
 
