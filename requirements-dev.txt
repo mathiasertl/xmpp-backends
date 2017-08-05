@@ -1,7 +1,9 @@
 Django==1.11.4
+Fabric3==1.13.1.post1
 Sphinx==1.6.3
 flake8==3.4.1
 ipython>=5.1.0
+isort==4.2.15
 pip>=9.0.1
 pyflakes==1.6.0
 requests==2.18.3
