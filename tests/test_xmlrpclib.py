@@ -23,7 +23,8 @@ try:
 except ImportError:
     from xmlrpc import client as stdxmlrpclib
 
-from xmpp_backends import xmlrpclib
+if six.PY2:
+    from xmpp_backends import xmlrpclib
 
 
 @unittest.skipIf(six.PY3, 'Not testing custom xmlrpclib in python3')
