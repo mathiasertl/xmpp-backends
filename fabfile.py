@@ -23,6 +23,7 @@ import os
 import sys
 from datetime import datetime
 
+import pytz
 from fabric.api import local
 from fabric.api import task
 from fabric.colors import green
@@ -109,6 +110,15 @@ def test_backend(backend, domain, config_path=''):
         error('set_last_activity() does not return None.')
     last = backend.get_last_activity(username1, domain)
     if now != last:
+        error('Did not get same last activity back: %s vs %s' % (now.isoformat(), last.isoformat()))
+
+    # do same with localized timezone
+    tz = pytz.timezone('Europe/Vienna')
+    now = tz.localize(now)
+    if backend.set_last_activity(username1, domain, 'foobar', timestamp=now) is not None:
+        error('set_last_activity() does not return None.')
+    last = backend.get_last_activity(username1, domain)
+    if now != pytz.utc.localize(last).astimezone(tz):
         error('Did not get same last activity back: %s vs %s' % (now.isoformat(), last.isoformat()))
 
     # remove user again
