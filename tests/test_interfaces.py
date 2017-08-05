@@ -63,8 +63,8 @@ class TestImplemented(unittest.TestCase):
 
     def assertOverwritten(self, subclass):
         for name in self.not_implemented:
-            self.assertNotEqual(getattr(XmppBackendBase, name).__func__,
-                                getattr(subclass, name).__func__,
+            self.assertNotEqual(getattr(XmppBackendBase, name),
+                                getattr(subclass, name),
                                 "%s.%s: Function is not overwritten." % (subclass.__name__, name))
 
     def test_ejabberd_rest(self):
