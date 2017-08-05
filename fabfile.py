@@ -21,6 +21,7 @@ import importlib
 import json
 import os
 import sys
+from datetime import datetime
 
 from fabric.api import local
 from fabric.api import task
@@ -51,6 +52,7 @@ def check():
 def test_backend(backend, domain, config_path=''):
     username1 = 'example'
     password1 = 'foobar'
+    password2 = 'barfoo'
 
     sys.path.insert(0, '.')
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'tests.django_settings')
@@ -70,17 +72,48 @@ def test_backend(backend, domain, config_path=''):
         error('all_users() did not return an empty set.')
     if backend.user_exists('example', domain):
         error('User "example" exists.')
+    if backend.check_password(username1, domain, password1) is not False:
+        error('check_password() did not return False for non-existing user.')
     try:
         backend.get_last_activity('example', domain)
         error('get_last_activity did not raise UserNotFound.')
     except UserNotFound:
         pass
+    try:
+        backend.set_password(username1, domain, password1)
+        error('set_password() did not raise UserNotFound.')
+    except UserNotFound:
+        pass
     ok()
 
-    print('Create and test example user...', end='')
+    print('Create and test example user... ', end='')
     if backend.create_user(username1, domain, password1) is not None:
         error('create_user() did not return None.')
     users = backend.all_users(domain)
     if users != {'%s@%s' % (username1, domain)}:
         error('Got wrong set of usernames: %s' % (users, ))
+    if backend.check_password(username1, domain, password1) is not True:
+        error('Could not verify password.')
+    if backend.check_password(username1, domain, password2) is not False:
+        error('False password is accepted.')
+    if backend.set_password(username1, domain, password2) is not None:
+        error('set_password() did not return None.')
+    if backend.check_password(username1, domain, password2) is not True:
+        error('Could not verify password.')
+    if backend.check_password(username1, domain, password1) is not False:
+        error('False password is accepted.')
+
+    backend.get_last_activity(username1, domain)
+    now = datetime(2017, 8, 5, 12, 14, 23)
+    if backend.set_last_activity(username1, domain, 'foobar', timestamp=now) is not None:
+        error('set_last_activity() does not return None.')
+    last = backend.get_last_activity(username1, domain)
+    if now != last:
+        error('Did not get same last activity back: %s vs %s' % (now.isoformat(), last.isoformat()))
+
+    # remove user again
+    if backend.remove_user(username1, domain) is not None:
+        error('remove_user() did not return None.')
+    if backend.all_users(domain) != set():
+        error('all_users() did not return an empty set after removing user.')
     ok()
