@@ -26,7 +26,10 @@ pip install xmpp-backends
 
 ### 0.3.1 (to be released)
 
-* Update requirements.
+* Add a fabfile for common development tasks.
+  * Code quality is now checked using `isort` and `flake8` with the `fab check` command.
+* Update development requirements.
+* Update language quantifiers for setup.py.
 * Fix `start_user_session` in the dummy backend.
 
 ### 0.3.0 (2016-12-26)
