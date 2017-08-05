@@ -27,7 +27,8 @@ pip install xmpp-backends
 ### 0.3.1 (to be released)
 
 * Add a fabfile for common development tasks.
-  * Code quality is now checked using `isort` and `flake8` with the `fab check` command.
+  * Code quality is now checked using [isort](https://github.com/timothycrosley/isort) and
+    [flake8](https://gitlab.com/pycqa/flake8) with the `fab check` command.
 * Update development requirements.
 * Update language quantifiers for setup.py.
 * Use [Travis CI](https://travis-ci.org) to run at least some basic in continuous integration.
