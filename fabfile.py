@@ -15,6 +15,7 @@
 
 from __future__ import absolute_import
 from __future__ import unicode_literals
+from __future__ import print_function
 
 import importlib
 import json
@@ -23,6 +24,19 @@ import sys
 
 from fabric.api import local
 from fabric.api import task
+from fabric.colors import green
+from fabric.colors import red
+
+from xmpp_backends.base import UserNotFound
+
+
+def error(msg, status=1):
+    print(red(msg))
+    sys.exit(status)
+
+
+def ok(msg='OK.'):
+    print(green(msg))
 
 
 @task
@@ -34,7 +48,10 @@ def check():
 
 
 @task
-def test_backend(backend, config_path=''):
+def test_backend(backend, domain, config_path=''):
+    username1 = 'example'
+    password1 = 'foobar'
+
     sys.path.insert(0, '.')
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'tests.django_settings')
     mod_path, cls_name = backend.rsplit('.', 1)
@@ -48,4 +65,22 @@ def test_backend(backend, config_path=''):
 
     backend = cls(**config.get('kwargs', {}))
 
-    backend.user_exists('foo', 'bar')
+    print('Testing initial state... ', end='')
+    if backend.all_users(domain) != set():
+        error('all_users() did not return an empty set.')
+    if backend.user_exists('example', domain):
+        error('User "example" exists.')
+    try:
+        backend.get_last_activity('example', domain)
+        error('get_last_activity did not raise UserNotFound.')
+    except UserNotFound:
+        pass
+    ok()
+
+    print('Create and test example user...', end='')
+    if backend.create_user(username1, domain, password1) is not None:
+        error('create_user() did not return None.')
+    users = backend.all_users(domain)
+    if users != {'%s@%s' % (username1, domain)}:
+        error('Got wrong set of usernames: %s' % (users, ))
+    ok()
