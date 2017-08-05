@@ -10,3 +10,4 @@ install:
 script:
   - fab check
   - python setup.py test
+  - fab test_backend:xmpp_backends.dummy.DummyBackend,example.com
