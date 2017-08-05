@@ -36,6 +36,7 @@ def check():
 @task
 def test_backend(backend, config_path=''):
     sys.path.insert(0, '.')
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'tests.django_settings')
     mod_path, cls_name = backend.rsplit('.', 1)
     importlib.import_module('xmpp_backends')
     mod = importlib.import_module(mod_path)
