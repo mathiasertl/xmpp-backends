@@ -24,4 +24,4 @@ base = XmppBackendBase()
 class TestDateTimeToTimestamp(unittest.TestCase):
     def test_no_tz(self):
         now = datetime(2000, 3, 5, 12, 20, 3)
-        self.assertEqual(base.datetime_to_timestamp(now), None)
+        self.assertEqual(base.datetime_to_timestamp(now), 952255203)
