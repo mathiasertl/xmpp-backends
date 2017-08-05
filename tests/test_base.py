@@ -25,7 +25,9 @@ base = XmppBackendBase()
 class TestDateTimeToTimestamp(unittest.TestCase):
     def test_no_tz(self):
         now = datetime(2000, 1, 5, 12, 20, 3)
-        self.assertEqual(base.datetime_to_timestamp(now), 947074803)
+        converted = base.datetime_to_timestamp(now)
+        self.assertEqual(converted, 947074803)
+        self.assertEqual(datetime.utcfromtimestamp(converted), now)
 
         now = datetime(2000, 7, 5, 12, 20, 3)
         self.assertEqual(base.datetime_to_timestamp(now), 962799603)
@@ -33,15 +35,24 @@ class TestDateTimeToTimestamp(unittest.TestCase):
     def test_utc(self):
         # results should be identical to no_tz above, since UTC is the default
         now = pytz.utc.localize(datetime(2000, 1, 5, 12, 20, 3))
-        self.assertEqual(base.datetime_to_timestamp(now), 947074803)
+        converted = base.datetime_to_timestamp(now)
+        self.assertEqual(converted, 947074803)
+        self.assertEqual(pytz.utc.localize(datetime.utcfromtimestamp(converted)), now)
 
         now = pytz.utc.localize(datetime(2000, 7, 5, 12, 20, 3))
-        self.assertEqual(base.datetime_to_timestamp(now), 962799603)
+        converted = base.datetime_to_timestamp(now)
+        self.assertEqual(converted, 962799603)
+        self.assertEqual(pytz.utc.localize(datetime.utcfromtimestamp(converted)), now)
 
     def test_vienna(self):
+        # results are now different because this is a different TZ
         tz = pytz.timezone('Europe/Vienna')
         now = tz.localize(datetime(2000, 1, 5, 12, 20, 3))
-        self.assertEqual(base.datetime_to_timestamp(now), 947071203)
+        converted = base.datetime_to_timestamp(now)
+        self.assertEqual(converted, 947071203)
+        self.assertEqual(pytz.utc.localize(datetime.utcfromtimestamp(converted)), now)
 
         now = tz.localize(datetime(2000, 7, 5, 12, 20, 3))
-        self.assertEqual(base.datetime_to_timestamp(now), 962792403)
+        converted = base.datetime_to_timestamp(now)
+        self.assertEqual(converted, 962792403)
+        self.assertEqual(pytz.utc.localize(datetime.utcfromtimestamp(converted)), now)
