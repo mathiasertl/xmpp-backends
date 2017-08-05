@@ -17,6 +17,7 @@
 #from __future__ import unicode_literals
 
 import unittest
+import six
 try:
     import xmlrpclib as stdxmlrpclib
 except ImportError:
@@ -25,6 +26,7 @@ except ImportError:
 from xmpp_backends import xmlrpclib
 
 
+@unittest.skipIf(six.PY3, 'Not testing custom xmlrpclib in python3')
 class TestUnicodeChars(unittest.TestCase):
     def parse_response(self, resp):
         return resp[32:resp.find('</string>')]
