@@ -16,6 +16,7 @@
 import unittest
 from datetime import datetime
 
+import pytz
 from xmpp_backends.base import XmppBackendBase
 
 base = XmppBackendBase()
@@ -23,5 +24,24 @@ base = XmppBackendBase()
 
 class TestDateTimeToTimestamp(unittest.TestCase):
     def test_no_tz(self):
-        now = datetime(2000, 3, 5, 12, 20, 3)
-        self.assertEqual(base.datetime_to_timestamp(now), 952255203)
+        now = datetime(2000, 1, 5, 12, 20, 3)
+        self.assertEqual(base.datetime_to_timestamp(now), 947074803)
+
+        now = datetime(2000, 7, 5, 12, 20, 3)
+        self.assertEqual(base.datetime_to_timestamp(now), 962799603)
+
+    def test_utc(self):
+        # results should be identical to no_tz above, since UTC is the default
+        now = pytz.utc.localize(datetime(2000, 1, 5, 12, 20, 3))
+        self.assertEqual(base.datetime_to_timestamp(now), 947074803)
+
+        now = pytz.utc.localize(datetime(2000, 7, 5, 12, 20, 3))
+        self.assertEqual(base.datetime_to_timestamp(now), 962799603)
+
+    def test_vienna(self):
+        tz = pytz.timezone('Europe/Vienna')
+        now = tz.localize(datetime(2000, 1, 5, 12, 20, 3))
+        self.assertEqual(base.datetime_to_timestamp(now), 947071203)
+
+        now = tz.localize(datetime(2000, 7, 5, 12, 20, 3))
+        self.assertEqual(base.datetime_to_timestamp(now), 962792403)
