@@ -17,6 +17,7 @@ setup(
     install_requires=[
         'six>=1.10.0',
     ],
+    test_suite='tests',
     classifiers=[
         "Development Status :: 4 - Beta",
         "Environment :: Web Environment",
