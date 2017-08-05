@@ -100,6 +100,11 @@ class DummyBackend(XmppBackendBase):
             if email is not None:
                 data['email'] = email
             self.module.set(user, data)
+
+            # maintain list of users in cache
+            users = self.module.get('all_users', set())
+            users.add(user)
+            self.module.set('all_users', users)
         else:
             raise UserExists()
 
@@ -171,11 +176,15 @@ class DummyBackend(XmppBackendBase):
         self.set_password(username, domain, self.get_random_password())
 
     def all_users(self, domain):
-        return set()
+        return set(self.module.get('all_users', set()))
 
     def remove_user(self, username, domain):
         user = '%s@%s' % (username, domain)
         log.debug('Remove: %s', user)
+
+        users = self.module.get('all_users', set())
+        users.remove(user)
+        self.module.set('all_users', users)
 
         self.module.delete(user)
 
