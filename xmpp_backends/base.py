@@ -23,6 +23,7 @@ import time
 from datetime import datetime
 from importlib import import_module
 
+import pytz
 import six
 
 
@@ -82,6 +83,8 @@ class XmppBackendBase(object):
     def datetime_to_timestamp(self, dt):
         """Helper function to convert a datetime object to a timestamp.
 
+        If datetime instance ``dt`` is naive, it is assumed that it is in UTC.
+
         In Python 3, this just calls ``datetime.timestamp()`, in Python 2, it substracts any timezone offset
         and returns the difference since 1970-01-01 00:00:00.
 
@@ -96,6 +99,8 @@ class XmppBackendBase(object):
             return int(time.time())
 
         if six.PY3:
+            if not dt.tzinfo:
+                dt = pytz.utc.localize(dt)
             return int(dt.timestamp())
         else:
             if dt.tzinfo:
