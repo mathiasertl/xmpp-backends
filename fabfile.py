@@ -103,7 +103,9 @@ def test_backend(backend, domain, config_path=''):
         error('Could not verify password.')
     if backend.check_password(username1, domain, password1) is not False:
         error('False password is accepted.')
+    ok()
 
+    print('Test last activity... ', end='')
     backend.get_last_activity(username1, domain)
     now = datetime(2017, 8, 5, 12, 14, 23)
     if backend.set_last_activity(username1, domain, 'foobar', timestamp=now) is not None:
@@ -120,8 +122,10 @@ def test_backend(backend, domain, config_path=''):
     last = backend.get_last_activity(username1, domain)
     if now != pytz.utc.localize(last).astimezone(tz):
         error('Did not get same last activity back: %s vs %s' % (now.isoformat(), last.isoformat()))
+    ok()
 
     # remove user again
+    print('Remove user... ', end='')
     if backend.remove_user(username1, domain) is not None:
         error('remove_user() did not return None.')
     if backend.all_users(domain) != set():
