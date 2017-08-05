@@ -163,12 +163,14 @@ class DummyBackend(XmppBackendBase):
         user = '%s@%s' % (username, domain)
         if timestamp is None:
             timestamp = time.time()
+        else:
+            timestamp = self.datetime_to_timestamp(timestamp)
 
         data = self.module.get(user)
         if data is None:
             raise UserNotFound()
         else:
-            data['last_status'] = (time.time(), status)
+            data['last_status'] = (timestamp, status)
             self.module.set(user, data)
 
     def block_user(self, username, domain):
