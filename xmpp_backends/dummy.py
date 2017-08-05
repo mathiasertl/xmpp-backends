@@ -157,7 +157,7 @@ class DummyBackend(XmppBackendBase):
         if data is None:
             raise UserNotFound()
         else:
-            return datetime.fromtimestamp(data['last_status'][0])
+            return datetime.utcfromtimestamp(data['last_status'][0])
 
     def set_last_activity(self, username, domain, status, timestamp=None):
         user = '%s@%s' % (username, domain)
