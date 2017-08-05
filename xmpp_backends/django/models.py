@@ -2,29 +2,30 @@
 #
 # This file is part of xmpp-backends (https://github.com/mathiasertl/xmpp-backends).
 #
-# xmpp-backends is free software: you can redistribute it and/or modify it under the terms of the
-# GNU General Public License as published by the Free Software Foundation, either version 3 of the
-# License, or (at your option) any later version.
+# xmpp-backends is free software: you can redistribute it and/or modify it under the terms of the GNU General
+# Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
+# option) any later version.
 #
-# xmpp-backends is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-# without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
-# the GNU General Public License for more details.
+# xmpp-backends is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+# for more details.
 #
-# You should have received a copy of the GNU General Public License along with xmpp-backends.  If
-# not, see <http://www.gnu.org/licenses/>.
+# You should have received a copy of the GNU General Public License along with xmpp-backends.  If not, see
+# <http://www.gnu.org/licenses/>.
 
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
-from . import xmpp_backend
 from django.contrib.auth.models import AbstractBaseUser
 from django.utils.translation import ugettext_lazy as _
+
+from . import xmpp_backend
 
 
 class XmppBackendUser(AbstractBaseUser):
     """An abstract base model using xmpp as backend for various functions.
 
-    The model assumes that the username as returned by :py:func:`get_username` is the full JID of
-    the user.
+    The model assumes that the username as returned by :py:func:`get_username` is the full JID of the user.
     """
 
     class Meta:
@@ -38,8 +39,7 @@ class XmppBackendUser(AbstractBaseUser):
     def set_password(self, raw_password):
         """Calls :py:func:`~xmpp_backends.base.XmppBackendBase.set_password` for the user.
 
-        If password is ``None``, calls
-        :py:func:`~xmpp_backends.base.XmppBackendBase.set_unusable_password`.
+        If password is ``None``, calls :py:func:`~xmpp_backends.base.XmppBackendBase.set_unusable_password`.
         """
         if raw_password is None:
             self.set_unusable_password()

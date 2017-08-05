@@ -2,27 +2,26 @@
 #
 # This file is part of xmpp-backends (https://github.com/mathiasertl/xmpp-backends).
 #
-# xmpp-backends is free software: you can redistribute it and/or modify it under the terms of the
-# GNU General Public License as published by the Free Software Foundation, either version 3 of the
-# License, or (at your option) any later version.
+# xmpp-backends is free software: you can redistribute it and/or modify it under the terms of the GNU General
+# Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
+# option) any later version.
 #
-# xmpp-backends is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-# without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
-# the GNU General Public License for more details.
+# xmpp-backends is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+# for more details.
 #
-# You should have received a copy of the GNU General Public License along with xmpp-backends.  If
-# not, see <http://www.gnu.org/licenses/>.
+# You should have received a copy of the GNU General Public License along with xmpp-backends.  If not, see
+# <http://www.gnu.org/licenses/>.
 
 from __future__ import unicode_literals
 
 import logging
 import time
-
 from datetime import datetime
 
-from .base import XmppBackendBase
 from .base import UserExists
 from .base import UserNotFound
+from .base import XmppBackendBase
 
 log = logging.getLogger(__name__)
 
@@ -30,11 +29,9 @@ log = logging.getLogger(__name__)
 class DummyBackend(XmppBackendBase):
     """A dummy backend for development using Djangos caching framework.
 
-    By default, Djangos caching framework uses in-memory data structures, so
-    every registration will be removed if you restart the development server.
-    You can configure a different cache (e.g. memcached), see
-    `Django's cache framework <https://docs.djangoproject.com/en/dev/topics/cache/>`_
-    for details.
+    By default, Djangos caching framework uses in-memory data structures, so every registration will be
+    removed if you restart the development server.  You can configure a different cache (e.g. memcached), see
+    `Django's cache framework <https://docs.djangoproject.com/en/dev/topics/cache/>`_ for details.
     """
 
     library = 'django.core.cache.cache'
@@ -51,7 +48,7 @@ class DummyBackend(XmppBackendBase):
                            started=None, status='available', statustext=''):
         """Method to add a user session for debugging.
 
-                :param username: The username of the user.
+        :param   username: The username of the user.
         :type    username: str
         :param     domain: The domain of the user.
         :type      domain: str

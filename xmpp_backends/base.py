@@ -2,16 +2,16 @@
 #
 # This file is part of xmpp-backends (https://github.com/mathiasertl/xmpp-backends).
 #
-# xmpp-backends is free software: you can redistribute it and/or modify it under the terms of the
-# GNU General Public License as published by the Free Software Foundation, either version 3 of the
-# License, or (at your option) any later version.
+# xmpp-backends is free software: you can redistribute it and/or modify it under the terms of the GNU General
+# Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
+# option) any later version.
 #
-# xmpp-backends is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-# without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
-# the GNU General Public License for more details.
+# xmpp-backends is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+# for more details.
 #
-# You should have received a copy of the GNU General Public License along with xmpp-backends.  If
-# not, see <http://www.gnu.org/licenses/>.
+# You should have received a copy of the GNU General Public License along with xmpp-backends.  If not, see
+# <http://www.gnu.org/licenses/>.
 
 """Common code for XMPP backends."""
 
@@ -20,7 +20,6 @@ from __future__ import unicode_literals
 import random
 import string
 import time
-
 from datetime import datetime
 from importlib import import_module
 
@@ -53,9 +52,9 @@ class XmppBackendBase(object):
     library = None
     """Import-party of any third-party library you need.
 
-    Set this attribute to an import path and you will be able to access the module as
-    ``self.module``. This way you don't have to do a module-level import, which would mean that
-    everyone has to have that library installed, even if they're not using your backend.
+    Set this attribute to an import path and you will be able to access the module as ``self.module``. This
+    way you don't have to do a module-level import, which would mean that everyone has to have that library
+    installed, even if they're not using your backend.
     """
     _module = None
 
@@ -83,8 +82,8 @@ class XmppBackendBase(object):
     def datetime_to_timestamp(self, dt):
         """Helper function to convert a datetime object to a timestamp.
 
-        In Python 3, this just calls ``datetime.timestamp()`, in Python 2, it substracts any
-        timezone offset and returns the difference since 1970-01-01 00:00:00.
+        In Python 3, this just calls ``datetime.timestamp()`, in Python 2, it substracts any timezone offset
+        and returns the difference since 1970-01-01 00:00:00.
 
         Note that the function always returns an int, even in Python 3.
 
@@ -108,8 +107,7 @@ class XmppBackendBase(object):
 
         :param length: The length of the random password.
         :type  length: int
-        :param  chars: A string with characters to choose from. Defaults to all
-            ASCII letters and digits.
+        :param  chars: A string with characters to choose from. Defaults to all ASCII letters and digits.
         :type   chars: str
         """
         if chars is None:
@@ -151,8 +149,8 @@ class XmppBackendBase(object):
         :param   domain: The domain of the user.
         :type    domain: str
         :return: A list of connections, each list element is a dictionary with the keys ``"ip"``,
-            ``"priority"``, ``"uptime"``, ``"status"``, ``"resource"`` and ``"statustext"``.
-            See above for more information.
+            ``"priority"``, ``"uptime"``, ``"status"``, ``"resource"`` and ``"statustext"``.  See above for
+            more information.
         """
 
         raise NotImplementedError
@@ -187,19 +185,19 @@ class XmppBackendBase(object):
     def create_reservation(self, username, domain, email=None):
         """Reserve a new account.
 
-        This method is called when a user account should be reserved, meaning that the account can
-        no longer be registered by anybody else but the user cannot yet log in either. This is
-        useful if e.g. an email confirmation is still pending.
+        This method is called when a user account should be reserved, meaning that the account can no longer
+        be registered by anybody else but the user cannot yet log in either. This is useful if e.g. an email
+        confirmation is still pending.
 
-        The default implementation calls :py:func:`~xmpp_backends.base.XmppBackendBase.create_user`
-        with a random password.
+        The default implementation calls :py:func:`~xmpp_backends.base.XmppBackendBase.create_user` with a
+        random password.
 
         :param username: The username of the user.
         :type  username: str
         :param   domain: The domain of the user.
         :type    domain: str
-        :param    email: The email address provided by the user. Note that at this point it is not
-                         confirmed. You are free to ignore this parameter.
+        :param    email: The email address provided by the user. Note that at this point it is not confirmed.
+            You are free to ignore this parameter.
         """
         password = self.get_random_password()
         self.create(username=username, domain=domain, password=password, email=email)
@@ -207,9 +205,8 @@ class XmppBackendBase(object):
     def confirm_reservation(self, username, domain, password, email=None):
         """Confirm a reservation for a username.
 
-        The default implementation just calls
-        :py:func:`~xmpp_backends.base.XmppBackendBase.set_password` and optionally
-        :py:func:`~xmpp_backends.base.XmppBackendBase.set_email`.
+        The default implementation just calls :py:func:`~xmpp_backends.base.XmppBackendBase.set_password` and
+        optionally :py:func:`~xmpp_backends.base.XmppBackendBase.set_email`.
         """
         self.set_password(username=username, domain=domain, password=password)
         if email is not None:
@@ -244,8 +241,7 @@ class XmppBackendBase(object):
     def get_last_activity(self, username, domain):
         """Get the last activity of the user.
 
-        The datetime object returned should be a naive datetime object representing the time in
-        UTC.
+        The datetime object returned should be a naive datetime object representing the time in UTC.
 
         :param username: The username of the user.
         :type  username: str
@@ -262,8 +258,8 @@ class XmppBackendBase(object):
         .. NOTE::
 
            If your backend requires a Unix timestamp (seconds since 1970-01-01), you can use the
-           :py:func:`~xmpp_backends.base.XmppBackendBase.datetime_to_timestamp` convenience
-           function to convert it to an integer.
+           :py:func:`~xmpp_backends.base.XmppBackendBase.datetime_to_timestamp` convenience function to
+           convert it to an integer.
 
         :param  username: The username of the user.
         :type   username: str
@@ -272,8 +268,7 @@ class XmppBackendBase(object):
         :param    status: The status text.
         :type     status: str
         :param timestamp: A datetime object representing the last activity. If the object is not
-            timezone-aware, assume UTC. If ``timestamp`` is ``None``, assume the current date and
-            time.
+            timezone-aware, assume UTC. If ``timestamp`` is ``None``, assume the current date and time.
         :type  timestamp: datetime
         """
         raise NotImplementedError
@@ -281,8 +276,8 @@ class XmppBackendBase(object):
     def block_user(self, username, domain):
         """Block the specified user.
 
-        The default implementation calls
-        :py:func:`~xmpp_backends.base.XmppBackendBase.set_password` with a random password.
+        The default implementation calls :py:func:`~xmpp_backends.base.XmppBackendBase.set_password` with a
+        random password.
 
         :param username: The username of the user.
         :type  username: str
@@ -311,8 +306,8 @@ class XmppBackendBase(object):
         """Expire a username reservation.
 
         This method is called when a reservation expires. The default implementation just calls
-        :py:func:`~xmpp_backends.base.XmppBackendBase.remove_user`. This is fine if you do not
-        override :py:func:`~xmpp_backends.base.XmppBackendBase.create_reservation`.
+        :py:func:`~xmpp_backends.base.XmppBackendBase.remove_user`. This is fine if you do not override
+        :py:func:`~xmpp_backends.base.XmppBackendBase.create_reservation`.
 
         :param username: The username of the user.
         :type  username: str
@@ -338,8 +333,8 @@ class XmppBackendBase(object):
 
         :param   domain: The domain of interest.
         :type    domain: str
-        :return: A set of all users. The usernames do not include the domain, so
-                 ``user@example.com`` will just be ``"user"``.
+        :return: A set of all users. The usernames do not include the domain, so ``user@example.com`` will
+            just be ``"user"``.
         :rtype: set of str
         """
         raise NotImplementedError
@@ -359,8 +354,8 @@ class XmppBackendBase(object):
     def stats(self, stat, domain=None):
         """Get statistical value about the XMPP server.
 
-        Minimal statistics that should be supported is ``"registered_users"`` and
-        ``"online_users"``. The specific backend might support additional stats.
+        Minimal statistics that should be supported is ``"registered_users"`` and ``"online_users"``. The
+        specific backend might support additional stats.
 
         :param stat: The value of the statistic.
         :type  stat: str
@@ -381,9 +376,8 @@ class EjabberdBackendBase(XmppBackendBase):
     def has_usable_password(self, username, domain):
         """Always return ``True``.
 
-        In ejabberd there is no such thing as a "banned" account or an unusable password. Even
-        ejabberd's ``ban_account`` command only sets a random password that the user could
-        theoretically guess.
+        In ejabberd there is no such thing as a "banned" account or an unusable password. Even ejabberd's
+        ``ban_account`` command only sets a random password that the user could theoretically guess.
         """
 
         return True

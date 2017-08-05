@@ -2,21 +2,20 @@
 #
 # This file is part of xmpp-backends (https://github.com/mathiasertl/xmpp-backends).
 #
-# xmpp-backends is free software: you can redistribute it and/or modify it under the terms of the
-# GNU General Public License as published by the Free Software Foundation, either version 3 of the
-# License, or (at your option) any later version.
+# xmpp-backends is free software: you can redistribute it and/or modify it under the terms of the GNU General
+# Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
+# option) any later version.
 #
-# xmpp-backends is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-# without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
-# the GNU General Public License for more details.
+# xmpp-backends is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+# for more details.
 #
-# You should have received a copy of the GNU General Public License along with xmpp-backends.  If
-# not, see <http://www.gnu.org/licenses/>.
+# You should have received a copy of the GNU General Public License along with xmpp-backends.  If not, see
+# <http://www.gnu.org/licenses/>.
 
 from __future__ import unicode_literals
 
 import logging
-
 from datetime import datetime
 from datetime import timedelta
 from subprocess import PIPE
@@ -37,13 +36,12 @@ class EjabberdctlBackend(EjabberdBackendBase):
     .. WARNING::
 
        This backend is not very secure because ejabberdctl gets any passwords in clear text via the
-       commandline. The process list (and thus the passwords) can usually be viewed by anyone that
-       has shell-access to your machine!
+       commandline. The process list (and thus the passwords) can usually be viewed by anyone that has
+       shell-access to your machine!
 
-    :param    path: Optional path to the ``ejabberdctl`` script. The default is
-        ``"/usr/sbin/ejabberdctl"``.
-    :param version: A tuple describing the version used, e.g. ``(16, 12,)``. See
-        :ref:`version parameter <ejabberd_version>` for a more detailed explanation.
+    :param    path: Optional path to the ``ejabberdctl`` script. The default is ``"/usr/sbin/ejabberdctl"``.
+    :param version: A tuple describing the version used, e.g. ``(16, 12,)``. See :ref:`version parameter
+        <ejabberd_version>` for a more detailed explanation.
     """
 
     def __init__(self, path='/usr/sbin/ejabberdctl', version=None):
@@ -153,8 +151,8 @@ class EjabberdctlBackend(EjabberdBackendBase):
             raise BackendError(code)
 
     def message_user(self, username, domain, subject, message):
-        """Currently use send_message_chat and discard subject, because headline messages are not
-        stored by mod_offline."""
+        """Currently use send_message_chat and discard subject, because headline messages are not stored by
+        mod_offline."""
         self.ctl('send_message_chat', domain, '%s@%s' % (username, domain), message)
 
     def all_users(self, domain):

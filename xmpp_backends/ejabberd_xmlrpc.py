@@ -2,22 +2,22 @@
 #
 # This file is part of xmpp-backends (https://github.com/mathiasertl/xmpp-backends).
 #
-# xmpp-backends is free software: you can redistribute it and/or modify it under the terms of the
-# GNU General Public License as published by the Free Software Foundation, either version 3 of the
-# License, or (at your option) any later version.
+# xmpp-backends is free software: you can redistribute it and/or modify it under the terms of the GNU General
+# Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
+# option) any later version.
 #
-# xmpp-backends is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-# without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
-# the GNU General Public License for more details.
+# xmpp-backends is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+# for more details.
 #
-# You should have received a copy of the GNU General Public License along with xmpp-backends.  If
-# not, see <http://www.gnu.org/licenses/>.
+# You should have received a copy of the GNU General Public License along with xmpp-backends.  If not, see
+# <http://www.gnu.org/licenses/>.
 
+from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import logging
 import socket
-
 from datetime import datetime
 from datetime import timedelta
 
@@ -25,15 +25,15 @@ import six
 
 from six.moves.http_client import BadStatusLine
 
+from .base import BackendError
+from .base import EjabberdBackendBase
+from .base import UserExists
+
 if six.PY2:  # we have a special version for Python2
     from . import xmlrpclib
 else:  # use the default for Python3 (god save us all!)
     from xmlrpc import client as xmlrpclib
 
-
-from xmpp_backends.base import EjabberdBackendBase  # NOQA
-from xmpp_backends.base import BackendError  # NOQA
-from xmpp_backends.base import UserExists  # NOQA
 
 log = logging.getLogger(__name__)
 
@@ -48,10 +48,9 @@ class EjabberdXMLRPCBackend(EjabberdBackendBase):
         The backend does not handle UTF-8 characters correctly if you use ejabberd <= 14.07 and
         Python 3.
 
-    **ejabberd configuration:** The ``xmlrpc`` module is included with ejabberd_ since version
-    13.12. If you use an earlier version, please get and run the module from the
-    `ejabberd-contrib <https://github.com/processone/ejabberd-contrib>`_ repository. Configuring
-    the interface is simple::
+    **ejabberd configuration:** The ``xmlrpc`` module is included with ejabberd_ since version 13.12. If you
+    use an earlier version, please get and run the module from the `ejabberd-contrib
+    <https://github.com/processone/ejabberd-contrib>`_ repository. Configuring the interface is simple::
 
         listen:
             - ip: "127.0.0.1"
@@ -64,8 +63,8 @@ class EjabberdXMLRPCBackend(EjabberdBackendBase):
     :param      verbose: Directly passed to xmlrpclib.
     :param   allow_none: Directly passed to xmlrpclib.
     :param use_datetime: Directly passed to xmlrpclib.
-    :param      context: Directly passed to xmlrpclib. Ignored in in Python3, where the parameter
-        is still documented but no longer accepted by the ServerProxy constructor.
+    :param      context: Directly passed to xmlrpclib. Ignored in in Python3, where the parameter is still
+        documented but no longer accepted by the ServerProxy constructor.
     :param         user: Username of the JID used for authentication.
     :param       server: Server of the JID used for authenticiation.
     :param     password: The password of the given JID.
@@ -74,9 +73,8 @@ class EjabberdXMLRPCBackend(EjabberdBackendBase):
     """
     credentials = None
 
-    def __init__(self, uri='http://127.0.0.1:4560', transport=None, encoding=None, verbose=0,
-                 allow_none=0, use_datetime=0, context=None, user=None, server=None, password=None,
-                 version=(17, 7, )):
+    def __init__(self, uri='http://127.0.0.1:4560', transport=None, encoding=None, verbose=0, allow_none=0,
+                 use_datetime=0, context=None, user=None, server=None, password=None, version=(17, 7, )):
         super(EjabberdXMLRPCBackend, self).__init__()
 
         kwargs = {
@@ -116,8 +114,7 @@ class EjabberdXMLRPCBackend(EjabberdBackendBase):
 
         if result['res'] == 0:
             try:
-                # we ignore errors here because not setting last activity is only a problem in
-                # edge-cases.
+                # we ignore errors here because not setting last activity is only a problem in edge-cases.
                 self.set_last_activity(username, domain, status='Registered')
             except BackendError as e:
                 log.error('Error setting last activity: %s', e)
@@ -158,8 +155,8 @@ class EjabberdXMLRPCBackend(EjabberdBackendBase):
         raw_sessions = result.get('sessions_info', [])
         sessions = []
         for data in raw_sessions:
-            # The data structure is a bit weird, its a list of one-element dicts.
-            # We itemize each dict and then flatten the resulting list
+            # The data structure is a bit weird, its a list of one-element dicts.  We itemize each dict and
+            # then flatten the resulting list
             session = [d.items() for d in data['session']]
             session = dict([item for sublist in session for item in sublist])
 
