@@ -30,6 +30,7 @@ pip install xmpp-backends
   * Code quality is now checked using `isort` and `flake8` with the `fab check` command.
 * Update development requirements.
 * Update language quantifiers for setup.py.
+* Use [Travis CI](https://travis-ci.org) to run at least some basic in continuous integration.
 * Fix `start_user_session` in the dummy backend.
 
 ### 0.3.0 (2016-12-26)
