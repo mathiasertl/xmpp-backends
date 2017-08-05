@@ -26,6 +26,7 @@ pip install xmpp-backends
 
 ### 0.3.1 (to be released)
 
+* Account for API changes in ejabberd 17.04.
 * Add a fabfile for common development tasks.
   * Code quality is now checked using [isort](https://github.com/timothycrosley/isort) and
     [flake8](https://gitlab.com/pycqa/flake8) with the `fab check` command.
