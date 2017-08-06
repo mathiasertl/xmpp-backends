@@ -86,6 +86,7 @@ class EjabberdRestBackend(EjabberdBackendBase):
         self.kwargs = kwargs
         self.headers = kwargs.pop('headers', {})
         self.headers.setdefault('X-Admin', 'true')
+        self.version = version
         if user:
             self.kwargs['auth'] = (user, password)
 
