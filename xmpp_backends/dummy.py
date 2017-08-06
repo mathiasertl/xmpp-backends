@@ -134,7 +134,7 @@ class DummyBackend(XmppBackendBase):
 
         data = self.module.get(user)
         if data is None:
-            raise UserNotFound("User does not exist in backend.")
+            raise UserNotFound('%s@%s' % (username, domain))
         else:
             data['pass'] = password
             self.module.set(user, data)
