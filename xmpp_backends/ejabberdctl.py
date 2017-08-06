@@ -47,7 +47,7 @@ class EjabberdctlBackend(EjabberdBackendBase):
         <ejabberd_version>` for a more detailed explanation.
     """
 
-    def __init__(self, path='/usr/sbin/ejabberdctl', version=None):
+    def __init__(self, path='/usr/sbin/ejabberdctl', version=(17, 7, )):
         self.ejabberdctl = path
         self.version = version
 
