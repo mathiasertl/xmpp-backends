@@ -233,7 +233,7 @@ class EjabberdRestBackend(EjabberdBackendBase):
     def remove_user(self, username, domain):
         response = self.post('unregister', user=username, host=domain)
         if response.content == b'""':
-            return True
+            return
         else:
             raise BackendError('Unknown Error')
 

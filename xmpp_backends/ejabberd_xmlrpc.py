@@ -247,7 +247,7 @@ class EjabberdXMLRPCBackend(EjabberdBackendBase):
     def remove_user(self, username, domain):
         result = self.rpc('unregister', user=username, host=domain)
         if result['res'] == 0:
-            return True
+            return
         else:
             raise BackendError(result.get('text', 'Unknown Error'))
 
