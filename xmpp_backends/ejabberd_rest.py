@@ -147,7 +147,15 @@ class EjabberdRestBackend(EjabberdBackendBase):
             parsed = response.json()
             if parsed['status'] == 'NOT FOUND':
                 raise UserNotFound('%s@%s' % (username, domain))
-            return datetime.strptime(parsed['timestamp'], '%Y-%m-%dT%H:%M:%S.%fZ')
+
+            timestamp = parsed['timestamp']
+            if len(timestamp) == 27:
+                # NOTE: This format is encountered when the user is not found.
+                fmt = '%Y-%m-%dT%H:%M:%S.%fZ'
+            else:
+                fmt = '%Y-%m-%dT%H:%M:%SZ'
+
+            return datetime.strptime(parsed['timestamp'], fmt)
 
     def set_last_activity(self, username, domain, status, timestamp=None):
         timestamp = self.datetime_to_timestamp(timestamp)
