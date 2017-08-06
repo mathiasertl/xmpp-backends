@@ -178,7 +178,8 @@ class DummyBackend(XmppBackendBase):
         self.set_password(username, domain, self.get_random_password())
 
     def all_users(self, domain):
-        return set(self.module.get('all_users', set()))
+        return set([u.split('@')[-1] for u in self.module.get('all_users', set())
+                    if u.endswith('@%s' % domain)])
 
     def remove_user(self, username, domain):
         user = '%s@%s' % (username, domain)
