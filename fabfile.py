@@ -96,7 +96,7 @@ def test_backend(backend, domain, config_path=''):
     if backend.create_user(username1, domain, password1) is not None:
         error('create_user() did not return None.')
     users = backend.all_users(domain)
-    if users != {username1, }:
+    if users != {username1, } | initial_users:
         error('Got wrong set of usernames: %s' % (users, ))
     if backend.check_password(username1, domain, password1) is not True:
         error('Could not verify password.')
