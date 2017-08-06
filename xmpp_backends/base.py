@@ -267,7 +267,7 @@ class XmppBackendBase(object):
         """
         raise NotImplementedError
 
-    def set_last_activity(self, username, domain, status, timestamp=None):
+    def set_last_activity(self, username, domain, status='', timestamp=None):
         """Set the last activity of the user.
 
         .. NOTE::

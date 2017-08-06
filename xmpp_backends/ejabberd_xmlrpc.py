@@ -159,7 +159,7 @@ class EjabberdXMLRPCBackend(EjabberdBackendBase):
 
             return datetime.strptime(timestamp, fmt)
 
-    def set_last_activity(self, username, domain, status, timestamp=None):
+    def set_last_activity(self, username, domain, status='', timestamp=None):
         timestamp = self.datetime_to_timestamp(timestamp)
         self.rpc('set_last', user=username, host=domain, timestamp=timestamp, status=status)
 

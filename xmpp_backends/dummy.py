@@ -159,7 +159,7 @@ class DummyBackend(XmppBackendBase):
         else:
             return datetime.utcfromtimestamp(data['last_status'][0])
 
-    def set_last_activity(self, username, domain, status, timestamp=None):
+    def set_last_activity(self, username, domain, status='', timestamp=None):
         user = '%s@%s' % (username, domain)
         if timestamp is None:
             timestamp = time.time()

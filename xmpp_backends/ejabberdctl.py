@@ -145,7 +145,7 @@ class EjabberdctlBackend(EjabberdBackendBase):
 
             return datetime.strptime(timestamp, fmt)
 
-    def set_last_activity(self, username, domain, status, timestamp=None):
+    def set_last_activity(self, username, domain, status='', timestamp=None):
         timestamp = str(self.datetime_to_timestamp(timestamp))
         self.ctl('set_last', username, domain, timestamp, status)
 
