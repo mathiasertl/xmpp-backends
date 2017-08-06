@@ -134,7 +134,7 @@ class DummyBackend(XmppBackendBase):
 
         data = self.module.get(user)
         if data is None:
-            raise UserNotFound('%s@%s' % (username, domain))
+            raise UserNotFound(username, domain)
         else:
             data['pass'] = password
             self.module.set(user, data)
@@ -145,7 +145,7 @@ class DummyBackend(XmppBackendBase):
 
         data = self.module.get(user)
         if data is None:
-            raise UserNotFound()
+            raise UserNotFound(username, domain)
         else:
             data['email'] = email
             self.module.set(user, data)
@@ -155,7 +155,7 @@ class DummyBackend(XmppBackendBase):
 
         data = self.module.get(user)
         if data is None:
-            raise UserNotFound('%s@%s' % (username, domain))
+            raise UserNotFound(username, domain)
         else:
             return datetime.utcfromtimestamp(data['last_status'][0])
 
@@ -168,7 +168,7 @@ class DummyBackend(XmppBackendBase):
 
         data = self.module.get(user)
         if data is None:
-            raise UserNotFound()
+            raise UserNotFound(username, domain)
         else:
             data['last_status'] = (timestamp, status)
             self.module.set(user, data)

@@ -146,7 +146,7 @@ class EjabberdRestBackend(EjabberdBackendBase):
         else:
             parsed = response.json()
             if parsed['status'] == 'NOT FOUND':
-                raise UserNotFound('%s@%s' % (username, domain))
+                raise UserNotFound(username, domain)
 
             timestamp = parsed['timestamp']
             if len(timestamp) == 27:
@@ -210,7 +210,7 @@ class EjabberdRestBackend(EjabberdBackendBase):
         if response.content == b'0':
             return
         elif response.status_code == 404:
-            raise UserNotFound('%s@%s' % (username, domain))
+            raise UserNotFound(username, domain)
         else:
             raise BackendError('Unknown Error')
 

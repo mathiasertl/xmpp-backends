@@ -44,7 +44,17 @@ class UserExists(BackendError):
 
 class UserNotFound(BackendError):
     """Raised when a user is not found."""
-    pass
+
+    def __init__(self, node, domain, resource=None):
+        self.node = node
+        self.domain = domain
+        self.resource = resource
+
+    def __str__(self):
+        s = '%s@%s' % (self.node, self.domain)
+        if self.resource is not None:
+            s += '/%s' % self.resource
+        return s
 
 
 class XmppBackendBase(object):

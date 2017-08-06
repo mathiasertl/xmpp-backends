@@ -135,7 +135,7 @@ class EjabberdctlBackend(EjabberdBackendBase):
         else:
             timestamp, reason = out.strip().split('\t', 1)
             if reason == 'NOT FOUND':
-                raise UserNotFound('%s@%s' % (username, domain))
+                raise UserNotFound(username, domain)
 
             if len(timestamp) == 27:
                 # NOTE: This format is encountered when the user is not found.
@@ -168,7 +168,7 @@ class EjabberdctlBackend(EjabberdBackendBase):
             out = out.decode('utf-8')
 
         if code == 1 and out == '{not_found,"unknown_user"}\n':
-            raise UserNotFound('%s@%s' % (username, domain))
+            raise UserNotFound(username, domain)
         elif code != 0:  # 0 is also returned if the user doesn't exist.
             raise BackendError(code)
 

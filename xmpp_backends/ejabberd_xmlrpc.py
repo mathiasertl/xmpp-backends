@@ -148,7 +148,7 @@ class EjabberdXMLRPCBackend(EjabberdBackendBase):
         else:
             data = result['last_activity']
             if data[1]['status'] == 'NOT FOUND':
-                raise UserNotFound('%s@%s' % (username, domain))
+                raise UserNotFound(username, domain)
 
             timestamp = data[0]['timestamp']
             if len(timestamp) == 27:
@@ -216,7 +216,7 @@ class EjabberdXMLRPCBackend(EjabberdBackendBase):
             result = self.rpc('change_password', user=username, host=domain, newpass=password)
         except xmlrpclib.Fault as e:
             if e.faultCode == -118:
-                raise UserNotFound('%s@%s' % (username, domain))
+                raise UserNotFound(username, domain)
             raise BackendError('Unknown Error')
 
         if result['res'] == 0:
