@@ -52,6 +52,7 @@ def check():
 @task
 def test_backend(backend, domain, config_path=''):
     username1 = 'example'
+    jid1 = '%s@%s' % (username1, domain)
     password1 = 'foobar'
     password2 = 'barfoo'
 
@@ -79,8 +80,9 @@ def test_backend(backend, domain, config_path=''):
     try:
         ret = backend.get_last_activity(username1, domain)
         error('get_last_activity did not raise UserNotFound: %s' % ret)
-    except UserNotFound:
-        pass
+    except UserNotFound as e:
+        if str(e) != jid1:
+            error('UserNotFound from get_last_activity did not match "%s": "%s"' % (jid1, str(e)))
     try:
         backend.set_password(username1, domain, password1)
         error('set_password() did not raise UserNotFound.')
