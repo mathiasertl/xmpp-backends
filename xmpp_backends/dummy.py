@@ -168,7 +168,7 @@ class DummyBackend(XmppBackendBase):
 
         data = self.module.get(user)
         if data is None:
-            raise UserNotFound(username, domain)
+            pass  # NOTE: real APIs provide no error either :-/
         else:
             data['last_status'] = (timestamp, status)
             self.module.set(user, data)
