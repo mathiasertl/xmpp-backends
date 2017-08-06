@@ -71,8 +71,9 @@ def test_backend(backend, domain, config_path=''):
     initial_users = set(config.get('expected_users', set()))
 
     print('Testing initial state... ', end='')
-    if backend.all_users(domain) != initial_users:
-        error('all_users() did not return an empty set.')
+    users = backend.all_users(domain)
+    if users != initial_users:
+        error('all_users() did not return expected users: %s' % (users, ))
     if backend.user_exists('example', domain):
         error('User "example" exists.')
     if backend.check_password(username1, domain, password1) is not False:
