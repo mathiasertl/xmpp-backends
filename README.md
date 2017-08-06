@@ -1,7 +1,8 @@
 # xmpp-backends
 
-**xmpp-backends** provides a set of classes with a common interface to communicate with admin interfaces of
-various XMPP servers. 
+**xmpp-backends** is a Python library and provides a set of classes with a common interface to communicate
+with admin interfaces of various XMPP servers. It also includes helper libraries to make it easier to use and
+configure with Django.
 
 Detailed documentation is available at http://xmpp-backends.rtfd.org/.
 
@@ -24,7 +25,7 @@ pip install xmpp-backends
 
 ## ChangeLog
 
-### 0.3.1 (to be released)
+### 0.4.0 (to be released)
 
 * Account for API changes in ejabberd 17.04.
 * Add a fabfile for common development tasks.
