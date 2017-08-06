@@ -156,9 +156,13 @@ class EjabberdctlBackend(EjabberdBackendBase):
             raise BackendError(code)
 
     def set_password(self, username, domain, password):
-        code, out, err = self.ctl('change_password', username, domain,
-                                  password)
-        if code != 0:  # 0 is also returned if the user doesn't exist.
+        code, out, err = self.ctl('change_password', username, domain, password)
+        if six.PY3:
+            out = out.decode('utf-8')
+
+        if code == 1 and out == '{not_found,"unknown_user"}\n':
+            raise UserNotFound('%s@%s' % (username, domain))
+        elif code != 0:  # 0 is also returned if the user doesn't exist.
             raise BackendError(code)
 
     def set_unusable_password(self, username, domain):
