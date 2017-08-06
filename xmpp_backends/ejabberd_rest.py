@@ -25,6 +25,7 @@ import requests
 from .base import BackendError
 from .base import EjabberdBackendBase
 from .base import UserExists
+from .base import UserNotFound
 
 log = logging.getLogger(__name__)
 
@@ -143,8 +144,10 @@ class EjabberdRestBackend(EjabberdBackendBase):
         # ejabberd 17.04 introduced a change:
         #       https://github.com/processone/ejabberd/issues/1565
         else:
-            result = response.json()['timestamp']
-            return datetime.strptime(result, '%Y-%m-%dT%H:%M:%S.%fZ')
+            parsed = response.json()
+            if parsed['status'] == 'NOT FOUND':
+                raise UserNotFound('%s@%s' % (username, domain))
+            return datetime.strptime(parsed['timestamp'], '%Y-%m-%dT%H:%M:%S.%fZ')
 
     def set_last_activity(self, username, domain, status, timestamp=None):
         timestamp = self.datetime_to_timestamp(timestamp)
