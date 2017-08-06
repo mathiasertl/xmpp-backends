@@ -192,7 +192,7 @@ class EjabberdXMLRPCBackend(EjabberdBackendBase):
     def set_password(self, username, domain, password):
         result = self.rpc('change_password', user=username, host=domain, newpass=password)
         if result['res'] == 0:
-            return True
+            return
         else:
             raise BackendError(result.get('text', 'Unknown Error'))
 

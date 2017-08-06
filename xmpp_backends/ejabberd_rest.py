@@ -200,7 +200,7 @@ class EjabberdRestBackend(EjabberdBackendBase):
         response = self.post('change_password', user=username, host=domain, newpass=password,
                              allowed_status=[200, 404])
         if response.content == b'0':
-            return True
+            return
         elif response.status_code == 404:
             raise UserNotFound('%s@%s' % (username, domain))
         else:
