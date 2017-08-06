@@ -48,6 +48,10 @@ class EjabberdctlBackend(EjabberdBackendBase):
 
     def __init__(self, path='/usr/sbin/ejabberdctl', version=None):
         self.ejabberdctl = path
+        self.version = version
+
+    def get_version(self):
+        return self.version
 
     def ex(self, *cmd):
         p = Popen(cmd, stdout=PIPE, stderr=PIPE)
@@ -112,6 +116,7 @@ class EjabberdctlBackend(EjabberdBackendBase):
 
     def get_last_activity(self, username, domain):
         code, out, err = self.ctl('get_last', username, domain)
+        version = self.get_version()
 
         if code != 0:
             raise BackendError(code)
@@ -119,12 +124,16 @@ class EjabberdctlBackend(EjabberdBackendBase):
         if six.PY3:
             out = out.decode('utf-8')
 
-        if out == 'Online':
-            return datetime.utcnow()
-        elif out == 'Never':
-            return None
+        if version < (17, 4):
+            if out == 'Online':
+                return datetime.utcnow()
+            elif out == 'Never':
+                return None
+            else:
+                return datetime.strptime(out[:19], '%Y-%m-%d %H:%M:%S')
         else:
-            return datetime.strptime(out[:19], '%Y-%m-%d %H:%M:%S')
+            timestamp, reason = out.strip().split('\t', 1)
+            return datetime.strptime(timestamp, '%Y-%m-%d %H:%M:%S')
 
     def set_last_activity(self, username, domain, status, timestamp=None):
         timestamp = str(self.datetime_to_timestamp(timestamp))
