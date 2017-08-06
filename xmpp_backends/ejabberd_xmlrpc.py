@@ -28,6 +28,7 @@ from six.moves.http_client import BadStatusLine
 from .base import BackendError
 from .base import EjabberdBackendBase
 from .base import UserExists
+from .base import UserNotFound
 
 if six.PY2:  # we have a special version for Python2
     from . import xmlrpclib
@@ -95,6 +96,10 @@ class EjabberdXMLRPCBackend(EjabberdBackendBase):
                 'server': server,
                 'password': password,
             }
+        self.version = version
+
+    def get_version(self):
+        return self.version
 
     def rpc(self, cmd, **kwargs):
         """Generic helper function to call an RPC method."""
@@ -128,14 +133,23 @@ class EjabberdXMLRPCBackend(EjabberdBackendBase):
 
     def get_last_activity(self, username, domain):
         result = self.rpc('get_last', user=username, host=domain)
+        version = self.get_version()
 
-        activity = result['last_activity']
-        if activity == 'Online':
-            return datetime.utcnow()
-        elif activity == 'Never':
-            return None
+        if version < (17, 4):
+            # ejabberd 17.04 introduced a change:
+            #       https://github.com/processone/ejabberd/issues/1565
+            activity = result['last_activity']
+            if activity == 'Online':
+                return datetime.utcnow()
+            elif activity == 'Never':
+                return None
+            else:
+                return datetime.strptime(activity[:19], '%Y-%m-%d %H:%M:%S')
         else:
-            return datetime.strptime(activity[:19], '%Y-%m-%d %H:%M:%S')
+            data = result['last_activity']
+            if data['status'] == 'NOT FOUND':
+                raise UserNotFound('%s@%s' % (username, domain))
+            return datetime.strptime(data['timestamp'], '%Y-%m-%dT%H:%M:%S.%fZ')
 
     def set_last_activity(self, username, domain, status, timestamp=None):
         timestamp = self.datetime_to_timestamp(timestamp)
