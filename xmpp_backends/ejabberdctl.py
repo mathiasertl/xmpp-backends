@@ -26,6 +26,7 @@ import six
 from .base import BackendError
 from .base import EjabberdBackendBase
 from .base import UserExists
+from .base import UserNotFound
 
 log = logging.getLogger(__name__)
 
@@ -133,6 +134,8 @@ class EjabberdctlBackend(EjabberdBackendBase):
                 return datetime.strptime(out[:19], '%Y-%m-%d %H:%M:%S')
         else:
             timestamp, reason = out.strip().split('\t', 1)
+            if reason == 'NOT FOUND':
+                raise UserNotFound('%s@%s' % (username, domain))
             return datetime.strptime(timestamp, '%Y-%m-%d %H:%M:%S')
 
     def set_last_activity(self, username, domain, status, timestamp=None):
