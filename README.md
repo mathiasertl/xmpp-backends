@@ -15,6 +15,7 @@ pip install xmpp-backends
 
 ## Supported backends
 
+* `ejabberd_rest`: Connects to ejabberd via `mod_http_api`. This is the recommended backend for ejabberd.
 * `ejabberd_xmlrpc`: Connects to ejabberd via `mod_xmlrpc`. The backend uses it's own version of Python's
   xmlrpc library to correctly encode UTF-8 characters.
 * `ejabberdctl`: Uses the `ejabberdctl` command line utility that obviously needs to be available on the local
@@ -29,10 +30,15 @@ pip install xmpp-backends
 * Add a fabfile for common development tasks.
   * Code quality is now checked using [isort](https://github.com/timothycrosley/isort) and
     [flake8](https://gitlab.com/pycqa/flake8) with the `fab check` command.
+  * `fab test_backend` now allows you to test a backend. The command is used to assert identical behaviour in
+    the various backends.
 * Update development requirements.
 * Update language quantifiers for setup.py.
 * Use [Travis CI](https://travis-ci.org) to run at least some basic in continuous integration.
 * Fix `start_user_session` in the dummy backend.
+* Fix Python3 support for the `ejabberdctl` backend.
+* `set_last_activity` now has an empty default status.
+* Various minor fixes in returned values and raised exceptions in all backends.
 
 ### 0.3.0 (2016-12-26)
 
