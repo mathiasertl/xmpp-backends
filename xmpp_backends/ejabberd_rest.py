@@ -144,7 +144,7 @@ class EjabberdRestBackend(EjabberdBackendBase):
         #       https://github.com/processone/ejabberd/issues/1565
         else:
             result = response.json()['timestamp']
-            return datetime.strptime(result, '%Y-%m-%dT%H:%M:%SZ')
+            return datetime.strptime(result, '%Y-%m-%dT%H:%M:%S.%fZ')
 
     def set_last_activity(self, username, domain, status, timestamp=None):
         timestamp = self.datetime_to_timestamp(timestamp)
