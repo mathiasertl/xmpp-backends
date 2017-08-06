@@ -136,7 +136,14 @@ class EjabberdctlBackend(EjabberdBackendBase):
             timestamp, reason = out.strip().split('\t', 1)
             if reason == 'NOT FOUND':
                 raise UserNotFound('%s@%s' % (username, domain))
-            return datetime.strptime(timestamp, '%Y-%m-%d %H:%M:%S')
+
+            if len(timestamp) == 27:
+                # NOTE: This format is encountered when the user is not found.
+                fmt = '%Y-%m-%dT%H:%M:%S.%fZ'
+            else:
+                fmt = '%Y-%m-%dT%H:%M:%SZ'
+
+            return datetime.strptime(timestamp, fmt)
 
     def set_last_activity(self, username, domain, status, timestamp=None):
         timestamp = str(self.datetime_to_timestamp(timestamp))
