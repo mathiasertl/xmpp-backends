@@ -155,7 +155,7 @@ class DummyBackend(XmppBackendBase):
 
         data = self.module.get(user)
         if data is None:
-            raise UserNotFound()
+            raise UserNotFound('%s@%s' % (username, domain))
         else:
             return datetime.utcfromtimestamp(data['last_status'][0])
 
