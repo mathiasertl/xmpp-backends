@@ -116,6 +116,9 @@ class EjabberdctlBackend(EjabberdBackendBase):
         if code != 0:
             raise BackendError(code)
 
+        if six.PY3:
+            out = out.decode('utf-8')
+
         if out == 'Online':
             return datetime.utcnow()
         elif out == 'Never':
