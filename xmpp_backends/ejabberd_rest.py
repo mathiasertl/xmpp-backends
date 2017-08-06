@@ -197,7 +197,8 @@ class EjabberdRestBackend(EjabberdBackendBase):
             raise BackendError('Unknown Error')
 
     def set_password(self, username, domain, password):
-        response = self.post('change_password', user=username, host=domain, newpass=password)
+        response = self.post('change_password', user=username, host=domain, newpass=password,
+                             allowed_status=[200, 404])
         if response.content == b'0':
             return True
         elif response.status_code == 404:
