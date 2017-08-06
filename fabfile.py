@@ -77,8 +77,8 @@ def test_backend(backend, domain, config_path=''):
     if backend.check_password(username1, domain, password1) is not False:
         error('check_password() did not return False for non-existing user.')
     try:
-        backend.get_last_activity('example', domain)
-        error('get_last_activity did not raise UserNotFound.')
+        ret = backend.get_last_activity(username1, domain)
+        error('get_last_activity did not raise UserNotFound: %s' % ret)
     except UserNotFound:
         pass
     try:
