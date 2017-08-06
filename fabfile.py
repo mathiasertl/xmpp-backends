@@ -87,7 +87,8 @@ def test_backend(backend, domain, config_path=''):
         backend.set_password(username1, domain, password1)
         error('set_password() did not raise UserNotFound.')
     except UserNotFound:
-        pass
+        if str(e) != jid1:
+            error('UserNotFound from set_password did not match "%s": "%s"' % (jid1, str(e)))
     ok()
 
     print('Create and test example user... ', end='')
