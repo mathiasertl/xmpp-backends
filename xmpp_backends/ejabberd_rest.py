@@ -89,9 +89,9 @@ class EjabberdRestBackend(EjabberdBackendBase):
         if user:
             self.kwargs['auth'] = (user, password)
 
-    def get_version(self, request):
-        if request.header.get('Ejabberd-Version'):
-            return request.header.get('Ejabberd-Version').split('.')
+    def get_version(self, response):
+        if response.headers.get('Ejabberd-Version'):
+            return response.headers.get('Ejabberd-Version').split('.')
         return self.version
 
     def post(self, cmd, allowed_status=None, **payload):
