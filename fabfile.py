@@ -67,9 +67,10 @@ def test_backend(backend, domain, config_path=''):
         config = json.load(stream)
 
     backend = cls(**config.get('kwargs', {}))
+    initial_users = set(config.get('expected_users', set()))
 
     print('Testing initial state... ', end='')
-    if backend.all_users(domain) != set():
+    if backend.all_users(domain) != initial_users:
         error('all_users() did not return an empty set.')
     if backend.user_exists('example', domain):
         error('User "example" exists.')
@@ -128,6 +129,6 @@ def test_backend(backend, domain, config_path=''):
     print('Remove user... ', end='')
     if backend.remove_user(username1, domain) is not None:
         error('remove_user() did not return None.')
-    if backend.all_users(domain) != set():
+    if backend.all_users(domain) != initial_users:
         error('all_users() did not return an empty set after removing user.')
     ok()
