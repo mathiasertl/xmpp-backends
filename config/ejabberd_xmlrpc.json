@@ -1,7 +1,7 @@
 {
     "expected_users": ["api"],
     "kwargs": {
-        "password": "example", 
+        "password": "secret",
         "user": "api", 
         "server": "example.com"
     }
