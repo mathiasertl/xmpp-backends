@@ -85,6 +85,12 @@ def test_backend(backend, domain, config_path=''):
         if str(e) != jid1:
             error('UserNotFound from get_last_activity did not match "%s": "%s"' % (jid1, str(e)))
     try:
+        ret = backend.set_last_activity(username1, domain)
+        error('set_last_activity did not raise UserNotFound: %s' % ret)
+    except UserNotFound as e:
+        if str(e) != jid1:
+            error('UserNotFound from set_last_activity did not match "%s": "%s"' % (jid1, str(e)))
+    try:
         backend.set_password(username1, domain, password1)
         error('set_password() did not raise UserNotFound.')
     except UserNotFound as e:
