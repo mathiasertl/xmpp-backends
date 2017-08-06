@@ -29,10 +29,10 @@ Testing
 
 There is a small test-suite that can be run with::
 
-   python -m unittest discover
+   python setup.py test
 
-... but it doesn't assume that you have a running XMPP server. It only tests
-wether all interfaces actually implement all methods.
+... but it doesn't assume that you have a running XMPP server. It only has a few basic tests for functions not
+related to XMPP and tests if all interfaces actually implement all methods.
 
 Test script
 ===========
