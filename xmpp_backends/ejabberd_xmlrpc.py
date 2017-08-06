@@ -110,7 +110,7 @@ class EjabberdXMLRPCBackend(EjabberdBackendBase):
                 return func(kwargs)
             else:
                 return func(self.credentials, kwargs)
-        except (xmlrpclib.ProtocolError, BadStatusLine, xmlrpclib.Fault, socket.error) as e:
+        except (xmlrpclib.ProtocolError, BadStatusLine, socket.error) as e:
             log.error(e)
             raise BackendError("Error reaching backend.")
 
@@ -204,7 +204,13 @@ class EjabberdXMLRPCBackend(EjabberdBackendBase):
             raise BackendError(result.get('text', 'Unknown Error'))
 
     def set_password(self, username, domain, password):
-        result = self.rpc('change_password', user=username, host=domain, newpass=password)
+        try:
+            result = self.rpc('change_password', user=username, host=domain, newpass=password)
+        except xmlrpclib.Fault as e:
+            if e.faultCode == -118:
+                raise UserNotFound('%s@%s' % (username, domain))
+            raise BackendError('Unknown Error')
+
         if result['res'] == 0:
             return
         else:
