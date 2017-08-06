@@ -21,6 +21,8 @@ from datetime import timedelta
 from subprocess import PIPE
 from subprocess import Popen
 
+import six
+
 from .base import BackendError
 from .base import EjabberdBackendBase
 from .base import UserExists
@@ -159,6 +161,9 @@ class EjabberdctlBackend(EjabberdBackendBase):
         code, out, err = self.ctl('registered_users', domain)
         if code != 0:
             raise BackendError(code)
+
+        if six.PY3:
+            out = out.decode('utf-8')
 
         return set(out.splitlines())
 
