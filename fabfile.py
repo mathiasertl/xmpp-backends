@@ -69,7 +69,7 @@ def test_backend(backend, domain, config_path='', version=''):
 
     kwargs = config.get('kwargs', {})
     if version:
-        kwargs['version'] = tuple(version.split('.'))
+        kwargs['version'] = tuple(int(t) for t in version.split('.'))
 
     backend = cls(**config.get('kwargs', {}))
     initial_users = set(config.get('expected_users', set()))
