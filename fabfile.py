@@ -174,11 +174,12 @@ def test_backend(backend, domain, config_path='', version=''):
 
     print('Test statistics... ', end='')
     stat = backend.stats('registered_users')
-    if stat != 0:
-        error('registered_users did not return 0: %s' % stat)
+    expected_stat = len(initial_users)
+    if stat != expected_stat:
+        error('registered_users did not return %s: %s' % (expected_stat, stat))
     stat = backend.stats('registered_users', domain)
-    if stat != 0:
-        error('registered_users for domain did not return 0: %s' % stat)
+    if stat != expected_stat:
+        error('registered_users for domain did not return %s: %s' % (expected_stat, stat))
     stat = backend.stats('online_users')
     if stat != 0:
         error('online_users did not return 0: %s' % stat)
