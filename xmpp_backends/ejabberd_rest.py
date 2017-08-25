@@ -22,6 +22,7 @@ from datetime import timedelta
 
 import requests
 
+from .base import BackendConnectionError
 from .base import BackendError
 from .base import EjabberdBackendBase
 from .base import UserExists
@@ -101,7 +102,10 @@ class EjabberdRestBackend(EjabberdBackendBase):
             allowed_status = [200]
 
         uri = '%s%s' % (self.uri, cmd)
-        response = requests.post(uri, json=payload, headers=self.headers, **self.kwargs)
+        try:
+            response = requests.post(uri, json=payload, headers=self.headers, **self.kwargs)
+        except requests.exceptions.RequestException as e:
+            raise BackendConnectionError(e)
 
         if response.status_code not in allowed_status:
             raise BackendError('HTTP %s: %s' % (response.status_code, response.content))

@@ -37,6 +37,11 @@ class InvalidXmppBackendError(BackendError):
     pass
 
 
+class BackendConnectionError(BackendError):
+    """Raised when the backend is unavailable."""
+    pass
+
+
 class UserExists(BackendError):
     """Raised when a user already exists."""
     pass
