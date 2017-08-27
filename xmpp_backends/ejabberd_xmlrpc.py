@@ -25,6 +25,7 @@ import six
 
 from six.moves.http_client import BadStatusLine
 
+from .base import BackendConnectionError
 from .base import BackendError
 from .base import EjabberdBackendBase
 from .base import UserExists
@@ -110,7 +111,9 @@ class EjabberdXMLRPCBackend(EjabberdBackendBase):
                 return func(kwargs)
             else:
                 return func(self.credentials, kwargs)
-        except (xmlrpclib.ProtocolError, BadStatusLine, socket.error) as e:
+        except socket.error as e:
+            raise BackendConnectionError(e)
+        except (xmlrpclib.ProtocolError, BadStatusLine) as e:
             log.error(e)
             raise BackendError("Error reaching backend.")
 
