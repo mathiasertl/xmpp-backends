@@ -62,6 +62,30 @@ class UserNotFound(BackendError):
         return s
 
 
+class UserSession(object):
+    """An object describing a user session.
+    """
+    def __init__(self, backend, node, domain, resource, priority, ip_address, uptime, status, connection_type,
+                 encrypted, compressed):
+        self._backend = backend
+        self.node = node
+        self.domain = domain
+        self.jid = '%s@%s' % (node, domain)
+        self.priority = priority
+        self.ip_address = ip_address
+        self.uptime = uptime
+        self.status = status
+
+
+def EjabberdUserSession(UserSession):
+    def __init__(self, backend, node, domain, resource, priority, ip_address, uptime, status,
+                 connection_string):
+        ip_address = self.parse_ip_address(ip_address)
+        connection_type, encrypted, compressed = self.parse_connection_string(connection_string)
+        super(UserSession, self).__init__(backend, node, domain, resource, priority, ip_address, uptime,
+                                          status, connection_type, encrypted, compressed)
+
+
 class XmppBackendBase(object):
     """Base class for all XMPP backends."""
 
@@ -357,6 +381,24 @@ class XmppBackendBase(object):
             just be ``"user"``.
         :rtype: set of str
         """
+        raise NotImplementedError
+
+    def all_domains(self):
+        """List of all domains used by this backend.
+
+        :return: List of all domains served by this backend.
+        :rtype: list of str
+        """
+        raise NotImplementedError
+
+    def all_sessions(self, domain=None):
+        """List all current user sessions.
+
+        :param domain: Optionally only return sessions for the given domain.
+        :return: List of dictionaries defining the user session.
+        :rtype: list of dicts
+        """
+
         raise NotImplementedError
 
     def remove_user(self, username, domain):
