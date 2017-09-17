@@ -48,6 +48,8 @@ class TestInterfaces(unittest.TestCase):
 class TestImplemented(unittest.TestCase):
     not_implemented = [
         'all_users',
+        'all_domains',
+        'all_sessions',
         'block_user',
         'check_email',
         'check_password',
