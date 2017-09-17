@@ -101,58 +101,6 @@ class UserSession(object):
         self.status = status
 
 
-def EjabberdUserSession(UserSession):
-    def __init__(self, backend, username, domain, resource, priority, ip_address, uptime, status,
-                 connection_string):
-        ip_address = self.parse_ip_address(ip_address)
-        connection_type, encrypted, compressed = self.parse_connection_string(connection_string)
-        super(UserSession, self).__init__(backend, username, domain, resource, priority, ip_address, uptime,
-                                          status, connection_type, encrypted, compressed)
-
-    def parse_connection_string(self, connection):
-        """Parse a connection string as returned by the ``connected_users_info`` or ``user_sessions_info`` API calls.
-
-        Example::
-
-            >>> parse_connection_string('c2s_tls')
-            >>> parse_connection_string('c2s_compressed_tls')
-            >>> parse_connection_string('http_bind')
-
-        :param connection: The connection string as returned by the ejabberd APIs.
-        :return: A tuple representing the conntion type, if it is encrypted and if it uses XMPP stream
-            compression.
-        :rtype: tuple
-        """
-        # TODO: Websockets, HTTP Polling
-        if connection == 'c2s_tls':
-            return CONNECTION_XMPP, True, False
-        elif connection == 'c2s_compressed_tls':
-            return CONNECTION_XMPP, True, True
-        elif connection == 'http_bind':
-            return CONNECTION_HTTP_BINDING, None, None
-        log.warn('Could not parse connection string "%s"', connection)
-        return CONNECTION_UNKNOWN, True, True
-
-    def parse_ip_address(self, ip_address):
-        """Parse an address as returned by the ``connected_users_info`` or ``user_sessions_info`` API calls.
-
-        Example::
-
-            >>> parse_ip_address('192.168.0.1')
-            IPv4Address(u'192.168.0.1')
-            >>> parse_ip_address('::1')
-            IPv6Address('::1')
-
-        :param ip_address: An IP address.
-        :return: The parsed IP address.
-        :rtype: `ipaddress.IPv6Address` or `ipaddress.IPv4Address`.
-        """
-        if ip_address.startswith('::FFFF:'):
-            ip_address = ip_address[7:]
-
-        return ipaddress.ip_address(ip_address)
-
-
 class XmppBackendBase(object):
     """Base class for all XMPP backends."""
 
@@ -518,3 +466,47 @@ class EjabberdBackendBase(XmppBackendBase):
     def check_email(self, username, domain, email):
         """Not yet implemented."""
         pass
+
+    def parse_connection_string(self, connection):
+        """Parse string as returned by the ``connected_users_info`` or ``user_sessions_info`` API calls.
+
+        >>> EjabberdBackendBase().parse_connection_string('c2s_tls')
+        (0, True, False)
+        >>> EjabberdBackendBase().parse_connection_string('c2s_compressed_tls')
+        (0, True, True)
+        >>> EjabberdBackendBase().parse_connection_string('http_bind')
+        (2, None, None)
+
+        :param connection: The connection string as returned by the ejabberd APIs.
+        :return: A tuple representing the conntion type, if it is encrypted and if it uses XMPP stream
+            compression.
+        :rtype: tuple
+        """
+        # TODO: Websockets, HTTP Polling
+        if connection == 'c2s_tls':
+            return CONNECTION_XMPP, True, False
+        elif connection == 'c2s_compressed_tls':
+            return CONNECTION_XMPP, True, True
+        elif connection == 'http_bind':
+            return CONNECTION_HTTP_BINDING, None, None
+        log.warn('Could not parse connection string "%s"', connection)
+        return CONNECTION_UNKNOWN, True, True
+
+    def parse_ip_address(self, ip_address):
+        """Parse an address as returned by the ``connected_users_info`` or ``user_sessions_info`` API calls.
+
+        Example::
+
+            >>> EjabberdBackendBase().parse_ip_address('192.168.0.1')  # doctest: +FORCE_TEXT
+            IPv4Address('192.168.0.1')
+            >>> EjabberdBackendBase().parse_ip_address('::1')  # doctest: +FORCE_TEXT
+            IPv6Address('::1')
+
+        :param ip_address: An IP address.
+        :return: The parsed IP address.
+        :rtype: `ipaddress.IPv6Address` or `ipaddress.IPv4Address`.
+        """
+        if ip_address.startswith('::FFFF:'):
+            ip_address = ip_address[7:]
+
+        return ipaddress.ip_address(ip_address)
