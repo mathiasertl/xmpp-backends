@@ -25,7 +25,12 @@ pip install xmpp-backends
 
 ## ChangeLog
 
-### 0.4.0 (to be released)
+### 0.4.1 (2017-08-27)
+
+* Raise new `BackendConnectionError` if the backend can't be reached. This case was previously unhandled in 
+  the `ejabberd_rest` backend.
+
+### 0.4.0 (2017-08-08)
 
 * Account for API changes in ejabberd 17.04.
 * Add a fabfile for common development tasks.
