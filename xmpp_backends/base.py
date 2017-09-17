@@ -28,9 +28,9 @@ from importlib import import_module
 import pytz
 import six
 
-from .constants import CONNECTION_XMPP
 from .constants import CONNECTION_HTTP_BINDING
 from .constants import CONNECTION_UNKNOWN
+from .constants import CONNECTION_XMPP
 
 log = logging.getLogger(__name__)
 

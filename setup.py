@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import sys
+
 from setuptools import setup
 
 PY2 = sys.version_info[0] == 2
