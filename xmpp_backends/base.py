@@ -17,6 +17,8 @@
 
 from __future__ import unicode_literals
 
+import ipaddress
+import logging
 import random
 import string
 import time
@@ -25,6 +27,12 @@ from importlib import import_module
 
 import pytz
 import six
+
+from .constants import CONNECTION_XMPP
+from .constants import CONNECTION_HTTP_BINDING
+from .constants import CONNECTION_UNKNOWN
+
+log = logging.getLogger(__name__)
 
 
 class BackendError(Exception):
@@ -64,13 +72,29 @@ class UserNotFound(BackendError):
 
 class UserSession(object):
     """An object describing a user session.
+
+    :param         backend: The XMPP backend used for retrieving this session.
+    :param        username: The username of the user.
+    :type         username: str
+    :param          domain: The domain of the user.
+    :type           domain: str
+    :param        resource: The resource of the user.
+    :param        priority: The priority of this connection.
+    :param      ip_address: The IP address of this connection.
+    :param          uptime: A timestamp of when this connection came online.
+    :param          status: The status message for this connection (e.g. "I am available.").
+    :param connection_type: The type of connection.
+    :param       encrypted: If this connection is encrypted. This may be ``None`` if the backend is not able
+        decide if the connection is encrypted (e.g. if it is a HTTP bind connection).
+    :param      compressed: If this connection uses XMPP stream compression. This is always ``None`` for
+        connections where this is not applicable, e.g. Websocket connections.
     """
-    def __init__(self, backend, node, domain, resource, priority, ip_address, uptime, status, connection_type,
-                 encrypted, compressed):
+    def __init__(self, backend, username, domain, resource, priority, ip_address, uptime, status,
+                 connection_type, encrypted, compressed):
         self._backend = backend
-        self.node = node
+        self.username = username
         self.domain = domain
-        self.jid = '%s@%s' % (node, domain)
+        self.jid = '%s@%s' % (username, domain)
         self.priority = priority
         self.ip_address = ip_address
         self.uptime = uptime
@@ -78,12 +102,29 @@ class UserSession(object):
 
 
 def EjabberdUserSession(UserSession):
-    def __init__(self, backend, node, domain, resource, priority, ip_address, uptime, status,
+    def __init__(self, backend, username, domain, resource, priority, ip_address, uptime, status,
                  connection_string):
         ip_address = self.parse_ip_address(ip_address)
         connection_type, encrypted, compressed = self.parse_connection_string(connection_string)
-        super(UserSession, self).__init__(backend, node, domain, resource, priority, ip_address, uptime,
+        super(UserSession, self).__init__(backend, username, domain, resource, priority, ip_address, uptime,
                                           status, connection_type, encrypted, compressed)
+
+    def parse_connection_string(self, connection):
+        # TODO: Websockets, HTTP Polling
+        if connection == 'http_bind':
+            return CONNECTION_HTTP_BINDING, None, None
+        elif connection == 'c2s_tls':
+            return CONNECTION_XMPP, True, False
+        elif connection == 'c2s_compressed_tls':
+            return CONNECTION_XMPP, True, True
+        log.warn('Could not parse connection string "%s"', connection)
+        return CONNECTION_UNKNOWN, True, True
+
+    def parse_ip_address(self, ip_address):
+        if ip_address.startswith('::FFFF:'):
+            ip_address = ip_address[7:]
+
+        return ipaddress.ip_address(ip_address)
 
 
 class XmppBackendBase(object):
