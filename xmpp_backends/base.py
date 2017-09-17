@@ -472,17 +472,20 @@ class EjabberdBackendBase(XmppBackendBase):
         """Not yet implemented."""
         pass
 
-    def parse_connection_string(self, connection):
+    def parse_connection_string(self, connection, version):
         """Parse string as returned by the ``connected_users_info`` or ``user_sessions_info`` API calls.
 
-        >>> EjabberdBackendBase().parse_connection_string('c2s_tls')
+        >>> EjabberdBackendBase().parse_connection_string('c2s_tls', (17, 8, ))
         (0, True, False)
-        >>> EjabberdBackendBase().parse_connection_string('c2s_compressed_tls')
+        >>> EjabberdBackendBase().parse_connection_string('c2s_compressed_tls', (17, 8, ))
         (0, True, True)
-        >>> EjabberdBackendBase().parse_connection_string('http_bind')
+        >>> EjabberdBackendBase().parse_connection_string('http_bind', (17, 8, ))
         (2, None, None)
 
         :param connection: The connection string as returned by the ejabberd APIs.
+        :type  connection: str
+        :param    version: The ejabberd version as tuple, currently unused.
+        :type     version: tuple
         :return: A tuple representing the conntion type, if it is encrypted and if it uses XMPP stream
             compression.
         :rtype: tuple
@@ -497,17 +500,20 @@ class EjabberdBackendBase(XmppBackendBase):
         log.warn('Could not parse connection string "%s"', connection)
         return CONNECTION_UNKNOWN, True, True
 
-    def parse_ip_address(self, ip_address):
+    def parse_ip_address(self, ip_address, version):
         """Parse an address as returned by the ``connected_users_info`` or ``user_sessions_info`` API calls.
 
         Example::
 
-            >>> EjabberdBackendBase().parse_ip_address('192.168.0.1')  # doctest: +FORCE_TEXT
+            >>> EjabberdBackendBase().parse_ip_address('192.168.0.1', (17, 8, ))  # doctest: +FORCE_TEXT
             IPv4Address('192.168.0.1')
-            >>> EjabberdBackendBase().parse_ip_address('::1')  # doctest: +FORCE_TEXT
+            >>> EjabberdBackendBase().parse_ip_address('::1', (17, 8, ))  # doctest: +FORCE_TEXT
             IPv6Address('::1')
 
         :param ip_address: An IP address.
+        :type  ip_address: str
+        :param    version: The ejabberd version as tuple, currently unused.
+        :type     version: tuple
         :return: The parsed IP address.
         :rtype: `ipaddress.IPv6Address` or `ipaddress.IPv4Address`.
         """
