@@ -25,6 +25,10 @@ pip install xmpp-backends
 
 ## ChangeLog
 
+### 0.5.0 (TBR)
+
+* `ipaddress` is now a dependency in Python2.
+
 ### 0.4.1 (2017-08-27)
 
 * Raise new `BackendConnectionError` if the backend can't be reached. This case was previously unhandled in 

@@ -1,6 +1,16 @@
 #!/usr/bin/env python
 
+import sys
 from setuptools import setup
+
+PY2 = sys.version_info[0] == 2
+install_requires = [
+    'six>=1.10.0',
+]
+
+if PY2:
+    install_requires.append('ipaddress>=1.0.18')
+
 
 setup(
     name='xmpp-backends',
@@ -14,9 +24,7 @@ setup(
         'xmpp_backends.django',
     ],
     license="GNU General Public License (GPL) v3",
-    install_requires=[
-        'six>=1.10.0',
-    ],
+    install_requires=install_requires,
     test_suite='tests',
     classifiers=[
         "Development Status :: 4 - Beta",
