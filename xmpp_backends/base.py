@@ -144,6 +144,11 @@ class XmppBackendBase(object):
 
         Note that the function always returns an int, even in Python 3.
 
+        >>> XmppBackendBase().datetime_to_timestamp(datetime(2017, 9, 17, 19, 59))
+        1505678340
+        >>> XmppBackendBase().datetime_to_timestamp(datetime(1984, 11, 6, 13, 21))
+        468595260
+
         :param dt: The datetime object to convert. If ``None``, returns the current time.
         :type  dt: datetime
         :return: The seconds in UTC.
