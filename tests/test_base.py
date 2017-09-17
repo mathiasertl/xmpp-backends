@@ -13,11 +13,16 @@
 # You should have received a copy of the GNU General Public License along with xmpp-backends.  If
 # not, see <http://www.gnu.org/licenses/>.
 
+import doctest
+import re
 import unittest
 from datetime import datetime
 
 import pytz
+import six
 from xmpp_backends.base import XmppBackendBase
+
+from .utils import CompatDoctestChecker
 
 base = XmppBackendBase()
 
@@ -56,3 +61,8 @@ class TestDateTimeToTimestamp(unittest.TestCase):
         converted = base.datetime_to_timestamp(now)
         self.assertEqual(converted, 962792403)
         self.assertEqual(pytz.utc.localize(datetime.utcfromtimestamp(converted)), now)
+
+
+def load_tests(loader, tests, ignore):
+    tests.addTests(doctest.DocTestSuite('xmpp_backends.base', checker=CompatDoctestChecker()))
+    return tests
