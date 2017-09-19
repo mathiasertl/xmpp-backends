@@ -67,24 +67,34 @@ class DummyBackend(XmppBackendBase):
             started = datetime.utcnow()
 
         user = '%s@%s' % (username, domain)
-        data = self.module.get(user)
-        data.setdefault('sessions', [])
-
-        data['sessions'].append({
+        session_data = {
             'ip': ip,
             'priority': priority,
             'started': started,
             'status': status,
             'resource': resource,
             'statustext': statustext,
-        })
+        }
+
+        data = self.module.get(user)
+        data.setdefault('sessions', [])
+        data['sessions'].append(session_data)
         self.module.set(user, data)
+
+        session_data['user'] = user
+        all_sessions = self.model.get('all_sessions')
+        all_sessions.append(session_data)
+        self.module.set('all_sessions', all_sessions)
 
     def stop_user_session(self, username, domain, resource, reason=''):
         user = '%s@%s' % (username, domain)
         data = self.module.get(user)
         data['sessions'] = [d for d in data.get('sessions', []) if d['resource'] != resource]
         self.module.set(user, data)
+
+        all_sessions = self.model.get('all_sessions')
+        all_sessions = [s for s in all_sessions if d['user'] != user]
+        self.model.set('all_sessions', all_sessions)
 
     def create_user(self, username, domain, password, email=None):
         user = '%s@%s' % (username, domain)
@@ -191,7 +201,7 @@ class DummyBackend(XmppBackendBase):
                     if u.endswith('@%s' % domain)])
 
     def all_sessions(self, domain=None):
-        pass
+        return self.module.get('all_sessions') or set()
 
     def remove_user(self, username, domain):
         user = '%s@%s' % (username, domain)
