@@ -90,6 +90,10 @@ class DummyBackend(XmppBackendBase):
         user = '%s@%s' % (username, domain)
         log.debug('Create user: %s (%s)', user, password)
 
+        domains = self.module.get('all_domains') or set()
+        domains.add(domain)
+        self.module.set('all_domains', domains)
+
         data = self.module.get(user)
         if data is None:
             data = {
@@ -177,9 +181,17 @@ class DummyBackend(XmppBackendBase):
         # overwritten so we pass tests
         self.set_password(username, domain, self.get_random_password())
 
+    def all_domains(self):
+        """Just returns all domains of all users added so far."""
+
+        return self.module.get('all_domains') or set()
+
     def all_users(self, domain):
         return set([u.split('@')[0] for u in self.module.get('all_users', set())
                     if u.endswith('@%s' % domain)])
+
+    def all_sessions(self, domain=None):
+        pass
 
     def remove_user(self, username, domain):
         user = '%s@%s' % (username, domain)
