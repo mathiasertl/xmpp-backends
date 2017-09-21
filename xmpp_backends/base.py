@@ -89,16 +89,21 @@ class UserSession(object):
     :param      compressed: If this connection uses XMPP stream compression. This is always ``None`` for
         connections where this is not applicable, e.g. Websocket connections.
     """
-    def __init__(self, backend, username, domain, resource, priority, ip_address, uptime, status,
+    def __init__(self, backend, username, domain, resource, priority, ip_address, uptime, status, status_text,
                  connection_type, encrypted, compressed):
         self._backend = backend
         self.username = username
         self.domain = domain
         self.jid = '%s@%s' % (username, domain)
+        self.resource = resource
         self.priority = priority
         self.ip_address = ip_address
         self.uptime = uptime
         self.status = status
+        self.status_text = status_text
+        self.connection_type = connection_type
+        self.encrypted = encrypted
+        self.compressed = compressed
 
 
 class XmppBackendBase(object):
