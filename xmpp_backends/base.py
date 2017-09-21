@@ -70,6 +70,7 @@ class UserNotFound(BackendError):
         return s
 
 
+@six.python_2_unicode_compatible
 class UserSession(object):
     """An object describing a user session.
 
@@ -104,6 +105,15 @@ class UserSession(object):
         self.connection_type = connection_type
         self.encrypted = encrypted
         self.compressed = compressed
+
+    def __eq__(self, other):
+        return self.jid == other.jid and self.resource == other.resource
+
+    def __hash__(self):
+        return hash((self.jid, self.resource))
+
+    def __str__(self):
+        return '%s@%s/%s' % (self.username, self.domain, self.resource)
 
 
 class XmppBackendBase(object):
