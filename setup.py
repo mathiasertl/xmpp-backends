@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 
+import os
 import sys
 
 from setuptools import setup
+from setuptools.command.test import test
 
 PY2 = sys.version_info[0] == 2
 install_requires = [
@@ -11,6 +13,15 @@ install_requires = [
 
 if PY2:
     install_requires.append('ipaddress>=1.0.18')
+
+
+class django_test(test):
+    def run(self):
+        os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'tests.django_settings')
+        sys.path.insert(0, '.')
+        import django
+        django.setup()
+        test.run(self)  # super() fails, LOL
 
 
 setup(
@@ -24,6 +35,9 @@ setup(
         'xmpp_backends',
         'xmpp_backends.django',
     ],
+    cmdclass={
+        'test': django_test,
+    },
     license="GNU General Public License (GPL) v3",
     install_requires=install_requires,
     test_suite='tests',
