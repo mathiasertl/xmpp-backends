@@ -82,7 +82,7 @@ def start_bot(jid, password, host, port):
 
 
 def test_session(session, username, domain):
-    assert session.username == username, 'Username does not match'
+    assert session.username == username, 'Username: "%s" vs "%s"' % (session.username, username)
     assert session.domain == domain, 'Domain does not match'
     assert isinstance(session.ip_address, (ipaddress.IPv4Address, ipaddress.IPv6Address))
     assert isinstance(session.uptime, datetime)
