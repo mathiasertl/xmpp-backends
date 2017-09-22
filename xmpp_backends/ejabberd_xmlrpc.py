@@ -243,9 +243,17 @@ class EjabberdXMLRPCBackend(EjabberdBackendBase):
         }
         self.rpc('send_message', **kwargs)
 
+    def all_domains(self):
+        return [d['vhost'] for d in self.rpc('registered_vhosts')['vhosts']]
+
     def all_users(self, domain):
         users = self.rpc('registered_users', host=domain)['users']
         return set([e['username'] for e in users])
+
+    def all_sessions(self, domain=None):
+        result = set(self.rpc('connected_users_info')['connected_users_info'])
+        print(result)
+        return result
 
     def remove_user(self, username, domain):
         result = self.rpc('unregister', user=username, host=domain)

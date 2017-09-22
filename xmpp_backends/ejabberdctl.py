@@ -183,11 +183,29 @@ class EjabberdctlBackend(EjabberdBackendBase):
         mod_offline."""
         self.ctl('send_message_chat', domain, '%s@%s' % (username, domain), message)
 
+    def all_domains(self):
+        code, out, err = self.ctl('registered_vhosts')
+        if code != 0:
+            raise BackendError(code)
+        if six.PY3:
+            out = out.decode('utf-8')
+
+        return set(out.splitlines())
+
     def all_users(self, domain):
         code, out, err = self.ctl('registered_users', domain)
         if code != 0:
             raise BackendError(code)
 
+        if six.PY3:
+            out = out.decode('utf-8')
+
+        return set(out.splitlines())
+
+    def all_sessions(self):
+        code, out, err = self.ctl('connected_users_info')
+        if code != 0:
+            raise BackendError(code)
         if six.PY3:
             out = out.decode('utf-8')
 

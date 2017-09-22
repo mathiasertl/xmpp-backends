@@ -231,8 +231,14 @@ class EjabberdRestBackend(EjabberdBackendBase):
         }
         self.post('send_message', **kwargs)
 
+    def all_domains(self):
+        return self.post('registered_vhosts').json()
+
     def all_users(self, domain):
         return set(self.post('registered_users', host=domain).json())
+
+    def all_sessions(self, domain=None):
+        return set(self.post('connected_users_info').json())
 
     def remove_user(self, username, domain):
         response = self.post('unregister', user=username, host=domain)
