@@ -512,6 +512,8 @@ class EjabberdBackendBase(XmppBackendBase):
             return CONNECTION_XMPP, True, True
         elif connection == 'http_bind':
             return CONNECTION_HTTP_BINDING, None, None
+        elif connection == 'c2s':
+            return CONNECTION_XMPP, False, False
         log.warn('Could not parse connection string "%s"', connection)
         return CONNECTION_UNKNOWN, True, True
 
