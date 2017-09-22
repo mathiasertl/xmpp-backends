@@ -84,7 +84,7 @@ class DummyBackend(XmppBackendBase):
     def stop_user_session(self, username, domain, resource, reason=''):
         user = '%s@%s' % (username, domain)
         data = self.module.get(user)
-        data['sessions'] = set([d for d in data.get('sessions', []) if d['resource'] != resource])
+        data['sessions'] = set([d for d in data.get('sessions', []) if d.resource != resource])
         self.module.set(user, data)
 
         all_sessions = self.module.get('all_sessions')
