@@ -112,7 +112,7 @@ class DummyBackend(XmppBackendBase):
             data = {
                 'pass': password,
                 'last_status': (time.time(), 'Registered'),
-                'sessions': [],
+                'sessions': set(),
             }
             if email is not None:
                 data['email'] = email
