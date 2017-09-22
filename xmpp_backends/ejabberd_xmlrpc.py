@@ -21,6 +21,7 @@ import socket
 from datetime import datetime
 from datetime import timedelta
 
+import pytz
 import six
 
 from six.moves.http_client import BadStatusLine
@@ -30,6 +31,7 @@ from .base import BackendError
 from .base import EjabberdBackendBase
 from .base import UserExists
 from .base import UserNotFound
+from .base import UserSession
 
 if six.PY2:  # we have a special version for Python2
     from . import xmlrpclib
@@ -178,26 +180,28 @@ class EjabberdXMLRPCBackend(EjabberdBackendBase):
     def user_sessions(self, username, domain):
         result = self.rpc('user_sessions_info', user=username, host=domain)
         raw_sessions = result.get('sessions_info', [])
-        sessions = []
+        version = self.get_version()
+        sessions = set()
         for data in raw_sessions:
             # The data structure is a bit weird, its a list of one-element dicts.  We itemize each dict and
             # then flatten the resulting list
             session = [d.items() for d in data['session']]
             session = dict([item for sublist in session for item in sublist])
 
-            started = datetime.utcnow() - timedelta(seconds=session['uptime'])
-            ip = session['ip']
-            if ip.startswith('::FFFF:'):
-                ip = ip[7:]
-
-            sessions.append({
-                'ip': ip,
-                'priority': session['priority'],
-                'started': started,
-                'status': session['status'],
-                'resource': session['resource'],
-                'statustext': session['statustext'],
-            })
+            started = pytz.utc.localize(datetime.utcnow() - timedelta(seconds=session['uptime']))
+            typ, encrypted, compressed = self.parse_connection_string(session['connection'], version)
+            sessions.add(UserSession(
+                backend=self,
+                username=username,
+                domain=domain,
+                resource=session['resource'],
+                priority=session['priority'],
+                ip_address=self.parse_ip_address(session['ip'], version),
+                uptime=started,
+                status=session['status'],
+                status_text=session['statustext'],
+                connection_type=typ, encrypted=encrypted, compressed=compressed
+            ))
         return sessions
 
     def stop_user_session(self, username, domain, resource, reason=''):
@@ -251,9 +255,32 @@ class EjabberdXMLRPCBackend(EjabberdBackendBase):
         return set([e['username'] for e in users])
 
     def all_sessions(self, domain=None):
-        result = set(self.rpc('connected_users_info')['connected_users_info'])
-        print(result)
-        return result
+        result = self.rpc('connected_users_info')['connected_users_info']
+        version = self.get_version()
+        sessions = set()
+        for data in result:
+            # The data structure is a bit weird, its a list of one-element dicts.  We itemize each dict and
+            # then flatten the resulting list
+            session = [d.items() for d in data['sessions']]
+            session = dict([item for sublist in session for item in sublist])
+
+            username, domain = session['jid'].split('@', 1)
+            domain, resource = domain.split('/', 1)
+            started = pytz.utc.localize(datetime.utcnow() - timedelta(seconds=session['uptime']))
+            typ, encrypted, compressed = self.parse_connection_string(session['connection'], version)
+            sessions.add(UserSession(
+                backend=self,
+                username=username,
+                domain=domain,
+                resource=resource,
+                priority=session['priority'],
+                ip_address=self.parse_ip_address(session['ip'], version),
+                uptime=started,
+                status='',  # session['status'],
+                status_text='',  # session['statustext'],
+                connection_type=typ, encrypted=encrypted, compressed=compressed
+            ))
+        return sessions
 
     def remove_user(self, username, domain):
         result = self.rpc('unregister', user=username, host=domain)
