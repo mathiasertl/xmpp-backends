@@ -91,7 +91,7 @@ def test_session(session, username, domain):
 
 
 @task
-def test_backend(backend, domain, config_path='', version=''):
+def test_backend(backend, domain, config_path='', version='', use_xmpp='n'):
     username1 = 'example'
     jid1 = '%s@%s' % (username1, domain)
     password1 = 'foobar'
@@ -200,24 +200,25 @@ def test_backend(backend, domain, config_path='', version=''):
         error('user_sessions() did not return empty set: %s' % sessions)
     ok()
 
-    print('Start tests requiring a running session...', end='', flush=True)
-    try:
-        xmpp, thread = start_bot('%s@%s' % (username1, domain), password2, host='localhost', port='5222')
-        time.sleep(1)  # wait for connection to establish
-        user_sessions = backend.user_sessions(username1, domain)
-        if len(user_sessions) != 1:
-            error('Found wrong number of user sessions: %s', user_sessions)
-        session = list(user_sessions)[0]
-        test_session(session, username1, domain)
+    if use_xmpp == 'y':
+        print('Start tests requiring a running session...', end='', flush=True)
+        try:
+            xmpp, thread = start_bot('%s@%s' % (username1, domain), password2, host='localhost', port='5222')
+            time.sleep(1)  # wait for connection to establish
+            user_sessions = backend.user_sessions(username1, domain)
+            if len(user_sessions) != 1:
+                error('Found wrong number of user sessions: %s', user_sessions)
+            session = list(user_sessions)[0]
+            test_session(session, username1, domain)
 
-        sessions = backend.all_sessions()
-        if len(sessions) != 1:
-            error('Found wrong number of user sessions: %s', sessions)
-        session = list(sessions)[0]
-        test_session(session, username1, domain)
-    finally:
-        xmpp.disconnect()
-    ok()
+            sessions = backend.all_sessions()
+            if len(sessions) != 1:
+                error('Found wrong number of user sessions: %s', sessions)
+            session = list(sessions)[0]
+            test_session(session, username1, domain)
+        finally:
+            xmpp.disconnect()
+        ok()
 
     # block user
     print('Block user and check previous passwords... ', end='')
