@@ -1,5 +1,9 @@
 {
     "kwargs": {
-        "domains": ["example.com"]
+        "domains": [
+            "example.com",
+            "example.net",
+            "example.org"
+        ]
     }
 }
