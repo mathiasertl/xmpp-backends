@@ -107,7 +107,7 @@ class UserSession(object):
         self.compressed = compressed
 
     def __eq__(self, other):
-        return self.jid == other.jid and self.resource == other.resource
+        return isinstance(other, UserSession) and self.jid == other.jid and self.resource == other.resource
 
     def __hash__(self):
         return hash((self.jid, self.resource))

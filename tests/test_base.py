@@ -87,8 +87,11 @@ class TestUserSessions(unittest.TestCase):
         self.assertEqual(session_a, session_b)
 
         # change the resource
-        session_b = 'new resource'
+        session_b.resource = 'new resource'
         self.assertNotEqual(session_a, session_b)
+
+        # We can also compare other object
+        self.assertNotEqual(session_a, 'foobar')
 
     def test_hash(self):
         sessions = set()
