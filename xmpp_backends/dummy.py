@@ -56,7 +56,7 @@ class DummyBackend(XmppBackendBase):
 
     def user_sessions(self, username, domain):
         user = '%s@%s' % (username, domain)
-        return self.module.get(user).get('sessions', [])
+        return self.module.get(user).get('sessions', set())
 
     def start_user_session(self, username, domain, resource, **kwargs):
         """Method to add a user session for debugging.
