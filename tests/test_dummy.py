@@ -24,17 +24,17 @@ class TestDummySessions(TestCase):
         self.backend = DummyBackend()
 
     def test_wrong_user(self):
-        self.assertEquals(self.backend.all_sessions(), set())
+        self.assertEqual(self.backend.all_sessions(), set())
         with self.assertRaisesRegex(UserNotFound, 'wrong@example.com/rsrc'):
             self.backend.start_user_session('wrong', 'example.com', 'rsrc', ip_address='127.0.0.1')
-        self.assertEquals(self.backend.all_sessions(), set())
+        self.assertEqual(self.backend.all_sessions(), set())
 
     def test_session(self):
         node = 'user'
         domain = 'example.com'
         rsrc = 'resource'
         self.backend.create_user(node, domain, 'password')
-        self.assertEquals(self.backend.all_sessions(), set())
+        self.assertEqual(self.backend.all_sessions(), set())
 
         self.backend.start_user_session(node, domain, rsrc, ip_address='127.0.0.1')
         sessions = self.backend.all_sessions()
