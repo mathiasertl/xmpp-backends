@@ -100,6 +100,12 @@ def test_backend(backend, domain, config_path='', version=''):
     except UserNotFound as e:
         if str(e) != jid1:
             error('UserNotFound from set_password did not match "%s": "%s"' % (jid1, str(e)))
+    all_domains = backend.all_domains()
+    if list(sorted(all_domains)) != ['example.com', 'example.net', 'example.org']:
+        error('Backend serves wrong domains: %s' % ', '.join(all_domains))
+    sessions = backend.all_sessions()
+    if sessions != set():
+        error('Backend has initial sessions: %s' % sessions)
     ok()
 
     print('Create and test example user... ', end='')
