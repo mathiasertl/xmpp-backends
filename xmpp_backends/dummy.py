@@ -19,9 +19,13 @@ import logging
 import time
 from datetime import datetime
 
+import pytz
+
 from .base import UserExists
 from .base import UserNotFound
+from .base import UserSession
 from .base import XmppBackendBase
+from .constants import CONNECTION_XMPP
 
 log = logging.getLogger(__name__)
 
@@ -44,57 +48,48 @@ class DummyBackend(XmppBackendBase):
         user = '%s@%s' % (username, domain)
         return self.module.get(user).get('sessions', [])
 
-    def start_user_session(self, username, domain, resource, ip='127.0.0.1', priority=0,
-                           started=None, status='available', statustext=''):
+    def start_user_session(self, username, domain, resource, **kwargs):
         """Method to add a user session for debugging.
 
-        :param   username: The username of the user.
-        :type    username: str
-        :param     domain: The domain of the user.
-        :type      domain: str
-        :param   resource: The resource for the connection. This identifies the session.
-        :param         ip: The IP the user connects from, defaults to ``"127.0.0.1"``.
-        :type          ip: str
-        :param   priority: The priority of the connection, defaults to ``0``.
-        :type    priority: int
-        :param    started: When the connection was started, defaults to "now".
-        :type     started: datetime
-        :param     status: The status used, defaults to ``"available"``.
-        :param statustext: The status text, defaults to ``""``.
+        Accepted parameters are the same as to the constructor of :py:class:`~xmpp_backends.base.UserSession`.
         """
 
-        if started is None:
-            started = datetime.utcnow()
+        kwargs.setdefault('uptime', pytz.utc.localize(datetime.utcnow()))
+        kwargs.setdefault('priority', 0)
+        kwargs.setdefault('status', 'online')
+        kwargs.setdefault('status_text', '')
+        kwargs.setdefault('connection_type', CONNECTION_XMPP)
+        kwargs.setdefault('encrypted', True)
+        kwargs.setdefault('compressed', False)
 
         user = '%s@%s' % (username, domain)
-        session_data = {
-            'ip': ip,
-            'priority': priority,
-            'started': started,
-            'status': status,
-            'resource': resource,
-            'statustext': statustext,
-        }
+        session = UserSession(self, username, domain, resource, **kwargs)
 
         data = self.module.get(user)
-        data.setdefault('sessions', [])
-        data['sessions'].append(session_data)
+        if data is None:
+            raise UserNotFound(username, domain, resource)
+
+        data.setdefault('sessions', set())
+        if isinstance(data['sessions'], list):
+            # Cast old data to set
+            data['sessions'] = set(data['sessions'])
+
+        data['sessions'].add(session)
         self.module.set(user, data)
 
-        session_data['user'] = user
-        all_sessions = self.model.get('all_sessions')
-        all_sessions.append(session_data)
+        all_sessions = self.module.get('all_sessions', set())
+        all_sessions.add(session)
         self.module.set('all_sessions', all_sessions)
 
     def stop_user_session(self, username, domain, resource, reason=''):
         user = '%s@%s' % (username, domain)
         data = self.module.get(user)
-        data['sessions'] = [d for d in data.get('sessions', []) if d['resource'] != resource]
+        data['sessions'] = set([d for d in data.get('sessions', []) if d['resource'] != resource])
         self.module.set(user, data)
 
-        all_sessions = self.model.get('all_sessions')
-        all_sessions = [s for s in all_sessions if d['user'] != user]
-        self.model.set('all_sessions', all_sessions)
+        all_sessions = self.module.get('all_sessions')
+        all_sessions = set([s for s in all_sessions if s.jid != user])
+        self.module.set('all_sessions', all_sessions)
 
     def create_user(self, username, domain, password, email=None):
         user = '%s@%s' % (username, domain)
