@@ -21,6 +21,7 @@ from datetime import datetime
 
 import pytz
 
+from .base import BackendError
 from .base import UserExists
 from .base import UserNotFound
 from .base import UserSession
@@ -36,11 +37,20 @@ class DummyBackend(XmppBackendBase):
     By default, Djangos caching framework uses in-memory data structures, so every registration will be
     removed if you restart the development server.  You can configure a different cache (e.g. memcached), see
     `Django's cache framework <https://docs.djangoproject.com/en/dev/topics/cache/>`_ for details.
+
+    :params domains: A list of domains to serve.
     """
 
     library = 'django.core.cache.cache'
 
+    def __init__(self, domains):
+        super(DummyBackend, self).__init__()
+        self._domains = domains
+
     def user_exists(self, username, domain):
+        if domain not in self._domains:
+            return False
+
         user = '%s@%s' % (username, domain)
         return self.module.get(user) is not None
 
@@ -92,12 +102,10 @@ class DummyBackend(XmppBackendBase):
         self.module.set('all_sessions', all_sessions)
 
     def create_user(self, username, domain, password, email=None):
+        if domain not in self._domains:
+            raise BackendError('Backend does not serve domain %s.' % domain)
         user = '%s@%s' % (username, domain)
         log.debug('Create user: %s (%s)', user, password)
-
-        domains = self.module.get('all_domains') or set()
-        domains.add(domain)
-        self.module.set('all_domains', domains)
 
         data = self.module.get(user)
         if data is None:
@@ -187,9 +195,9 @@ class DummyBackend(XmppBackendBase):
         self.set_password(username, domain, self.get_random_password())
 
     def all_domains(self):
-        """Just returns all domains of all users added so far."""
+        """Just returns the domains passed to the constructor."""
 
-        return self.module.get('all_domains') or set()
+        return list(self._domains)
 
     def all_users(self, domain):
         return set([u.split('@')[0] for u in self.module.get('all_users', set())
