@@ -21,12 +21,14 @@ from datetime import timedelta
 from subprocess import PIPE
 from subprocess import Popen
 
+import pytz
 import six
 
 from .base import BackendError
 from .base import EjabberdBackendBase
 from .base import UserExists
 from .base import UserNotFound
+from .base import UserSession
 
 log = logging.getLogger(__name__)
 
@@ -73,26 +75,33 @@ class EjabberdctlBackend(EjabberdBackendBase):
 
     def user_sessions(self, username, domain):
         code, out, err = self.ctl('user_sessions_info', username, domain)
-        sessions = []
+        version = self.get_version()
+        sessions = set()
+
+        if six.PY3:
+            out = out.decode('utf-8')
 
         for line in out.splitlines():
             statustext = ''
-            _c, ip, _p, prio, _n, uptime, status, resource = line.split(None, 7)
-            if ip.startswith('::FFFF:'):
-                ip = ip[7:]
-            started = datetime.utcnow() - timedelta(int(uptime))
+            conn, ip, _p, prio, _n, uptime, status, resource = line.split(None, 7)
+            started = pytz.utc.localize(datetime.utcnow() - timedelta(int(uptime)))
 
             if ' ' in resource:
                 resource, statustext = resource.split(None, 1)
 
-            sessions.append({
-                'ip': ip,
-                'priority': int(prio),
-                'resource': resource.strip(),
-                'started': started,
-                'status': status,
-                'statustext': statustext,
-            })
+            typ, encrypted, compressed = self.parse_connection_string(conn, version)
+            sessions.add(UserSession(
+                backend=self,
+                username=username,
+                domain=domain,
+                resource=resource,
+                priority=int(prio),
+                ip_address=self.parse_ip_address(ip, version),
+                uptime=started,
+                status='',  # session['status'],
+                status_text='',  # session['statustext'],
+                connection_type=typ, encrypted=encrypted, compressed=compressed
+            ))
 
         return sessions
 
@@ -208,8 +217,31 @@ class EjabberdctlBackend(EjabberdBackendBase):
             raise BackendError(code)
         if six.PY3:
             out = out.decode('utf-8')
+        version = self.get_version()
+        sessions = set()
 
-        return set(out.splitlines())
+        for line in out.splitlines():
+            jid, conn, ip, _p, prio, node, uptime = line.split(None, 7)
+
+            username, domain = jid.split('@', 1)
+            domain, resource = domain.split('/', 1)
+
+            started = pytz.utc.localize(datetime.utcnow() - timedelta(int(uptime)))
+            typ, encrypted, compressed = self.parse_connection_string(conn, version)
+            sessions.add(UserSession(
+                backend=self,
+                username=username,
+                domain=domain,
+                resource=resource,
+                priority=int(prio),
+                ip_address=self.parse_ip_address(ip, version),
+                uptime=started,
+                status='',  # session['status'],
+                status_text='',  # session['statustext'],
+                connection_type=typ, encrypted=encrypted, compressed=compressed
+            ))
+
+        return sessions
 
     def remove_user(self, username, domain):
         code, out, err = self.ctl('unregister', username, domain)
