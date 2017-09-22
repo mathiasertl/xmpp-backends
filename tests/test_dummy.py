@@ -19,7 +19,7 @@ from xmpp_backends.base import UserNotFound
 from xmpp_backends.dummy import DummyBackend
 
 
-class TestSessionsBackend(TestCase):
+class TestDummySessions(TestCase):
     def setUp(self):
         self.backend = DummyBackend()
 
@@ -43,6 +43,11 @@ class TestSessionsBackend(TestCase):
         self.assertEqual(session.jid, '%s@%s' % (node, domain))
         self.assertEqual(session.username, node)
         self.assertEqual(session.domain, domain)
+        self.assertEqual(self.backend.user_sessions(node, domain), {session, })
+
+        self.backend.stop_user_session(node, domain, rsrc)
+        self.assertEqual(self.backend.all_sessions(), set())
+        self.assertEqual(self.backend.user_sessions(node, domain), set())
 
     def tearDown(self):
         self.backend.module.clear()
