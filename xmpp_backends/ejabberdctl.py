@@ -202,7 +202,7 @@ class EjabberdctlBackend(EjabberdBackendBase):
 
         return set(out.splitlines())
 
-    def all_sessions(self):
+    def all_sessions(self, domain=None):
         code, out, err = self.ctl('connected_users_info')
         if code != 0:
             raise BackendError(code)
