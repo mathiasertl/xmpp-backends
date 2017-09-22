@@ -20,6 +20,7 @@ import logging
 from datetime import datetime
 from datetime import timedelta
 
+import pytz
 import requests
 
 from .base import BackendConnectionError
@@ -27,6 +28,7 @@ from .base import BackendError
 from .base import EjabberdBackendBase
 from .base import UserExists
 from .base import UserNotFound
+from .base import UserSession
 
 log = logging.getLogger(__name__)
 
@@ -176,22 +178,24 @@ class EjabberdRestBackend(EjabberdBackendBase):
 
     def user_sessions(self, username, domain):
         response = self.post('user_sessions_info', user=username, host=domain)
+        version = self.get_version(response)
         data = response.json()
-        sessions = []
+        sessions = set()
         for d in data:
-            started = datetime.utcnow() - timedelta(seconds=d['uptime'])
-            ip = d['ip']
-            if ip.startswith('::FFFF:'):
-                ip = ip[7:]
-
-            sessions.append({
-                'ip': ip,
-                'priority': d['priority'],
-                'started': started,
-                'status': d['status'],
-                'resource': d['resource'],
-                'statustext': d['statustext'],
-            })
+            started = pytz.utc.localize(datetime.utcnow() - timedelta(seconds=d['uptime']))
+            typ, encrypted, compressed = self.parse_connection_string(d['connection'], version)
+            sessions.add(UserSession(
+                backend=self,
+                username=username,
+                domain=domain,
+                resource=d['resource'],
+                priority=d['priority'],
+                ip_address=self.parse_ip_address(d['ip'], version),
+                uptime=started,
+                status=d['status'],
+                status_text=d['statustext'],
+                connection_type=typ, encrypted=encrypted, compressed=compressed
+            ))
         return sessions
 
     def stop_user_session(self, username, domain, resource, reason=''):
@@ -238,7 +242,31 @@ class EjabberdRestBackend(EjabberdBackendBase):
         return set(self.post('registered_users', host=domain).json())
 
     def all_sessions(self, domain=None):
-        return set(self.post('connected_users_info').json())
+        # {'port': 49094, 'ip': '::1', 'connection': 'c2s', 'priority': 0, 'uptime': 3,
+        #  'node': 'ejabberd@pallene', 'jid': 'example@example.com/3951214195792401555238'}
+        response = self.post('connected_users_info')
+        version = self.get_version(response)
+        data = response.json()
+        sessions = set()
+        for d in data:
+            started = pytz.utc.localize(datetime.utcnow() - timedelta(seconds=d['uptime']))
+            username, domain = d['jid'].split('@', 1)
+            domain, resource = domain.split('/', 1)
+
+            typ, encrypted, compressed = self.parse_connection_string(d['connection'], version)
+            sessions.add(UserSession(
+                backend=self,
+                username=username,
+                domain=domain,
+                resource=resource,
+                priority=d['priority'],
+                ip_address=self.parse_ip_address(d['ip'], version),
+                uptime=started,
+                status='',  # d['status'],
+                status_text='',  # d['statustext'],
+                connection_type=typ, encrypted=encrypted, compressed=compressed
+            ))
+        return sessions
 
     def remove_user(self, username, domain):
         response = self.post('unregister', user=username, host=domain)

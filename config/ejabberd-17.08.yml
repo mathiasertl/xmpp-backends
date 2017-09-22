@@ -137,11 +137,12 @@ listen:
     certfile: 'CERTFILE'
   - ip: "::"
     port: 5222
+    certfile: 'CERTFILE'
     module: ejabberd_c2s
     max_stanza_size: 1048576
     shaper: c2s_shaper
     access: local
-    starttls_required: true
+    starttls: true
     protocol_options: 'TLSOPTS'
     ciphers: 'CIPHERS'
     # see https://www.ejabberd.im/faq/tcp

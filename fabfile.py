@@ -18,9 +18,12 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import importlib
+import ipaddress
 import json
 import os
 import sys
+import threading
+import time
 from datetime import datetime
 
 import pytz
@@ -28,6 +31,7 @@ from fabric.api import local
 from fabric.api import task
 from fabric.colors import green
 from fabric.colors import red
+from sleekxmpp import ClientXMPP
 
 from xmpp_backends.base import UserNotFound
 
@@ -47,6 +51,43 @@ def check():
 
     local('isort --check-only --diff -rc xmpp_backends setup.py fabfile.py')
     local('flake8 xmpp_backends/ setup.py fabfile.py')
+
+
+@task
+def start_bot(jid, password, host, port):
+    class EchoBot(ClientXMPP):
+        def __init__(self, jid, password, *args, **kwargs):
+            ClientXMPP.__init__(self, jid=jid, password=password, *args, **kwargs)
+
+            self.add_event_handler("session_start", self.start)
+            self.add_event_handler("message", self.message)
+
+        def start(self, event):
+            self.send_presence()
+            self.get_roster()
+
+        def message(self, msg):
+            if msg['type'] in ('chat', 'normal'):
+                msg.reply("Thanks for sending\n%(body)s" % msg).send()
+
+    xmpp = EchoBot(jid, password)
+
+    def process():
+        xmpp.process(block=True)
+
+    xmpp.connect((host, port), use_tls=False)
+    thread = threading.Thread(target=xmpp.process, kwargs={'block': True})
+    thread.start()
+    return xmpp, thread
+
+
+def test_session(session, username, domain):
+    assert session.username == username, 'Username does not match'
+    assert session.domain == domain, 'Domain does not match'
+    assert isinstance(session.ip_address, (ipaddress.IPv4Address, ipaddress.IPv6Address))
+    assert isinstance(session.uptime, datetime)
+    assert isinstance(session.priority, int)
+    assert session.priority >= 0
 
 
 @task
@@ -155,8 +196,27 @@ def test_backend(backend, domain, config_path='', version=''):
 
     print('Get (empty) list of user sessions... ', end='')
     sessions = backend.user_sessions(username1, domain)
-    if sessions != []:
-        error('user_sessions() did not return empty list: %s' % sessions)
+    if sessions != set():
+        error('user_sessions() did not return empty set: %s' % sessions)
+    ok()
+
+    print('Start tests requiring a running session...', end='', flush=True)
+    try:
+        xmpp, thread = start_bot('%s@%s' % (username1, domain), password2, host='localhost', port='5222')
+        time.sleep(1)  # wait for connection to establish
+        user_sessions = backend.user_sessions(username1, domain)
+        if len(user_sessions) != 1:
+            error('Found wrong number of user sessions: %s', user_sessions)
+        session = list(user_sessions)[0]
+        test_session(session, username1, domain)
+
+        sessions = backend.all_sessions()
+        if len(sessions) != 1:
+            error('Found wrong number of user sessions: %s', sessions)
+        session = list(sessions)[0]
+        test_session(session, username1, domain)
+    finally:
+        xmpp.disconnect()
     ok()
 
     # block user
