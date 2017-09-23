@@ -629,6 +629,7 @@ modules:
   mod_admin_extra: {}
   mod_announce: # recommends mod_adhoc
     access: announce
+  # mod_block_strangers: added in 17.03: https://blog.process-one.net/ejabberd-17-03/
   mod_block_strangers: {}
   mod_blocking: {} # requires mod_privacy
   mod_caps: {}
@@ -643,6 +644,7 @@ modules:
     default_encoding: "utf-8"
   mod_http_bind:
     max_inactivity: 60
+  # mod_bosh: added in 16.12: https://blog.process-one.net/ejabberd-16-12/
   mod_bosh: {}
   ## mod_http_fileserver:
   ##   docroot: "/var/www"
@@ -691,7 +693,9 @@ modules:
   mod_vcard:
     search: false
   mod_version: {}
+  # mod_stream_mgmt: added in 17.03: https://blog.process-one.net/ejabberd-17-03/
   mod_stream_mgmt: {}
+  # mod_s2s_dialback: added in 17.03: https://blog.process-one.net/ejabberd-17-03/
   mod_s2s_dialback: {}
   mod_http_api: {}
 
