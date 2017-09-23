@@ -31,6 +31,7 @@ from fabric.api import local
 from fabric.api import task
 from fabric.colors import green
 from fabric.colors import red
+from fabric.colors import yellow
 from sleekxmpp import ClientXMPP
 
 from xmpp_backends.base import UserNotFound
@@ -39,6 +40,10 @@ from xmpp_backends.base import UserNotFound
 def error(msg, status=1):
     print(red(msg))
     sys.exit(status)
+
+
+def warn(msg):
+    print(yellow(msg))
 
 
 def ok(msg='OK.'):
@@ -162,7 +167,9 @@ def test_backend(backend, domain, config_path='', version=''):
         error('check_password() did not return False for non-existing user.')
     try:
         ret = backend.get_last_activity(username1, domain)
-        error('get_last_activity did not raise UserNotFound: %s' % ret)
+        # ejabberd < 17.04 made no difference if the user existed or not
+        #   https://github.com/processone/ejabberd/issues/1565
+        warn('get_last_activity did not raise UserNotFound: %s' % ret)
     except UserNotFound as e:
         if str(e) != jid1:
             error('UserNotFound from get_last_activity did not match "%s": "%s"' % (jid1, str(e)))
@@ -206,7 +213,7 @@ def test_backend(backend, domain, config_path='', version=''):
 
     print('Test last activity... ', end='')
     last = backend.get_last_activity(username1, domain)
-    if last is not None:
+    if last is not None and not isinstance(last, datetime):
         error('Last of new user is not None: %s' % last)
 
     now = datetime(2017, 8, 5, 12, 14, 23)
