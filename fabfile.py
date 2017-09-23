@@ -103,13 +103,13 @@ def test_user_sessions(backend, username, domain, resource, password):
 
     user_sessions = backend.user_sessions(username, domain)
     if len(user_sessions) != 1:
-        error('Found wrong number of user sessions: %s', user_sessions)
+        error('Found wrong number of user sessions: %s' % user_sessions)
     session = list(user_sessions)[0]
     test_session(session, username, domain)
 
     sessions = backend.all_sessions()
     if len(sessions) != 1:
-        error('Found wrong number of user sessions: %s', sessions)
+        error('Found wrong number of user sessions: %s' % sessions)
     session = list(sessions)[0]
     test_session(session, username, domain)
 
@@ -122,7 +122,7 @@ def test_user_sessions(backend, username, domain, resource, password):
 
     user_sessions = backend.user_sessions(username, domain)
     if user_sessions != set():
-        error('Found wrong number of user sessions: %s', user_sessions)
+        error('Found wrong number of user sessions: %s' % user_sessions)
     ok()
 
 
@@ -208,6 +208,7 @@ def test_backend(backend, domain, config_path='', version=''):
     last = backend.get_last_activity(username1, domain)
     if last is not None:
         error('Last of new user is not None: %s' % last)
+
     now = datetime(2017, 8, 5, 12, 14, 23)
     if backend.set_last_activity(username1, domain, 'foobar', timestamp=now) is not None:
         error('set_last_activity() does not return None.')
