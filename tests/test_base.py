@@ -72,6 +72,13 @@ class TestUserSessions(unittest.TestCase):
                               encrypted=True, compressed=False)
         self.assertEqual(str(session), 'user@example.com/resource')
 
+    def test_repr(self):
+        session = UserSession(base, 'user', 'example.com', 'resource',
+                              priority=0, ip_address='127.0.0.1', uptime=None, status='online',
+                              status_text='I am online.', connection_type=CONNECTION_XMPP,
+                              encrypted=True, compressed=False)
+        self.assertEqual(repr(session), '<UserSession: user@example.com/resource>')
+
     def test_eq(self):
         session_a = UserSession(base, 'user', 'example.com', 'resource',
                                 priority=0, ip_address='127.0.0.1', uptime=None, status='online',

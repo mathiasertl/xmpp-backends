@@ -115,6 +115,9 @@ class UserSession(object):
     def __str__(self):
         return '%s@%s/%s' % (self.username, self.domain, self.resource)
 
+    def __repr__(self):
+        return '<UserSession: %s@%s/%s>' % (self.username, self.domain, self.resource)
+
 
 class XmppBackendBase(object):
     """Base class for all XMPP backends."""
