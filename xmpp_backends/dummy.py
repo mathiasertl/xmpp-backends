@@ -74,6 +74,9 @@ class DummyBackend(XmppBackendBase):
         kwargs.setdefault('encrypted', True)
         kwargs.setdefault('compressed', False)
         kwargs.setdefault('ip_address', '127.0.0.1')
+        if six.PY2 and isinstance(kwargs['ip_address'], str):
+            # ipaddress constructor does not eat str in py2 :-/
+            kwargs['ip_address'] = kwargs['ip_address'].decode('utf-8')
         if isinstance(kwargs['ip_address'], six.string_types):
             kwargs['ip_address'] = ipaddress.ip_address(kwargs['ip_address'])
 
