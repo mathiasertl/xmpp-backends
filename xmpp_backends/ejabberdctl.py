@@ -82,12 +82,8 @@ class EjabberdctlBackend(EjabberdBackendBase):
             out = out.decode('utf-8')
 
         for line in out.splitlines():
-            statustext = ''
-            conn, ip, _p, prio, _n, uptime, status, resource = line.split(None, 7)
+            conn, ip, _p, prio, _n, uptime, status, resource, status_text = line.split('\t', 8)
             started = pytz.utc.localize(datetime.utcnow() - timedelta(int(uptime)))
-
-            if ' ' in resource:
-                resource, statustext = resource.split(None, 1)
 
             typ, encrypted, compressed = self.parse_connection_string(conn, version)
             sessions.add(UserSession(
@@ -98,8 +94,7 @@ class EjabberdctlBackend(EjabberdBackendBase):
                 priority=int(prio),
                 ip_address=self.parse_ip_address(ip, version),
                 uptime=started,
-                status='',  # session['status'],
-                status_text='',  # session['statustext'],
+                status=status, status_text=status_text,
                 connection_type=typ, encrypted=encrypted, compressed=compressed
             ))
 
@@ -221,7 +216,7 @@ class EjabberdctlBackend(EjabberdBackendBase):
         sessions = set()
 
         for line in out.splitlines():
-            jid, conn, ip, _p, prio, node, uptime = line.split(None, 7)
+            jid, conn, ip, _p, prio, node, uptime = line.split('\t', 7)
 
             username, domain = jid.split('@', 1)
             domain, resource = domain.split('/', 1)
