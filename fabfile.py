@@ -92,7 +92,7 @@ def test_session(session, username, domain):
 
 
 def test_user_sessions(backend, username, domain, resource, password):
-    print('Start tests requiring a running session...', end='')
+    print('Start tests requiring a running session... ', end='')
     if hasattr(backend, 'start_user_session'):
         # Some backends (like the dummy backend) expose a method to start a "session".
         backend.start_user_session(username, domain, resource, ip_address='127.0.0.1')
