@@ -61,6 +61,7 @@ def start_bot(jid, password, host, port):
 
             self.add_event_handler("session_start", self.start)
             self.add_event_handler("message", self.message)
+            self.auto_reconnect = False  # to make sure that a killed session does not reconnect
 
         def start(self, event):
             self.send_presence()
