@@ -34,6 +34,7 @@ from fabric.colors import red
 from fabric.colors import yellow
 from sleekxmpp import ClientXMPP
 
+from xmpp_backends.base import EjabberdBackendBase
 from xmpp_backends.base import UserNotFound
 
 
@@ -96,8 +97,9 @@ def test_session(session, username, domain):
     assert session.priority >= 0
 
 
-def test_user_sessions(backend, username, domain, resource, password):
+def test_user_sessions(backend, username, domain, resource, password, supports_user_sessions):
     print('Start tests requiring a running session... ', end='')
+    xmpp = None
     if hasattr(backend, 'start_user_session'):
         # Some backends (like the dummy backend) expose a method to start a "session".
         backend.start_user_session(username, domain, resource, ip_address='127.0.0.1')
@@ -106,11 +108,12 @@ def test_user_sessions(backend, username, domain, resource, password):
         xmpp, thread = start_bot(jid, password, host='localhost', port='5222')
         time.sleep(1)  # wait for connection to establish
 
-    user_sessions = backend.user_sessions(username, domain)
-    if len(user_sessions) != 1:
-        error('Found wrong number of user sessions: %s' % user_sessions)
-    session = list(user_sessions)[0]
-    test_session(session, username, domain)
+    if supports_user_sessions:
+        user_sessions = backend.user_sessions(username, domain)
+        if len(user_sessions) != 1:
+            error('Found wrong number of user sessions: %s' % user_sessions)
+        session = list(user_sessions)[0]
+        test_session(session, username, domain)
 
     sessions = backend.all_sessions()
     if len(sessions) != 1:
@@ -121,13 +124,17 @@ def test_user_sessions(backend, username, domain, resource, password):
     # Stop session again and see that it's gone
     backend.stop_user_session(username, domain, resource)
 
+    if xmpp is not None:
+        xmpp.disconnect()
+
     sessions = backend.all_sessions()
     if sessions != set():
         error('Session not correctly stopped: %s' % sessions)
 
-    user_sessions = backend.user_sessions(username, domain)
-    if user_sessions != set():
-        error('Found wrong number of user sessions: %s' % user_sessions)
+    if supports_user_sessions:
+        user_sessions = backend.user_sessions(username, domain)
+        if user_sessions != set():
+            error('Found wrong number of user sessions: %s' % user_sessions)
     ok()
 
 
@@ -152,13 +159,23 @@ def test_backend(backend, domain, config_path='', version=''):
 
     kwargs = config.get('kwargs', {})
     if version:
-        kwargs['version'] = tuple(int(t) for t in version.split('.'))
+        version = tuple(int(t) for t in version.split('.'))
+        kwargs['version'] = version
 
     try:
         backend = cls(**kwargs)
     except NotImplementedError as e:
         print(yellow(e))
         return
+
+    supports_user_sessions = True
+    supports_set_last = True
+    if isinstance(backend, EjabberdBackendBase) and version >= (14, 7) and version <= (15, 4):
+        # This affects at least 14.07 until 15.04
+        # https://github.com/processone/ejabberd/issues/555
+        supports_set_last = False
+    if isinstance(backend, EjabberdBackendBase) and version == (14, 7):
+        supports_user_sessions = False
 
     initial_users = set(config.get('expected_users', set()))
 
@@ -176,11 +193,13 @@ def test_backend(backend, domain, config_path='', version=''):
     except UserNotFound as e:
         if str(e) != jid1:
             error('UserNotFound from get_last_activity did not match "%s": "%s"' % (jid1, str(e)))
-    try:
-        backend.set_last_activity(username1, domain)
-    except UserNotFound as e:
-        # ejabberd api does not indicate any error in this case
-        error('set_last_activity raised UserNotFound: %s' % e)
+
+    if supports_set_last:
+        try:
+            backend.set_last_activity(username1, domain)
+        except UserNotFound as e:
+            # ejabberd api does not indicate any error in this case
+            error('set_last_activity raised UserNotFound: %s' % e)
 
     try:
         backend.set_password(username1, domain, password1)
@@ -214,27 +233,30 @@ def test_backend(backend, domain, config_path='', version=''):
         error('False password is accepted.')
     ok()
 
-    print('Test last activity... ', end='')
-    last = backend.get_last_activity(username1, domain)
-    if last is not None and not isinstance(last, datetime):
-        error('Last of new user is not None: %s' % last)
+    if supports_set_last:
+        print('Test last activity... ', end='')
+        last = backend.get_last_activity(username1, domain)
+        if last is not None and not isinstance(last, datetime):
+            error('Last of new user is not None: %s' % last)
 
-    now = datetime(2017, 8, 5, 12, 14, 23)
-    if backend.set_last_activity(username1, domain, 'foobar', timestamp=now) is not None:
-        error('set_last_activity() does not return None.')
-    last = backend.get_last_activity(username1, domain)
-    if now != last:
-        error('Did not get same last activity back: %s vs %s' % (now.isoformat(), last.isoformat()))
+        now = datetime(2017, 8, 5, 12, 14, 23)
+        if backend.set_last_activity(username1, domain, 'foobar', timestamp=now) is not None:
+            error('set_last_activity() does not return None.')
+        last = backend.get_last_activity(username1, domain)
+        if now != last:
+            error('Did not get same last activity back: %s vs %s' % (now, last))
 
-    # do same with localized timezone
-    tz = pytz.timezone('Europe/Vienna')
-    now = tz.localize(now)
-    if backend.set_last_activity(username1, domain, 'foobar', timestamp=now) is not None:
-        error('set_last_activity() does not return None.')
-    last = backend.get_last_activity(username1, domain)
-    if now != pytz.utc.localize(last).astimezone(tz):
-        error('Did not get same last activity back: %s vs %s' % (now.isoformat(), last.isoformat()))
-    ok()
+        # do same with localized timezone
+        tz = pytz.timezone('Europe/Vienna')
+        now = tz.localize(now)
+        if backend.set_last_activity(username1, domain, 'foobar', timestamp=now) is not None:
+            error('set_last_activity() does not return None.')
+        last = backend.get_last_activity(username1, domain)
+        if now != pytz.utc.localize(last).astimezone(tz):
+            error('Did not get same last activity back: %s vs %s' % (now.isoformat(), last.isoformat()))
+        ok()
+    else:
+        print(yellow('Backend does not support setting last activity.'))
 
     print('Send user a message... ', end='')
     # message the user - we can not do anything with the message without an XMPP connection, so we just
@@ -244,14 +266,17 @@ def test_backend(backend, domain, config_path='', version=''):
         error('message_user() did not return None: %s' % msg)
     ok()
 
-    print('Get (empty) list of user sessions... ', end='')
-    sessions = backend.user_sessions(username1, domain)
-    if sessions != set():
-        error('user_sessions() did not return empty set: %s' % sessions)
-    ok()
+    if supports_user_sessions:
+        print('Get (empty) list of user sessions... ', end='')
+        sessions = backend.user_sessions(username1, domain)
+        if sessions != set():
+            error('user_sessions() did not return empty set: %s' % sessions)
+        ok()
+    else:
+        print(yellow('Backend does not support user sessions'))
 
     try:
-        test_user_sessions(backend, username1, domain, resource1, password2)
+        test_user_sessions(backend, username1, domain, resource1, password2, supports_user_sessions)
     finally:
         backend.stop_user_session(username1, domain, resource1)
 
