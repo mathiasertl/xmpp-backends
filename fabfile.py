@@ -206,7 +206,8 @@ def test_backend(backend, domain, config_path='', version=''):
         # Some backends (like the dummy backend) expose a method to start a "session".
         backend.start_user_session(username1, domain, resource1, ip_address='127.0.0.1')
     else:
-        xmpp, thread = start_bot('%s@%s' % (username1, domain), password2, host='localhost', port='5222')
+        jid = '%s@%s/%s' % (username1, domain, resource1)
+        xmpp, thread = start_bot(jid, password2, host='localhost', port='5222')
         time.sleep(1)  # wait for connection to establish
 
     user_sessions = backend.user_sessions(username1, domain)
