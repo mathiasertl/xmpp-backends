@@ -91,6 +91,41 @@ def test_session(session, username, domain):
     assert session.priority >= 0
 
 
+def test_user_sessions(backend, username, domain, resource, password):
+    print('Start tests requiring a running session...', end='')
+    if hasattr(backend, 'start_user_session'):
+        # Some backends (like the dummy backend) expose a method to start a "session".
+        backend.start_user_session(username, domain, resource, ip_address='127.0.0.1')
+    else:
+        jid = '%s@%s/%s' % (username, domain, resource)
+        xmpp, thread = start_bot(jid, password, host='localhost', port='5222')
+        time.sleep(1)  # wait for connection to establish
+
+    user_sessions = backend.user_sessions(username, domain)
+    if len(user_sessions) != 1:
+        error('Found wrong number of user sessions: %s', user_sessions)
+    session = list(user_sessions)[0]
+    test_session(session, username, domain)
+
+    sessions = backend.all_sessions()
+    if len(sessions) != 1:
+        error('Found wrong number of user sessions: %s', sessions)
+    session = list(sessions)[0]
+    test_session(session, username, domain)
+
+    # Stop session again and see that it's gone
+    backend.stop_user_session(username, domain, resource)
+
+    sessions = backend.all_sessions()
+    if sessions != set():
+        error('Session not correctly stopped: %s' % sessions)
+
+    user_sessions = backend.user_sessions(username, domain)
+    if user_sessions != set():
+        error('Found wrong number of user sessions: %s', user_sessions)
+    ok()
+
+
 @task
 def test_backend(backend, domain, config_path='', version=''):
     username1 = 'example'
@@ -202,38 +237,10 @@ def test_backend(backend, domain, config_path='', version=''):
         error('user_sessions() did not return empty set: %s' % sessions)
     ok()
 
-    print('Start tests requiring a running session...', end='')
-    if hasattr(backend, 'start_user_session'):
-        # Some backends (like the dummy backend) expose a method to start a "session".
-        backend.start_user_session(username1, domain, resource1, ip_address='127.0.0.1')
-    else:
-        jid = '%s@%s/%s' % (username1, domain, resource1)
-        xmpp, thread = start_bot(jid, password2, host='localhost', port='5222')
-        time.sleep(1)  # wait for connection to establish
-
-    user_sessions = backend.user_sessions(username1, domain)
-    if len(user_sessions) != 1:
-        error('Found wrong number of user sessions: %s', user_sessions)
-    session = list(user_sessions)[0]
-    test_session(session, username1, domain)
-
-    sessions = backend.all_sessions()
-    if len(sessions) != 1:
-        error('Found wrong number of user sessions: %s', sessions)
-    session = list(sessions)[0]
-    test_session(session, username1, domain)
-
-    # Stop session again and see that it's gone
-    backend.stop_user_session(username1, domain, resource1)
-
-    sessions = backend.all_sessions()
-    if sessions != set():
-        error('Session not correctly stopped: %s' % sessions)
-
-    user_sessions = backend.user_sessions(username1, domain)
-    if user_sessions != set():
-        error('Found wrong number of user sessions: %s', user_sessions)
-    ok()
+    try:
+        test_user_sessions(backend, username1, domain, resource1, password2)
+    finally:
+        backend.stop_user_session(username1, domain, resource1)
 
     # block user
     print('Block user and check previous passwords... ', end='')
