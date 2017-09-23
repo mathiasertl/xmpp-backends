@@ -23,6 +23,11 @@ ejabberd XMLRPC API
 Version-specific notes
 ======================
 
+* **ejabberd <= 17.03**: The ``get_last`` API call did not indicate if the user existed or not.
+  :py:class:`~xmpp_backends.base.get_last_activity` will return ``None`` if the user does not exist.
+  
+  .. seealso:: `GitHub issue <https://github.com/processone/ejabberd/issues/1565>`_
+
 * **ejabberd <= 14.07**: Encoding of UTF-8 characters in ejabberd <= 14.07 is handled in the same
   way as the standard PHP XMLRPC library does. **xmpp-backends** includes a hacked version of
   ``xmlrpclib`` to handle the behaviour, but the hack is not enabled for Python 3.
