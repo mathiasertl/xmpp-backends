@@ -173,6 +173,12 @@ class EjabberdctlBackend(EjabberdBackendBase):
             raise BackendError(code)
 
     def set_password(self, username, domain, password):
+        version = self.get_version()
+        if version <= (16, 1, ) and not self.user_exists(username, domain):
+            # 16.01 just creates the user upon change_password!
+            # NOTE: This may also affect other versions < 16.09.
+            raise UserNotFound(username, domain)
+
         code, out, err = self.ctl('change_password', username, domain, password)
         if six.PY3:
             out = out.decode('utf-8')
