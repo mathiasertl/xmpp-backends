@@ -40,6 +40,8 @@ class EjabberdRestBackend(EjabberdBackendBase):
     <https://docs.ejabberd.im/developer/ejabberd-api/>`_. It requires `requests
     <http://docs.python-requests.org/en/master/>`_.
 
+    .. NOTE:: This backend requires ejabberd 16.02 or later.
+
     Our current (17.07) configuration looks as follows::
 
         # "api" is an access_rules list
@@ -82,6 +84,9 @@ class EjabberdRestBackend(EjabberdBackendBase):
     def __init__(self, uri='http://127.0.0.1:5280/api/', user=None, password=None,
                  version=(17, 7, ), **kwargs):
         super(EjabberdRestBackend, self).__init__()
+
+        if version <= (16, 1):
+            raise NotImplementedError('EjabberdRestBackend does not support ejabberd >= 16.02.')
 
         if not uri.endswith('/'):
             uri += '/'
@@ -154,7 +159,6 @@ class EjabberdRestBackend(EjabberdBackendBase):
         #       https://github.com/processone/ejabberd/issues/1565
         else:
             parsed = response.json()
-            print(parsed)
             if parsed['status'] == 'NOT FOUND':
                 raise UserNotFound(username, domain)
 

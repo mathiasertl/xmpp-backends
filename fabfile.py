@@ -154,7 +154,12 @@ def test_backend(backend, domain, config_path='', version=''):
     if version:
         kwargs['version'] = tuple(int(t) for t in version.split('.'))
 
-    backend = cls(**kwargs)
+    try:
+        backend = cls(**kwargs)
+    except NotImplementedError as e:
+        print(yellow(e))
+        return
+
     initial_users = set(config.get('expected_users', set()))
 
     print('Testing initial state... ', end='')
