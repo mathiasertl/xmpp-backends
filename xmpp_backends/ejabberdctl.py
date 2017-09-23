@@ -77,9 +77,7 @@ class EjabberdctlBackend(EjabberdBackendBase):
         code, out, err = self.ctl('user_sessions_info', username, domain)
         version = self.get_version()
         sessions = set()
-
-        if six.PY3:
-            out = out.decode('utf-8')
+        out = out.decode('utf-8')  # bytes -> str in py3, str -> unicode in py2
 
         for line in out.splitlines():
             conn, ip, _p, prio, _n, uptime, status, resource, status_text = line.split('\t', 8)
@@ -215,8 +213,7 @@ class EjabberdctlBackend(EjabberdBackendBase):
         code, out, err = self.ctl('connected_users_info')
         if code != 0:
             raise BackendError(code)
-        if six.PY3:
-            out = out.decode('utf-8')
+        out = out.decode('utf-8')  # bytes -> str in py3, str -> unicode in py2
         version = self.get_version()
         sessions = set()
 
