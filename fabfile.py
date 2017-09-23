@@ -154,7 +154,7 @@ def test_backend(backend, domain, config_path='', version=''):
     if version:
         kwargs['version'] = tuple(int(t) for t in version.split('.'))
 
-    backend = cls(**config.get('kwargs', {}))
+    backend = cls(**kwargs)
     initial_users = set(config.get('expected_users', set()))
 
     print('Testing initial state... ', end='')
