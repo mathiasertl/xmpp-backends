@@ -92,6 +92,17 @@ class UserSession(object):
     """
     def __init__(self, backend, username, domain, resource, priority, ip_address, uptime, status, status_text,
                  connection_type, encrypted, compressed):
+        # make sure that data is in unicode
+        if six.PY2 is True:
+            if isinstance(username, six.binary_type):
+                username = username.decode('utf-8')
+            if isinstance(domain, six.binary_type):
+                domain = domain.decode('utf-8')
+            if isinstance(resource, six.binary_type):
+                resource = resource.decode('utf-8')
+            if isinstance(status_text, six.binary_type):
+                status_text = status_text.decode('utf-8')
+
         self._backend = backend
         self.username = username
         self.domain = domain
@@ -116,7 +127,10 @@ class UserSession(object):
         return '%s@%s/%s' % (self.username, self.domain, self.resource)
 
     def __repr__(self):
-        return '<UserSession: %s@%s/%s>' % (self.username, self.domain, self.resource)
+        val = '<UserSession: %s@%s/%s>' % (self.username, self.domain, self.resource)
+        if six.PY2 is True:
+            return val.encode('utf-8')
+        return val
 
 
 class XmppBackendBase(object):
