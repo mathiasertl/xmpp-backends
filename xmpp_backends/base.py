@@ -536,5 +536,8 @@ class EjabberdBackendBase(XmppBackendBase):
         """
         if ip_address.startswith('::FFFF:'):
             ip_address = ip_address[7:]
+        if six.PY2 and isinstance(ip_address, str):
+            # ipaddress constructor does not eat str in py2 :-/
+            ip_address = ip_address.decode('utf-8')
 
         return ipaddress.ip_address(ip_address)
