@@ -220,6 +220,10 @@ class EjabberdctlBackend(EjabberdBackendBase):
 
             username, domain = jid.split('@', 1)
             domain, resource = domain.split('/', 1)
+            if prio == 'nil':
+                prio = None
+            else:
+                prio = int(prio)
 
             started = pytz.utc.localize(datetime.utcnow() - timedelta(int(uptime)))
             typ, encrypted, compressed = self.parse_connection_string(conn, version)
@@ -228,7 +232,7 @@ class EjabberdctlBackend(EjabberdBackendBase):
                 username=username,
                 domain=domain,
                 resource=resource,
-                priority=int(prio),
+                priority=prio,
                 ip_address=self.parse_ip_address(ip, version),
                 uptime=started,
                 status='',  # session['status'],
