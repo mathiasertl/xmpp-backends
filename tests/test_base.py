@@ -13,11 +13,14 @@
 # You should have received a copy of the GNU General Public License along with xmpp-backends.  If
 # not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
+
 import doctest
 import unittest
 from datetime import datetime
 
 import pytz
+import six
 from xmpp_backends.base import XmppBackendBase
 from xmpp_backends.base import UserSession
 from xmpp_backends.constants import CONNECTION_HTTP_BINDING
@@ -78,6 +81,40 @@ class TestUserSessions(unittest.TestCase):
                               status_text='I am online.', connection_type=CONNECTION_XMPP,
                               encrypted=True, compressed=False)
         self.assertEqual(repr(session), '<UserSession: user@example.com/resource>')
+
+    def test_unicode(self):
+        session = UserSession(base, 'üser', 'example.com', 'resource',
+                              priority=0, ip_address='127.0.0.1', uptime=None, status='online',
+                              status_text='I am online.', connection_type=CONNECTION_XMPP,
+                              encrypted=True, compressed=False)
+        self.assertEqual(repr(session), '<UserSession: üser@example.com/resource>')
+        if six.PY2:
+            self.assertEqual(str(session), 'üser@example.com/resource'.encode('utf-8'))
+            self.assertEqual(unicode(session), 'üser@example.com/resource')  # NOQA
+        else:
+            self.assertEqual(str(session), 'üser@example.com/resource')
+
+        session = UserSession(base, 'user', 'example.com', 'resöurce',
+                              priority=0, ip_address='127.0.0.1', uptime=None, status='online',
+                              status_text='I am online.', connection_type=CONNECTION_XMPP,
+                              encrypted=True, compressed=False)
+        self.assertEqual(repr(session), '<UserSession: user@example.com/resöurce>')
+        if six.PY2:
+            self.assertEqual(str(session), 'user@example.com/resöurce'.encode('utf-8'))
+            self.assertEqual(unicode(session), 'user@example.com/resöurce')  # NOQA
+        else:
+            self.assertEqual(str(session), 'user@example.com/resöurce')
+
+        session = UserSession(base, 'üser', 'example.com', 'resöurce',
+                              priority=0, ip_address='127.0.0.1', uptime=None, status='online',
+                              status_text='I am online.', connection_type=CONNECTION_XMPP,
+                              encrypted=True, compressed=False)
+        self.assertEqual(repr(session), '<UserSession: üser@example.com/resöurce>')
+        if six.PY2:
+            self.assertEqual(str(session), 'üser@example.com/resöurce'.encode('utf-8'))
+            self.assertEqual(unicode(session), 'üser@example.com/resöurce')  # NOQA
+        else:
+            self.assertEqual(str(session), 'üser@example.com/resöurce')
 
     def test_eq(self):
         session_a = UserSession(base, 'user', 'example.com', 'resource',
