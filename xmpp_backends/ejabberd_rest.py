@@ -141,7 +141,10 @@ class EjabberdRestBackend(EjabberdBackendBase):
             result = response.json()['last_activity'].lower().strip()
 
             if result == 'never':
-                return None
+                if self.user_exists(username, domain):
+                    # The output is the same if the user does not exist
+                    return None
+                raise UserNotFound(username, domain)
             elif result == 'online':
                 return datetime.now()
 
@@ -151,6 +154,7 @@ class EjabberdRestBackend(EjabberdBackendBase):
         #       https://github.com/processone/ejabberd/issues/1565
         else:
             parsed = response.json()
+            print(parsed)
             if parsed['status'] == 'NOT FOUND':
                 raise UserNotFound(username, domain)
 

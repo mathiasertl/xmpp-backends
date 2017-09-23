@@ -167,13 +167,7 @@ def test_backend(backend, domain, config_path='', version=''):
         error('check_password() did not return False for non-existing user.')
     try:
         ret = backend.get_last_activity(username1, domain)
-
-        if isinstance(backend, EjabberdBackendBase) and version < (17, 4):
-            # ejabberd < 17.04 made no difference if the user existed or not
-            #   https://github.com/processone/ejabberd/issues/1565
-            warn('get_last_activity did not raise UserNotFound: %s' % ret)
-        else:
-            error('get_last_activity did not raise UserNotFound: %s' % ret)
+        error('get_last_activity did not raise UserNotFound: %s' % ret)
     except UserNotFound as e:
         if str(e) != jid1:
             error('UserNotFound from get_last_activity did not match "%s": "%s"' % (jid1, str(e)))

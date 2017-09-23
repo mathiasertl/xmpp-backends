@@ -147,7 +147,9 @@ class EjabberdXMLRPCBackend(EjabberdBackendBase):
             if activity == 'Online':
                 return datetime.utcnow()
             elif activity == 'Never':
-                return None
+                if self.user_exists(username, domain):
+                    return None
+                raise UserNotFound(username, domain)
             else:
                 return datetime.strptime(activity[:19], '%Y-%m-%d %H:%M:%S')
         else:

@@ -136,7 +136,9 @@ class EjabberdctlBackend(EjabberdBackendBase):
             if out == 'Online':
                 return datetime.utcnow()
             elif out == 'Never':
-                return None
+                if self.user_exists(username, domain):
+                    return None
+                raise UserNotFound(username, domain)
             else:
                 return datetime.strptime(out[:19], '%Y-%m-%d %H:%M:%S')
         else:
