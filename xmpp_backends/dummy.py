@@ -15,11 +15,13 @@
 
 from __future__ import unicode_literals
 
+import ipaddress
 import logging
 import time
 from datetime import datetime
 
 import pytz
+import six
 
 from .base import BackendError
 from .base import UserExists
@@ -71,6 +73,9 @@ class DummyBackend(XmppBackendBase):
         kwargs.setdefault('connection_type', CONNECTION_XMPP)
         kwargs.setdefault('encrypted', True)
         kwargs.setdefault('compressed', False)
+        kwargs.setdefault('ip_address', '127.0.0.1')
+        if isinstance(kwargs['ip_address'], six.string_types):
+            kwargs['ip_address'] = ipaddress.ip_address(kwargs['ip_address'])
 
         user = '%s@%s' % (username, domain)
         session = UserSession(self, username, domain, resource, **kwargs)
