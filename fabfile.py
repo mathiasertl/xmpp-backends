@@ -91,8 +91,9 @@ def test_session(session, username, domain):
 
 
 @task
-def test_backend(backend, domain, config_path='', version='', use_xmpp='n'):
+def test_backend(backend, domain, config_path='', version=''):
     username1 = 'example'
+    resource1 = 'resource1'
     jid1 = '%s@%s' % (username1, domain)
     password1 = 'foobar'
     password2 = 'barfoo'
@@ -200,25 +201,26 @@ def test_backend(backend, domain, config_path='', version='', use_xmpp='n'):
         error('user_sessions() did not return empty set: %s' % sessions)
     ok()
 
-    if use_xmpp == 'y':
-        print('Start tests requiring a running session...', end='', flush=True)
-        try:
-            xmpp, thread = start_bot('%s@%s' % (username1, domain), password2, host='localhost', port='5222')
-            time.sleep(1)  # wait for connection to establish
-            user_sessions = backend.user_sessions(username1, domain)
-            if len(user_sessions) != 1:
-                error('Found wrong number of user sessions: %s', user_sessions)
-            session = list(user_sessions)[0]
-            test_session(session, username1, domain)
+    print('Start tests requiring a running session...', end='', flush=True)
+    if hasattr(backend, 'start_user_session'):
+        # Some backends (like the dummy backend) expose a method to start a "session".
+        backend.start_user_session(username1, domain, resource1, ip_address='127.0.0.1')
+    else:
+        xmpp, thread = start_bot('%s@%s' % (username1, domain), password2, host='localhost', port='5222')
+        time.sleep(1)  # wait for connection to establish
 
-            sessions = backend.all_sessions()
-            if len(sessions) != 1:
-                error('Found wrong number of user sessions: %s', sessions)
-            session = list(sessions)[0]
-            test_session(session, username1, domain)
-        finally:
-            xmpp.disconnect()
-        ok()
+    user_sessions = backend.user_sessions(username1, domain)
+    if len(user_sessions) != 1:
+        error('Found wrong number of user sessions: %s', user_sessions)
+    session = list(user_sessions)[0]
+    test_session(session, username1, domain)
+
+    sessions = backend.all_sessions()
+    if len(sessions) != 1:
+        error('Found wrong number of user sessions: %s', sessions)
+    session = list(sessions)[0]
+    test_session(session, username1, domain)
+    ok()
 
     # block user
     print('Block user and check previous passwords... ', end='')
