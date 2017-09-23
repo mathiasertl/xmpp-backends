@@ -170,12 +170,15 @@ def test_backend(backend, domain, config_path='', version=''):
 
     supports_user_sessions = True
     supports_set_last = True
+    supports_block_user = True
     if isinstance(backend, EjabberdBackendBase) and version >= (14, 7) and version <= (15, 4):
         # This affects at least 14.07 until 15.04
         # https://github.com/processone/ejabberd/issues/555
         supports_set_last = False
     if isinstance(backend, EjabberdBackendBase) and version == (14, 7):
         supports_user_sessions = False
+    if isinstance(backend, EjabberdBackendBase) and version == (14, 7):
+        supports_block_user = False
 
     initial_users = set(config.get('expected_users', set()))
 
@@ -273,7 +276,7 @@ def test_backend(backend, domain, config_path='', version=''):
             error('user_sessions() did not return empty set: %s' % sessions)
         ok()
     else:
-        print(yellow('Backend does not support user sessions'))
+        print(yellow('Backend does not support user sessions.'))
 
     try:
         test_user_sessions(backend, username1, domain, resource1, password2, supports_user_sessions)
@@ -281,15 +284,18 @@ def test_backend(backend, domain, config_path='', version=''):
         backend.stop_user_session(username1, domain, resource1)
 
     # block user
-    print('Block user and check previous passwords... ', end='')
-    blk = backend.block_user(username1, domain)
-    if blk is not None:
-        error('block_user() did not return None: %s' % blk)
-    if backend.check_password(username1, domain, password1) is not False:
-        error('False password is accepted.')
-    if backend.check_password(username1, domain, password2) is not False:
-        error('False password is accepted.')
-    ok()
+    if supports_block_user:
+        print('Block user and check previous passwords... ', end='')
+        blk = backend.block_user(username1, domain)
+        if blk is not None:
+            error('block_user() did not return None: %s' % blk)
+        if backend.check_password(username1, domain, password1) is not False:
+            error('False password is accepted.')
+        if backend.check_password(username1, domain, password2) is not False:
+            error('False password is accepted.')
+        ok()
+    else:
+        print(yellow('Backend does not support blocking users.'))
 
     # remove user again
     print('Remove user... ', end='')
