@@ -133,6 +133,7 @@ class EjabberdctlBackend(EjabberdBackendBase):
             out = out.decode('utf-8')
 
         if version < (17, 4):
+            out = out.strip()
             if out == 'Online':
                 return datetime.utcnow()
             elif out == 'Never':
