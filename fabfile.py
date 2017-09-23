@@ -220,6 +220,17 @@ def test_backend(backend, domain, config_path='', version=''):
         error('Found wrong number of user sessions: %s', sessions)
     session = list(sessions)[0]
     test_session(session, username1, domain)
+
+    # Stop session again and see that it's gone
+    backend.stop_user_session(username1, domain, resource1)
+
+    sessions = backend.all_sessions()
+    if sessions != set():
+        error('Session not correctly stopped: %s' % sessions)
+
+    user_sessions = backend.user_sessions(username1, domain)
+    if user_sessions != set():
+        error('Found wrong number of user sessions: %s', user_sessions)
     ok()
 
     # block user
