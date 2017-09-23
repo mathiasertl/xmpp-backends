@@ -85,13 +85,18 @@ class EjabberdctlBackend(EjabberdBackendBase):
             conn, ip, _p, prio, _n, uptime, status, resource, status_text = line.split('\t', 8)
             started = pytz.utc.localize(datetime.utcnow() - timedelta(int(uptime)))
 
+            if prio == 'undefined':
+                prio = None
+            else:
+                prio = int(prio)
+
             typ, encrypted, compressed = self.parse_connection_string(conn, version)
             sessions.add(UserSession(
                 backend=self,
                 username=username,
                 domain=domain,
                 resource=resource,
-                priority=int(prio),
+                priority=prio,
                 ip_address=self.parse_ip_address(ip, version),
                 uptime=started,
                 status=status, status_text=status_text,
