@@ -124,6 +124,29 @@ define_macro:
       mode: 644
       group: 33
     spam_prevention: true
+  'API_COMMANDS':
+    - ban_account
+    - change_password
+    - check_account
+    - check_password
+    - connected_users_number
+    - connected_users_info
+    - get_last
+    - incoming_s2s_number
+    - kick_session
+    - muc_online_rooms
+    - num_active_users
+    - outgoing_s2s_number
+    - register
+    - registered_users
+    - registered_vhosts
+    - send_message
+    - set_last
+    - stats
+    - stats_host
+    - status
+    - unregister
+    - user_sessions_info
 
 ##
 ## listen: The ports ejabberd will listen on, which service each is handled
@@ -517,57 +540,15 @@ access_rules:
   ##   - deny:
   ##     - ip: "XXX.XXX.XXX.XXX/32"
   ##   - allow
+  admin:
+    - allow: admin
 
 ## ===============
 ## API PERMISSIONS
 ## ===============
-##
-## This section allows you to define who and using what method
-## can execute commands offered by ejabberd.
-##
-## By default "console commands" section allow executing all commands
-## issued using ejabberdctl command, and "admin access" section allows
-## users in admin acl that connect from 127.0.0.1 to  execute all
-## commands except start and stop with any available access method
-## (ejabberdctl, http-api, xmlrpc depending what is enabled on server).
-##
-## If you remove "console commands" there will be one added by
-## default allowing executing all commands, but if you just change
-## permissions in it, version from config file will be used instead
-## of default one.
-##
-api_permissions:
-  "console commands":
-    from:
-      - ejabberd_ctl
-    who: all
-    what: "*"
-  "admin access":
-    who:
-      - user: "api@example.com"
-      - access:
-          - allow:
-            #- acl: loopback
-            - acl: admin
-      - oauth:
-        - scope: "ejabberd:admin"
-        - access:
-          - allow:
-            #- acl: loopback
-            - acl: admin
-    what:
-      - "*"
-      - "!stop"
-      - "!start"
-    from:
-      - mod_http_api
-      - ejabberd_xmlrpc
-  "public commands":
-    who:
-      - ip: "127.0.0.1/8"
-    what:
-      - "status"
-      - "connected_users_number"
+commands_admin_access: admin
+commands: 
+  - add_commands: 'API_COMMANDS'
 
 ## By default the frequency of account registrations from the same IP
 ## is limited to 1 account every 10 minutes. To disable, specify: infinity
