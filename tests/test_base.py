@@ -87,34 +87,37 @@ class TestUserSessions(unittest.TestCase):
                               priority=0, ip_address='127.0.0.1', uptime=None, status='online',
                               status_text='I am online.', connection_type=CONNECTION_XMPP,
                               encrypted=True, compressed=False)
-        self.assertEqual(repr(session), '<UserSession: üser@example.com/resource>')
         if six.PY2:
+            self.assertEqual(repr(session), '<UserSession: üser@example.com/resource>'.encode('utf-8'))
             self.assertEqual(str(session), 'üser@example.com/resource'.encode('utf-8'))
             self.assertEqual(unicode(session), 'üser@example.com/resource')  # NOQA
         else:
+            self.assertEqual(repr(session), '<UserSession: üser@example.com/resource>')
             self.assertEqual(str(session), 'üser@example.com/resource')
 
         session = UserSession(base, 'user', 'example.com', 'resöurce',
                               priority=0, ip_address='127.0.0.1', uptime=None, status='online',
                               status_text='I am online.', connection_type=CONNECTION_XMPP,
                               encrypted=True, compressed=False)
-        self.assertEqual(repr(session), '<UserSession: user@example.com/resöurce>')
         if six.PY2:
+            self.assertEqual(repr(session), '<UserSession: user@example.com/resöurce>'.encode('utf-8'))
             self.assertEqual(str(session), 'user@example.com/resöurce'.encode('utf-8'))
             self.assertEqual(unicode(session), 'user@example.com/resöurce')  # NOQA
         else:
             self.assertEqual(str(session), 'user@example.com/resöurce')
+            self.assertEqual(repr(session), '<UserSession: user@example.com/resöurce>')
 
         session = UserSession(base, 'üser', 'example.com', 'resöurce',
                               priority=0, ip_address='127.0.0.1', uptime=None, status='online',
                               status_text='I am online.', connection_type=CONNECTION_XMPP,
                               encrypted=True, compressed=False)
-        self.assertEqual(repr(session), '<UserSession: üser@example.com/resöurce>')
         if six.PY2:
+            self.assertEqual(repr(session), '<UserSession: üser@example.com/resöurce>'.encode('utf-8'))
             self.assertEqual(str(session), 'üser@example.com/resöurce'.encode('utf-8'))
             self.assertEqual(unicode(session), 'üser@example.com/resöurce')  # NOQA
         else:
             self.assertEqual(str(session), 'üser@example.com/resöurce')
+            self.assertEqual(repr(session), '<UserSession: üser@example.com/resöurce>')
 
     def test_eq(self):
         session_a = UserSession(base, 'user', 'example.com', 'resource',
