@@ -221,6 +221,12 @@ class EjabberdXMLRPCBackend(EjabberdBackendBase):
             raise BackendError(result.get('text', 'Unknown Error'))
 
     def set_password(self, username, domain, password):
+        version = self.get_version()
+        if version <= (16, 1, ) and not self.user_exists(username, domain):
+            # 16.01 just creates the user upon change_password!
+            # NOTE: This may also affect other versions < 16.09.
+            raise UserNotFound(username, domain)
+
         try:
             result = self.rpc('change_password', user=username, host=domain, newpass=password)
         except xmlrpclib.Fault as e:
