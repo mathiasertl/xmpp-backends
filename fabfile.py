@@ -205,7 +205,9 @@ def test_backend(backend, domain, config_path='', version=''):
     ok()
 
     print('Test last activity... ', end='')
-    backend.get_last_activity(username1, domain)
+    last = backend.get_last_activity(username1, domain)
+    if last is not None:
+        error('Last of new user is not None: %s' % last)
     now = datetime(2017, 8, 5, 12, 14, 23)
     if backend.set_last_activity(username1, domain, 'foobar', timestamp=now) is not None:
         error('set_last_activity() does not return None.')
