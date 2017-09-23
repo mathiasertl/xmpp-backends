@@ -202,7 +202,7 @@ def test_backend(backend, domain, config_path='', version=''):
         error('user_sessions() did not return empty set: %s' % sessions)
     ok()
 
-    print('Start tests requiring a running session...', end='', flush=True)
+    print('Start tests requiring a running session...', end='')
     if hasattr(backend, 'start_user_session'):
         # Some backends (like the dummy backend) expose a method to start a "session".
         backend.start_user_session(username1, domain, resource1, ip_address='127.0.0.1')
