@@ -110,7 +110,7 @@ def test_user_sessions(backend, username, domain, resource, password):
 
     try:
         user_sessions = backend.user_sessions(username, domain)
-    except NotSupportedError as e:
+    except NotSupportedError:
         pass  # we already notified about this earlier.
     else:
         if len(user_sessions) != 1:
@@ -120,7 +120,7 @@ def test_user_sessions(backend, username, domain, resource, password):
 
     try:
         sessions = backend.all_sessions()
-    except NotSupportedError as e:
+    except NotSupportedError:
         pass  # we already notified about this earlier.
     else:
         if len(sessions) != 1:
@@ -212,7 +212,7 @@ def test_backend(backend, domain, config_path='', version=''):
 
     try:
         backend.set_last_activity(username1, domain)
-    except NotSupportedError as e:
+    except NotSupportedError:
         pass  # We have a separate line for that later
     except UserNotFound as e:
         # ejabberd api does not indicate any error in this case

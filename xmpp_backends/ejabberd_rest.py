@@ -86,7 +86,7 @@ class EjabberdRestBackend(EjabberdBackendBase):
         super(EjabberdRestBackend, self).__init__()
 
         if version <= (16, 1):
-            raise NotImplementedError('EjabberdRestBackend does not support ejabberd >= 16.02.')
+            raise NotImplementedError('EjabberdRestBackend does not support ejabberd <= 16.01.')
 
         if not uri.endswith('/'):
             uri += '/'
