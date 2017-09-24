@@ -118,11 +118,15 @@ def test_user_sessions(backend, username, domain, resource, password):
         session = list(user_sessions)[0]
         test_session(session, username, domain)
 
-    sessions = backend.all_sessions()
-    if len(sessions) != 1:
-        error('Found wrong number of user sessions: %s' % sessions)
-    session = list(sessions)[0]
-    test_session(session, username, domain)
+    try:
+        sessions = backend.all_sessions()
+    except NotSupportedError as e:
+        pass  # we already notified about this earlier.
+    else:
+        if len(sessions) != 1:
+            error('Found wrong number of user sessions: %s' % sessions)
+        session = list(sessions)[0]
+        test_session(session, username, domain)
 
     # Stop session again and see that it's gone
     backend.stop_user_session(username, domain, resource)
@@ -130,9 +134,13 @@ def test_user_sessions(backend, username, domain, resource, password):
     if xmpp is not None:
         xmpp.disconnect()
 
-    sessions = backend.all_sessions()
-    if sessions != set():
-        error('Session not correctly stopped: %s' % sessions)
+    try:
+        sessions = backend.all_sessions()
+    except NotSupportedError as e:
+        pass  # we already notified about this earlier.
+    else:
+        if sessions != set():
+            error('Session not correctly stopped: %s' % sessions)
 
     try:
         user_sessions = backend.user_sessions(username, domain)
