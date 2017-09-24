@@ -27,9 +27,17 @@ pip install xmpp-backends
 
 ### 0.5.0 (TBR)
 
-* New methods `all_domains` and `all_sessions`.
-* `user_sessions` now also returns a list of `UserSession` instances.
+* New methods `all_domains()` and `all_sessions()`.
+* `user_sessions` now also returns a list of `UserSession` instances, like `all_sessions()`.
 * `ipaddress` is now a dependency in Python2.
+* Raise `NotImplementedError` if a backend constructor gets an unsupported version.
+* `get_last_activity` now raises `UserNotFound` if the user does not exist. In ejabberd < 17.04, this means a
+  second API call.
+* `set_password` checks if the user exists with ejabberd < 16.01, as ejabberd just creates a user with the
+  underlying API call in those versions.
+* `block_user()` and `set_last_activity` and `user_sessions()` raise `NotSupportedError` for ejabberd 14.07,
+  as the underlying API call is broken in that version.
+* Fix `message_user()` to work with all versions.
 
 ### 0.4.1 (2017-08-27)
 
