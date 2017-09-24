@@ -13,3 +13,5 @@
 /MANIFEST
 /*egg-info/
 /docs/_build/
+/py2/
+/py3/
