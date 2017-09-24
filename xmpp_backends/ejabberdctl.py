@@ -56,6 +56,8 @@ class EjabberdctlBackend(EjabberdBackendBase):
 
         if version == (14, 7):
             log.warn('ejabberd 14.07 is really broken and many calls will not work!')
+        if version < (13, 6):
+            raise NotImplementedError('EjabberdRestBackend does not support ejabberd <= 16.01.')
 
     def get_version(self):
         return self.version
@@ -167,8 +169,8 @@ class EjabberdctlBackend(EjabberdBackendBase):
         code, out, err = self.ctl('set_last', username, domain, timestamp, status)
 
         version = self.get_version()
-        if code == 1 and version >= (17, 4):
-            # ejabberd returns status code 1 at least since 17.04
+        if code == 1 and version >= (16, 1):
+            # ejabberd returns status code 1 at least since 16.09
             return
         elif code != 0:
             if code == 1 and version == (14, 7):
