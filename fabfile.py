@@ -98,7 +98,7 @@ def test_session(session, username, domain):
     assert session.priority >= 0
 
 
-def test_user_sessions(backend, username, domain, resource, password, supports_user_sessions):
+def test_user_sessions(backend, username, domain, resource, password):
     print('Start tests requiring a running session... ', end='')
     xmpp = None
     if hasattr(backend, 'start_user_session'):
@@ -175,14 +175,11 @@ def test_backend(backend, domain, config_path='', version=''):
         print(yellow(e))
         return
 
-    supports_user_sessions = True
     supports_set_last = True
     if isinstance(backend, EjabberdBackendBase) and version >= (14, 7) and version <= (15, 4):
         # This affects at least 14.07 until 15.04
         # https://github.com/processone/ejabberd/issues/555
         supports_set_last = False
-    if isinstance(backend, EjabberdBackendBase) and version == (14, 7):
-        supports_user_sessions = False
 
     initial_users = set(config.get('expected_users', set()))
 
@@ -284,7 +281,7 @@ def test_backend(backend, domain, config_path='', version=''):
         ok()
 
     try:
-        test_user_sessions(backend, username1, domain, resource1, password2, supports_user_sessions)
+        test_user_sessions(backend, username1, domain, resource1, password2)
     finally:
         backend.stop_user_session(username1, domain, resource1)
 
