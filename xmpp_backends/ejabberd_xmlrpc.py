@@ -266,6 +266,7 @@ class EjabberdXMLRPCBackend(EjabberdBackendBase):
         }
 
         if version <= (14, 7):
+            # TODO: it's unclear when send_message was introduced
             command = 'send_message_chat'
         else:
             command = 'send_message'
