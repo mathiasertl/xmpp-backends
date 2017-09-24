@@ -25,7 +25,7 @@ pip install xmpp-backends
 
 ## ChangeLog
 
-### 0.5.0 (TBR)
+### 0.5.0 (2017-09-24)
 
 * New methods `all_domains()` and `all_user_sessions()`.
 * `user_sessions` now also returns a list of `UserSession` instances, like `all_sessions()`.
