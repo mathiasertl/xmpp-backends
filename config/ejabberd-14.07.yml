@@ -120,9 +120,6 @@ define_macro:
     # TODO 1: outdir is very old left-over from old drupal on same host.
     # TODO 2: Is it possible to have @HOST@ here? If no, maybe bugreport?
     outdir: "/var/www/example.com/sites/example.com/logs/"
-    file_permissions:
-      mode: 644
-      group: 33
     spam_prevention: true
   'API_COMMANDS':
     - ban_account
@@ -210,7 +207,7 @@ listen:
     port: 4560
     ip: "127.0.0.1"
     module: ejabberd_xmlrpc
-    access_commands: {}
+    access: xmlrpc
 
 ## Disabling digest-md5 SASL authentication. digest-md5 requires plain-text
 ## password storage (see auth_password_format option).
@@ -427,7 +424,10 @@ acl:
   ##
   admin:
      user:
-       - "api@example.com"
+       - "api": "example.com"
+  xmlrpc:
+    user:
+      - "api": "example.com"
 
   ##
   ## Blocked users
@@ -552,6 +552,10 @@ access:
   ## s2s: 
   ##   bad_servers: deny
   ##   all: allow
+  admin:
+    admin: allow
+  xmlrpc:
+    xmlrpc: allow
 
 ## ===============
 ## API PERMISSIONS
