@@ -26,6 +26,7 @@ import six
 
 from .base import BackendError
 from .base import EjabberdBackendBase
+from .base import NotSupportedError
 from .base import UserExists
 from .base import UserNotFound
 from .base import UserSession
@@ -168,6 +169,10 @@ class EjabberdctlBackend(EjabberdBackendBase):
         # connections. And stopping existing connections doesn't work either.
         code, out, err = self.ctl('ban_account', username, domain, 'Blocked')
         if code != 0:
+            version = self.get_version()
+            if version == (14, 7):
+                raise NotSupportedError("ejabberd 14.07 does not support banning accounts.")
+
             raise BackendError(code)
 
     def check_password(self, username, domain, password):
