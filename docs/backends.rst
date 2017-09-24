@@ -84,16 +84,20 @@ The ``version`` parameter is common to all `ejabberd <https://www.ejabberd.im/>`
 and is used to handle different behaviour among various versions of ejabberd. It is a simple tuple
 of integers describing the version, e.g. ``(16, 9, )`` for ejabberd version 16.09.
 
-Currently there are no version specific notes common to all backends, but in the future they will
-be listed below. Any version-specific behaviour for a specific backend is noted in the backends own
-documentation.
-
 Version-specific notes
 ======================
 
-* **ejabberd <= 17.03**: Ejabberd 17.03 and earlier return the timestamp for
+* **ejabberd <= 17.03:** Ejabberd 17.03 and earlier return the timestamp for
   ``get_last_activity`` in the system timezone, not UTC. See `this github issue
   <https://github.com/processone/ejabberd/issues/1565>`_.
+* **ejabberd <= 16.01:** :py:func:`~xmpp_backends.base.XmppBackendBase.set_password`
+  does a second API call verifying that the user exists, as the underlying API
+  call (``change_password``) creates the user if it doesn't exist.
+* **ejabberd <= 14.07:** :py:func:`~xmpp_backends.base.XmppBackendBase.block_user` and
+  :py:func:`~xmpp_backends.base.XmppBackendBase.all_sessions` will raise
+  :py:class:`~xmpp_backends.base.NotSupportedError`, as the underlying API call is known to be broken.
+  
+
 
 ``EjabberdBackendBase``
 =======================
