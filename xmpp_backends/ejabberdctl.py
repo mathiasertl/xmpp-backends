@@ -205,8 +205,7 @@ class EjabberdctlBackend(EjabberdBackendBase):
             raise BackendError(code)
 
     def set_unusable_password(self, username, domain):
-        code, out, err = self.ctl('ban_account', username, domain,
-                                  'by django-xmpp-account')
+        code, out, err = self.ctl('ban_account', username, domain, 'by xmpp-account')
         if code != 0:
             raise BackendError(code)
 
