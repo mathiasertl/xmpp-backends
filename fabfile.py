@@ -136,7 +136,7 @@ def test_user_sessions(backend, username, domain, resource, password):
 
     try:
         sessions = backend.all_sessions()
-    except NotSupportedError as e:
+    except NotSupportedError:
         pass  # we already notified about this earlier.
     else:
         if sessions != set():
