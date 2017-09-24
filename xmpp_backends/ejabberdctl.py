@@ -164,7 +164,14 @@ class EjabberdctlBackend(EjabberdBackendBase):
 
     def set_last_activity(self, username, domain, status='', timestamp=None):
         timestamp = str(self.datetime_to_timestamp(timestamp))
-        self.ctl('set_last', username, domain, timestamp, status)
+        code, out, err = self.ctl('set_last', username, domain, timestamp, status)
+
+        if code != 0:
+            version = self.get_version()
+            if code == 1 and version == (14, 7):
+                raise NotSupportedError("ejabberd 14.07 does not support banning accounts.")
+
+            raise BackendError(code)
 
     def block_user(self, username, domain):
         # 14.07 is really broken here. ban_account fails, and we cannot set a random password
@@ -173,7 +180,7 @@ class EjabberdctlBackend(EjabberdBackendBase):
         code, out, err = self.ctl('ban_account', username, domain, 'Blocked')
         if code != 0:
             version = self.get_version()
-            if version == (14, 7):
+            if code == 1 and version == (14, 7):
                 raise NotSupportedError("ejabberd 14.07 does not support banning accounts.")
 
             raise BackendError(code)
