@@ -25,6 +25,9 @@ raise :py:class:`~xmpp_backends.base.UserExists`.
 .. autoclass:: xmpp_backends.base.XmppBackendBase
    :members:
 
+.. autoclass:: xmpp_backends.base.UserSession
+   :members:
+
 .. _errors:
 
 ******
@@ -32,6 +35,9 @@ Errors
 ******
 
 .. autoexception:: xmpp_backends.base.BackendError
+   :members:
+
+.. autoexception:: xmpp_backends.base.NotSupportedError
    :members:
 
 .. autoexception:: xmpp_backends.base.InvalidXmppBackendError
