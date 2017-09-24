@@ -179,7 +179,7 @@ class XmppBackendBase(object):
 
         If datetime instance ``dt`` is naive, it is assumed that it is in UTC.
 
-        In Python 3, this just calls ``datetime.timestamp()`, in Python 2, it substracts any timezone offset
+        In Python 3, this just calls ``datetime.timestamp()``, in Python 2, it substracts any timezone offset
         and returns the difference since 1970-01-01 00:00:00.
 
         Note that the function always returns an int, even in Python 3.
