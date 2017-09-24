@@ -50,6 +50,14 @@ class BackendConnectionError(BackendError):
     pass
 
 
+class NotSupportedError(BackendError):
+    """Raised when a backend does not support a specific function.
+
+    This error may be thrown only with specific versions, e.g. if it requires minimum version.
+    """
+    pass
+
+
 class UserExists(BackendError):
     """Raised when a user already exists."""
     pass
