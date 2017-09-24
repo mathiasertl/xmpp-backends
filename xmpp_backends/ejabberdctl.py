@@ -169,7 +169,7 @@ class EjabberdctlBackend(EjabberdBackendBase):
         if code != 0:
             version = self.get_version()
             if code == 1 and version == (14, 7):
-                raise NotSupportedError("ejabberd 14.07 does not support banning accounts.")
+                raise NotSupportedError("ejabberd 14.07 does not support setting last activity.")
 
             raise BackendError(code)
 
