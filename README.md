@@ -27,7 +27,7 @@ pip install xmpp-backends
 
 ### 0.5.0 (TBR)
 
-* New methods `all_domains()` and `all_sessions()`.
+* New methods `all_domains()` and `all_user_sessions()`.
 * `user_sessions` now also returns a list of `UserSession` instances, like `all_sessions()`.
 * `ipaddress` is now a dependency in Python2.
 * Raise `NotImplementedError` if a backend constructor gets an unsupported version.

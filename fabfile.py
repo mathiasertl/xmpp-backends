@@ -119,7 +119,7 @@ def test_user_sessions(backend, username, domain, resource, password):
         test_session(session, username, domain)
 
     try:
-        sessions = backend.all_sessions()
+        sessions = backend.all_user_sessions()
     except NotSupportedError:
         pass  # we already notified about this earlier.
     else:
@@ -135,7 +135,7 @@ def test_user_sessions(backend, username, domain, resource, password):
         xmpp.disconnect()
 
     try:
-        sessions = backend.all_sessions()
+        sessions = backend.all_user_sessions()
     except NotSupportedError:
         pass  # we already notified about this earlier.
     else:
@@ -227,7 +227,7 @@ def test_backend(backend, domain, config_path='', version=''):
     all_domains = backend.all_domains()
     if list(sorted(all_domains)) != ['example.com', 'example.net', 'example.org']:
         error('Backend serves wrong domains: %s' % ', '.join(all_domains))
-    sessions = backend.all_sessions()
+    sessions = backend.all_user_sessions()
     if sessions != set():
         error('Backend has initial sessions: %s' % sessions)
     ok()

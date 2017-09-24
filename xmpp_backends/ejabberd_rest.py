@@ -249,7 +249,7 @@ class EjabberdRestBackend(EjabberdBackendBase):
     def all_users(self, domain):
         return set(self.post('registered_users', host=domain).json())
 
-    def all_sessions(self, domain=None):
+    def all_user_sessions(self):
         # {'port': 49094, 'ip': '::1', 'connection': 'c2s', 'priority': 0, 'uptime': 3,
         #  'node': 'ejabberd@pallene', 'jid': 'example@example.com/3951214195792401555238'}
         response = self.post('connected_users_info')

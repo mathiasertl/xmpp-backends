@@ -232,29 +232,14 @@ class XmppBackendBase(object):
         raise NotImplementedError
 
     def user_sessions(self, username, domain):
-        """Get a list of user sessions.
-
-        The function returns a list of dictionaries each describing a presence connection.
-
-        ========== ===============================================================================
-        key        Description
-        ========== ===============================================================================
-        ip         The IP the user is connected with, as a ``str``.
-        priority   The users priority, an ``int``.
-        started    When the session was started, a ``datetime`` in the UTC timezone.
-        status     The current status, e.g. ``"available"``.
-        resource   The resource used in the connection.
-        statustext The status text, if any. If the user does not have a presence text, the value
-                   is an empty string.
-        ========== ===============================================================================
+        """Get a list of all current sessions for the given user.
 
         :param username: The username of the user.
         :type  username: str
         :param   domain: The domain of the user.
         :type    domain: str
-        :return: A list of connections, each list element is a dictionary with the keys ``"ip"``,
-            ``"priority"``, ``"uptime"``, ``"status"``, ``"resource"`` and ``"statustext"``.  See above for
-            more information.
+        :return: A list :py:class:`~xmpp_backends.base.UserSession` describing the user sessions.
+        :rtype: list of :py:class:`~xmpp_backends.base.UserSession`
         """
 
         raise NotImplementedError
@@ -451,12 +436,12 @@ class XmppBackendBase(object):
         """
         raise NotImplementedError
 
-    def all_sessions(self, domain=None):
+    def all_user_sessions(self):
         """List all current user sessions.
 
         :param domain: Optionally only return sessions for the given domain.
-        :return: List of dictionaries defining the user session.
-        :rtype: list of dicts
+        :return: A list :py:class:`~xmpp_backends.base.UserSession` for all sessions.
+        :rtype: list of :py:class:`~xmpp_backends.base.UserSession`
         """
 
         raise NotImplementedError

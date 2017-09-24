@@ -94,7 +94,7 @@ Version-specific notes
   does a second API call verifying that the user exists, as the underlying API
   call (``change_password``) creates the user if it doesn't exist.
 * **ejabberd <= 14.07:** :py:func:`~xmpp_backends.base.XmppBackendBase.block_user` and
-  :py:func:`~xmpp_backends.base.XmppBackendBase.all_sessions` will raise
+  :py:func:`~xmpp_backends.base.XmppBackendBase.all_user_sessions` will raise
   :py:class:`~xmpp_backends.base.NotSupportedError`, as the underlying API call is known to be broken.
   
 

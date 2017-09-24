@@ -211,7 +211,7 @@ class DummyBackend(XmppBackendBase):
         return set([u.split('@')[0] for u in self.module.get('all_users', set())
                     if u.endswith('@%s' % domain)])
 
-    def all_sessions(self, domain=None):
+    def all_user_sessions(self):
         return self.module.get('all_sessions') or set()
 
     def remove_user(self, username, domain):

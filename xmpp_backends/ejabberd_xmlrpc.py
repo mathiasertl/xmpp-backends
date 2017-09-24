@@ -288,7 +288,7 @@ class EjabberdXMLRPCBackend(EjabberdBackendBase):
         users = self.rpc('registered_users', host=domain)['users']
         return set([e['username'] for e in users])
 
-    def all_sessions(self, domain=None):
+    def all_user_sessions(self):
         version = self.get_version()
         try:
             result = self.rpc('connected_users_info')['connected_users_info']

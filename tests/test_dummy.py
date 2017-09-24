@@ -24,20 +24,20 @@ class TestDummySessions(TestCase):
         self.backend = DummyBackend(domains=['example.com'])
 
     def test_wrong_user(self):
-        self.assertEqual(self.backend.all_sessions(), set())
+        self.assertEqual(self.backend.all_user_sessions(), set())
         with self.assertRaisesRegex(UserNotFound, 'wrong@example.com/rsrc'):
             self.backend.start_user_session('wrong', 'example.com', 'rsrc', ip_address='127.0.0.1')
-        self.assertEqual(self.backend.all_sessions(), set())
+        self.assertEqual(self.backend.all_user_sessions(), set())
 
     def test_session(self):
         node = 'user'
         domain = 'example.com'
         rsrc = 'resource'
         self.backend.create_user(node, domain, 'password')
-        self.assertEqual(self.backend.all_sessions(), set())
+        self.assertEqual(self.backend.all_user_sessions(), set())
 
         self.backend.start_user_session(node, domain, rsrc, ip_address='127.0.0.1')
-        sessions = self.backend.all_sessions()
+        sessions = self.backend.all_user_sessions()
         self.assertEqual(len(sessions), 1)
         session = list(sessions)[0]
         self.assertEqual(session.jid, '%s@%s' % (node, domain))
@@ -46,7 +46,7 @@ class TestDummySessions(TestCase):
         self.assertEqual(self.backend.user_sessions(node, domain), {session, })
 
         self.backend.stop_user_session(node, domain, rsrc)
-        self.assertEqual(self.backend.all_sessions(), set())
+        self.assertEqual(self.backend.all_user_sessions(), set())
         self.assertEqual(self.backend.user_sessions(node, domain), set())
 
     def tearDown(self):
