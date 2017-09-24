@@ -166,8 +166,11 @@ class EjabberdctlBackend(EjabberdBackendBase):
         timestamp = str(self.datetime_to_timestamp(timestamp))
         code, out, err = self.ctl('set_last', username, domain, timestamp, status)
 
-        if code != 0:
-            version = self.get_version()
+        version = self.get_version()
+        if code == 1 and version >= (17, 4):
+            # ejabberd returns status code 1 at least since 17.04
+            return
+        elif code != 0:
             if code == 1 and version == (14, 7):
                 raise NotSupportedError("ejabberd 14.07 does not support setting last activity.")
 
@@ -219,7 +222,17 @@ class EjabberdctlBackend(EjabberdBackendBase):
     def message_user(self, username, domain, subject, message):
         """Currently use send_message_chat and discard subject, because headline messages are not stored by
         mod_offline."""
-        code, out, err = self.ctl('send_message_chat', domain, '%s@%s' % (username, domain), message)
+        version = self.get_version()
+        jid = '%s@%s' % (username, domain)
+        if version <= (14, 7):
+            # TODO: it's unclear when send_message was introduced
+            command = 'send_message_chat'
+            args = domain, '%s@%s' % (username, domain), message
+        else:
+            command = 'send_message'
+            args = 'chat', domain, jid, subject, message
+
+        code, out, err = self.ctl(command, *args)
         if code != 0:
             raise BackendError(code)
 
