@@ -219,7 +219,9 @@ class EjabberdctlBackend(EjabberdBackendBase):
     def message_user(self, username, domain, subject, message):
         """Currently use send_message_chat and discard subject, because headline messages are not stored by
         mod_offline."""
-        self.ctl('send_message_chat', domain, '%s@%s' % (username, domain), message)
+        code, out, err = self.ctl('send_message_chat', domain, '%s@%s' % (username, domain), message)
+        if code != 0:
+            raise BackendError(code)
 
     def all_domains(self):
         code, out, err = self.ctl('registered_vhosts')
