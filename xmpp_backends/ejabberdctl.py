@@ -105,6 +105,9 @@ class EjabberdctlBackend(EjabberdBackendBase):
                 connection_type=typ, encrypted=encrypted, compressed=compressed
             ))
 
+        if len(sessions) == 0 and version == (14, 7):
+            raise NotSupportedError("ejabberd 14.07 always returns an empty list.")
+
         return sessions
 
     def stop_user_session(self, username, domain, resource, reason=''):
