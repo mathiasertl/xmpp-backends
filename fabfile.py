@@ -35,6 +35,7 @@ from fabric.colors import yellow
 from sleekxmpp import ClientXMPP
 
 from xmpp_backends.base import EjabberdBackendBase
+from xmpp_backends.base import NotSupportedError
 from xmpp_backends.base import UserNotFound
 
 
@@ -108,8 +109,11 @@ def test_user_sessions(backend, username, domain, resource, password, supports_u
         xmpp, thread = start_bot(jid, password, host='localhost', port='5222')
         time.sleep(1)  # wait for connection to establish
 
-    if supports_user_sessions:
+    try:
         user_sessions = backend.user_sessions(username, domain)
+    except NotSupportedError as e:
+        pass  # we already notified about this earlier.
+    else:
         if len(user_sessions) != 1:
             error('Found wrong number of user sessions: %s' % user_sessions)
         session = list(user_sessions)[0]
@@ -131,8 +135,11 @@ def test_user_sessions(backend, username, domain, resource, password, supports_u
     if sessions != set():
         error('Session not correctly stopped: %s' % sessions)
 
-    if supports_user_sessions:
+    try:
         user_sessions = backend.user_sessions(username, domain)
+    except NotSupportedError as e:
+        pass  # we already notified about this earlier.
+    else:
         if user_sessions != set():
             error('Found wrong number of user sessions: %s' % user_sessions)
     ok()
@@ -170,15 +177,12 @@ def test_backend(backend, domain, config_path='', version=''):
 
     supports_user_sessions = True
     supports_set_last = True
-    supports_block_user = True
     if isinstance(backend, EjabberdBackendBase) and version >= (14, 7) and version <= (15, 4):
         # This affects at least 14.07 until 15.04
         # https://github.com/processone/ejabberd/issues/555
         supports_set_last = False
     if isinstance(backend, EjabberdBackendBase) and version == (14, 7):
         supports_user_sessions = False
-    if isinstance(backend, EjabberdBackendBase) and version == (14, 7):
-        supports_block_user = False
 
     initial_users = set(config.get('expected_users', set()))
 
@@ -269,14 +273,15 @@ def test_backend(backend, domain, config_path='', version=''):
         error('message_user() did not return None: %s' % msg)
     ok()
 
-    if supports_user_sessions:
+    try:
         print('Get (empty) list of user sessions... ', end='')
         sessions = backend.user_sessions(username1, domain)
+    except NotSupportedError as e:
+        print(yellow(e))
+    else:
         if sessions != set():
             error('user_sessions() did not return empty set: %s' % sessions)
         ok()
-    else:
-        print(yellow('Backend does not support user sessions.'))
 
     try:
         test_user_sessions(backend, username1, domain, resource1, password2, supports_user_sessions)
@@ -284,9 +289,12 @@ def test_backend(backend, domain, config_path='', version=''):
         backend.stop_user_session(username1, domain, resource1)
 
     # block user
-    if supports_block_user:
+    try:
         print('Block user and check previous passwords... ', end='')
         blk = backend.block_user(username1, domain)
+    except NotSupportedError as e:
+        print(yellow(e))
+    else:
         if blk is not None:
             error('block_user() did not return None: %s' % blk)
         if backend.check_password(username1, domain, password1) is not False:
@@ -294,8 +302,6 @@ def test_backend(backend, domain, config_path='', version=''):
         if backend.check_password(username1, domain, password2) is not False:
             error('False password is accepted.')
         ok()
-    else:
-        print(yellow('Backend does not support blocking users.'))
 
     # remove user again
     print('Remove user... ', end='')
