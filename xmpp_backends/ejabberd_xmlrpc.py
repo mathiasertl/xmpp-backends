@@ -270,8 +270,8 @@ class EjabberdXMLRPCBackend(EjabberdBackendBase):
             command = 'send_message_chat'
         else:
             command = 'send_message'
-            kwargs['subject'] = subject,
-            kwargs['type'] = 'normal',
+            kwargs['subject'] = subject
+            kwargs['type'] = 'normal'
         result = self.rpc(command, **kwargs)
 
         if result['res'] == 0:
