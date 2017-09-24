@@ -29,6 +29,7 @@ from six.moves.http_client import BadStatusLine
 from .base import BackendConnectionError
 from .base import BackendError
 from .base import EjabberdBackendBase
+from .base import NotSupportedError
 from .base import UserExists
 from .base import UserNotFound
 from .base import UserSession
@@ -180,9 +181,9 @@ class EjabberdXMLRPCBackend(EjabberdBackendBase):
             raise BackendError(result.get('text', 'Unknown Error'))
 
     def user_sessions(self, username, domain):
+        version = self.get_version()
         result = self.rpc('user_sessions_info', user=username, host=domain)
         raw_sessions = result.get('sessions_info', [])
-        version = self.get_version()
         sessions = set()
         for data in raw_sessions:
             # The data structure is a bit weird, its a list of one-element dicts.  We itemize each dict and
@@ -240,20 +241,42 @@ class EjabberdXMLRPCBackend(EjabberdBackendBase):
             raise BackendError(result.get('text', 'Unknown Error'))
 
     def block_user(self, username, domain):
-        self.rpc('ban_account', user=username, host=domain, reason='Blocked.')
+        version = self.get_version()
+        try:
+            result = self.rpc('ban_account', user=username, host=domain, reason='Blocked.')
+        except BackendError:
+            if version == (14, 7):
+                raise NotSupportedError('ejabberd 14.07 does not support getting all sessions via xmlrpc.')
+            raise
+
+        if result['res'] == 0:
+            return
+        else:
+            raise BackendError(result.get('text', 'Unknown Error'))
 
     def message_user(self, username, domain, subject, message):
         """Currently use send_message_chat and discard subject, because headline messages are not
         stored by mod_offline."""
 
+        version = self.get_version()
         kwargs = {
             'body': message,
             'from': domain,
-            'subject': subject,
             'to': '%s@%s' % (username, domain),
-            'type': 'normal',
         }
-        self.rpc('send_message', **kwargs)
+
+        if version <= (14, 7):
+            command = 'send_message_chat'
+        else:
+            command = 'send_message'
+            kwargs['subject'] = subject,
+            kwargs['type'] = 'normal',
+        result = self.rpc(command, **kwargs)
+
+        if result['res'] == 0:
+            return
+        else:
+            raise BackendError(result.get('text', 'Unknown Error'))
 
     def all_domains(self):
         return [d['vhost'] for d in self.rpc('registered_vhosts')['vhosts']]
@@ -263,8 +286,13 @@ class EjabberdXMLRPCBackend(EjabberdBackendBase):
         return set([e['username'] for e in users])
 
     def all_sessions(self, domain=None):
-        result = self.rpc('connected_users_info')['connected_users_info']
         version = self.get_version()
+        try:
+            result = self.rpc('connected_users_info')['connected_users_info']
+        except BackendError:
+            if version == (14, 7):
+                raise NotSupportedError('ejabberd 14.07 does not support getting all sessions via xmlrpc.')
+            raise
         sessions = set()
         for data in result:
             # The data structure is a bit weird, its a list of one-element dicts.  We itemize each dict and
