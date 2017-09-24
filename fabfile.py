@@ -34,7 +34,6 @@ from fabric.colors import red
 from fabric.colors import yellow
 from sleekxmpp import ClientXMPP
 
-from xmpp_backends.base import EjabberdBackendBase
 from xmpp_backends.base import NotSupportedError
 from xmpp_backends.base import UserNotFound
 
@@ -175,12 +174,6 @@ def test_backend(backend, domain, config_path='', version=''):
         print(yellow(e))
         return
 
-    supports_set_last = True
-    if isinstance(backend, EjabberdBackendBase) and version >= (14, 7) and version <= (15, 4):
-        # This affects at least 14.07 until 15.04
-        # https://github.com/processone/ejabberd/issues/555
-        supports_set_last = False
-
     initial_users = set(config.get('expected_users', set()))
 
     print('Testing initial state... ', end='')
@@ -198,12 +191,13 @@ def test_backend(backend, domain, config_path='', version=''):
         if str(e) != jid1:
             error('UserNotFound from get_last_activity did not match "%s": "%s"' % (jid1, str(e)))
 
-    if supports_set_last:
-        try:
-            backend.set_last_activity(username1, domain)
-        except UserNotFound as e:
-            # ejabberd api does not indicate any error in this case
-            error('set_last_activity raised UserNotFound: %s' % e)
+    try:
+        backend.set_last_activity(username1, domain)
+    except NotSupportedError as e:
+        pass  # We have a separate line for that later
+    except UserNotFound as e:
+        # ejabberd api does not indicate any error in this case
+        error('set_last_activity raised UserNotFound: %s' % e)
 
     try:
         backend.set_password(username1, domain, password1)
@@ -237,7 +231,7 @@ def test_backend(backend, domain, config_path='', version=''):
         error('False password is accepted.')
     ok()
 
-    if supports_set_last:
+    try:
         print('Test last activity... ', end='')
         last = backend.get_last_activity(username1, domain)
         if last is not None and not isinstance(last, datetime):
@@ -259,8 +253,8 @@ def test_backend(backend, domain, config_path='', version=''):
         if now != pytz.utc.localize(last).astimezone(tz):
             error('Did not get same last activity back: %s vs %s' % (now.isoformat(), last.isoformat()))
         ok()
-    else:
-        print(yellow('Backend does not support setting last activity.'))
+    except NotSupportedError as e:
+        print(yellow(e))
 
     print('Send user a message... ', end='')
     # message the user - we can not do anything with the message without an XMPP connection, so we just
