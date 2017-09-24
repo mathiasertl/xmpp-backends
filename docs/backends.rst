@@ -61,11 +61,13 @@ currently uses these commands:
 * change_password
 * check_account
 * check_password
+* connected_users_info
 * get_last
 * kick_session
 * register
 * registered_users
-* send_message
+* registered_vhosts
+* send_message/send_message_chat
 * set_last
 * stats
 * stats_host
