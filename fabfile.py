@@ -159,9 +159,16 @@ def test_backend(backend, domain, config_path='', version=''):
     mod = importlib.import_module(mod_path)
     cls = getattr(mod, cls_name)
 
-    config_path = config_path or os.path.join('config', '%s.json' % mod.__name__.rsplit('.', 1)[-1])
-    with open(config_path) as stream:
-        config = json.load(stream)
+    mod_name = mod.__name__.rsplit('.', 1)[-1]
+
+    config_path = config_path or os.path.join('config', '%s-%s.json' % (mod_name, version))
+    if version and os.path.exists(config_path):
+        with open(config_path) as stream:
+            config = json.load(stream)
+    else:
+        config_path = config_path or os.path.join('config', '%s.json' % mod.__name__.rsplit('.', 1)[-1])
+        with open(config_path) as stream:
+            config = json.load(stream)
 
     kwargs = config.get('kwargs', {})
     if version:
