@@ -58,7 +58,7 @@ class DummyBackend(XmppBackendBase):
 
     def user_sessions(self, username, domain):
         user = '%s@%s' % (username, domain)
-        return self.module.get(user).get('sessions', set())
+        return self.module.get(user, {}).get('sessions', set())
 
     def start_user_session(self, username, domain, resource, **kwargs):
         """Method to add a user session for debugging.
@@ -102,10 +102,13 @@ class DummyBackend(XmppBackendBase):
     def stop_user_session(self, username, domain, resource, reason=''):
         user = '%s@%s' % (username, domain)
         data = self.module.get(user)
+        if data is None:
+            raise UserNotFound(username, domain)
+
         data['sessions'] = set([d for d in data.get('sessions', []) if d.resource != resource])
         self.module.set(user, data)
 
-        all_sessions = self.module.get('all_sessions')
+        all_sessions = self.module.get('all_sessions', set())
         all_sessions = set([s for s in all_sessions if s.jid != user])
         self.module.set('all_sessions', all_sessions)
 
@@ -212,7 +215,7 @@ class DummyBackend(XmppBackendBase):
                     if u.endswith('@%s' % domain)])
 
     def all_user_sessions(self):
-        return self.module.get('all_sessions') or set()
+        return self.module.get('all_sessions', set())
 
     def remove_user(self, username, domain):
         user = '%s@%s' % (username, domain)
