@@ -23,7 +23,6 @@ from datetime import timedelta
 
 import pytz
 import six
-
 from six.moves.http_client import BadStatusLine
 
 from .base import BackendConnectionError
