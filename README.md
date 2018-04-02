@@ -25,6 +25,10 @@ pip install xmpp-backends
 
 ## ChangeLog
 
+### 0.6.0 (TBR)
+
+* Update requirements.
+
 ### 0.5.0 (2017-09-24)
 
 * New methods `all_domains()` and `all_user_sessions()`.
