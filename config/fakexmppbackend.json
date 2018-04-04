@@ -1,0 +1,5 @@
+{
+    "django_setup": true,
+    "PYTHONPATH": "django_dev_project/",
+    "DJANGO_SETTINGS_MODULE": "django_dev_project.settings"
+}
