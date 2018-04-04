@@ -161,13 +161,8 @@ def test_backend(backend, domain, config_path='', version=''):
     password2 = 'barfoo'
 
     sys.path.insert(0, '.')
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'tests.django_settings')
-    mod_path, cls_name = backend.rsplit('.', 1)
-    importlib.import_module('xmpp_backends')
-    mod = importlib.import_module(mod_path)
-    cls = getattr(mod, cls_name)
 
-    mod_name = mod.__name__.rsplit('.', 1)[-1]
+    mod_name = backend.rsplit('.', 1)[-1].lower()
 
     if not config_path:
         test_path = os.path.join('config', '%s-%s.json' % (mod_name, version))
@@ -175,12 +170,28 @@ def test_backend(backend, domain, config_path='', version=''):
             config_path = test_path
         else:
             test_path = os.path.join('config', '%s.json' % mod_name)
-            if os.path.exists(test_path):
-                config_path = test_path
+            config_path = test_path
 
-    print('Use config path %s' % config_path)
-    with open(config_path) as stream:
-        config = json.load(stream)
+    if os.path.exists(config_path):
+        with open(config_path) as stream:
+            config = json.load(stream)
+    else:
+        config = {}
+
+    if config.get('DJANGO_SETTINGS_MODULE'):
+        os.environ.setdefault('DJANGO_SETTINGS_MODULE', config['DJANGO_SETTINGS_MODULE'])
+
+    if config.get('PYTHONPATH'):
+        sys.path.insert(0, config['PYTHONPATH'])
+
+    if config.get('django_setup', False):
+        import django
+        django.setup()
+
+    mod_path, cls_name = backend.rsplit('.', 1)
+    importlib.import_module('xmpp_backends')
+    mod = importlib.import_module(mod_path)
+    cls = getattr(mod, cls_name)
 
     kwargs = config.get('kwargs', {})
     if version:
