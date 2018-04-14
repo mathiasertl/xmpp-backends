@@ -6,8 +6,8 @@
 /lib
 /local
 /pip-selfcheck.json
-/share/
 /py3/
+/share/
 /dist/
 /Makefile
 /MANIFEST
