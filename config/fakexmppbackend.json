@@ -2,5 +2,12 @@
     "django_setup": true,
     "django_migrate": true,
     "PYTHONPATH": "django_dev_project/",
-    "DJANGO_SETTINGS_MODULE": "django_dev_project.fab_settings"
+    "DJANGO_SETTINGS_MODULE": "django_dev_project.fab_settings",
+    "kwargs": {
+        "domains": [
+            "example.com",
+            "example.net",
+            "example.org"
+        ]
+    }
 }
