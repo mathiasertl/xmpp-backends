@@ -1,5 +1,6 @@
 *.sw[po]
 *.py[co]
+/django_dev_project/db.sqlite3
 /bin
 /build/
 /include
