@@ -188,6 +188,10 @@ def test_backend(backend, domain, config_path='', version=''):
         import django
         django.setup()
 
+        if config.get('django_migrate', False):
+            from django.core.management import call_command
+            call_command('migrate')
+
     mod_path, cls_name = backend.rsplit('.', 1)
     importlib.import_module('xmpp_backends')
     mod = importlib.import_module(mod_path)
