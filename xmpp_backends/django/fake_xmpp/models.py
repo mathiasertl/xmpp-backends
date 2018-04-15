@@ -2,8 +2,8 @@
 
 from __future__ import unicode_literals
 
-from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
+from django.db import models
 from django.utils import timezone
 from django.utils.crypto import get_random_string
 

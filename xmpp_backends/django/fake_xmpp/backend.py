@@ -16,7 +16,6 @@
 import ipaddress
 
 import pytz
-
 from django.conf import settings
 from django.utils import timezone
 
@@ -24,7 +23,6 @@ from ...base import UserNotFound
 from ...base import UserSession
 from ...base import XmppBackendBase
 from ...constants import CONNECTION_XMPP
-
 from .models import FakeUser
 from .models import FakeUserSession
 
