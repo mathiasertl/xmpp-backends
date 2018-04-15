@@ -61,6 +61,7 @@ class FakeXMPPBackend(XmppBackendBase):
         except FakeUser.DoesNotExist:
             raise UserNotFound(username, domain)
         user.is_blocked = True
+        user.set_password(None)  # sets an unuseable password
         user.save()
 
     def check_email(self, username, domain, email):
