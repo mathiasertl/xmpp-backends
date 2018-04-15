@@ -1,4 +1,6 @@
 {
+    "django_setup": true,
+    "DJANGO_SETTINGS_MODULE": "tests.django_settings",
     "kwargs": {
         "domains": [
             "example.com",
