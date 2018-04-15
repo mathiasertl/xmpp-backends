@@ -17,10 +17,11 @@ import inspect
 import unittest
 
 from xmpp_backends.base import XmppBackendBase
+from xmpp_backends.django.fake_xmpp.backend import FakeXMPPBackend
+from xmpp_backends.dummy import DummyBackend
 from xmpp_backends.ejabberd_rest import EjabberdRestBackend
 from xmpp_backends.ejabberd_xmlrpc import EjabberdXMLRPCBackend
 from xmpp_backends.ejabberdctl import EjabberdctlBackend
-from xmpp_backends.dummy import DummyBackend
 
 
 class TestInterfaces(unittest.TestCase):
@@ -41,8 +42,14 @@ class TestInterfaces(unittest.TestCase):
     def test_ejabberdctl(self):
         self.assertEqualInterface(EjabberdctlBackend)
 
+    def test_ejabberd_rest(self):
+        self.assertEqualInterface(EjabberdRestBackend)
+
     def test_dummy(self):
         self.assertEqualInterface(DummyBackend)
+
+    def test_fake(self):
+        self.assertEqualInterface(FakeXMPPBackend)
 
 
 class TestImplemented(unittest.TestCase):
@@ -80,3 +87,6 @@ class TestImplemented(unittest.TestCase):
 
     def test_dummy(self):
         self.assertOverwritten(DummyBackend)
+
+    def test_fake(self):
+        self.assertOverwritten(FakeXMPPBackend)
