@@ -12,3 +12,4 @@ script:
   - fab check
   - python setup.py test
   - fab test_backend:xmpp_backends.dummy.DummyBackend,example.com
+  - fab test_backend:xmpp_backends.django.fake_xmpp.backend.FakeXMPPBackend,example.com
