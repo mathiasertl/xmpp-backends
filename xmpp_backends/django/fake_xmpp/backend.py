@@ -55,6 +55,22 @@ class FakeXMPPBackend(XmppBackendBase):
             compressed=s.compressed
         ) for s in FakeUserSession.objects.all()])
 
+    def block_user(self, username, domain):
+        try:
+            user = FakeUser.objects.get(username='%s@%s' % (username, domain))
+        except FakeUser.DoesNotExist:
+            raise UserNotFound(username, domain)
+        user.is_blocked = True
+        user.save()
+
+    def check_email(self, username, domain, email):
+        try:
+            user = FakeUser.objects.get(username='%s@%s' % (username, domain))
+        except FakeUser.DoesNotExist:
+            raise UserNotFound(username, domain)
+
+        return user.email == email
+
     def create_user(self, username, domain, password, email=None):
         user = FakeUser.objects.create(username='%s@%s' % (username, domain), email=email)
         user.set_password(password)
@@ -70,6 +86,15 @@ class FakeXMPPBackend(XmppBackendBase):
             return False
 
         return user.check_password(password)
+
+    def set_email(self, username, domain, email):
+        try:
+            user = FakeUser.objects.get(username='%s@%s' % (username, domain))
+        except FakeUser.DoesNotExist:
+            raise UserNotFound(username, domain)
+
+        user.email = email
+        user.save()
 
     def set_password(self, username, domain, password):
         try:

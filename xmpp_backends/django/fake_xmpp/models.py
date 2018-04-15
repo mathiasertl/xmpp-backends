@@ -13,6 +13,7 @@ class FakeUser(AbstractBaseUser):
     email = models.EmailField(blank=True, null=True)
     last_activity = models.DateTimeField(default=timezone.now)
     last_status = models.CharField(max_length=255, blank=True, null=True)
+    is_blocked = models.BooleanField(default=True)
 
     USERNAME_FIELD = 'username'
 
