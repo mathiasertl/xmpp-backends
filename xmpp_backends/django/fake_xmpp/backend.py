@@ -15,6 +15,9 @@
 
 import ipaddress
 
+import pytz
+
+from django.conf import settings
 from django.utils import timezone
 
 from ...base import UserNotFound
@@ -97,6 +100,10 @@ class FakeXMPPBackend(XmppBackendBase):
 
         if timestamp is None:
             timestamp = timezone.now()
+        elif settings.USE_TZ and timezone.is_naive(timestamp):
+            timestamp = timezone.make_aware(timestamp, pytz.utc)
+        elif not settings.USE_TZ and timezone.is_aware(timestamp):
+            timestamp = timezone.make_naive(timestamp, pytz.utc)
 
         user.last_activity = timestamp
         user.save()
