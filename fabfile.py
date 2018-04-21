@@ -370,7 +370,7 @@ def test_backend(backend, domain, config_path='', version=''):
         _test_backend(cls, config, version)
     finally:
         if docker:
-            local('docker stop %s' % docker_name)
+            local('docker kill %s' % docker_name)
             local('docker rm %s' % docker_name)
 
 
