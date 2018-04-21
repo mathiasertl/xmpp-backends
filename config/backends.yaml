@@ -27,6 +27,7 @@ xmpp_backends.ejabberd_rest.EjabberdRestBackend:
   DOCKER:
     container: mathiasertl/ejabberd
   BEFORE_TEST:
+    - sleep 3  # ejabberd takes a few seconds to start
     - docker exec %(DOCKER_CONTAINER)s /usr/sbin/ejabberdctl register api example.com secret
   EXPECTED_USERS:
     - api
