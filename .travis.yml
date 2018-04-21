@@ -15,8 +15,7 @@ stages:
   - check
   - test
 jobs:
-    - include:
-      - stage: check
-        script:
-            - fab check
-            - python setup.py test
+  - stage: check
+    script:
+        - fab check
+        - python setup.py test
