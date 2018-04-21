@@ -21,6 +21,7 @@ import importlib
 import ipaddress
 import json
 import os
+import subprocess
 import sys
 import threading
 import time
@@ -172,6 +173,7 @@ def test_backend(backend, domain, config_path='', version=''):
             test_path = os.path.join('config', '%s.json' % mod_name)
             config_path = test_path
 
+    print(config_path)
     if os.path.exists(config_path):
         with open(config_path) as stream:
             config = json.load(stream)
@@ -201,6 +203,17 @@ def test_backend(backend, domain, config_path='', version=''):
     if version:
         version = tuple(int(t) for t in version.split('.'))
         kwargs['version'] = version
+
+    docker = config.get('docker', True)
+    if docker:
+        cmd = [
+            'docker', 'run', '-d', '--name=xmpp-backends-test', '--rm',
+            '-p', '5222:5222/tcp', '-p', '5223:5223/tcp', '-p', '5269:5269/tcp', '-p', '5280:5280/tcp',
+            '--mount', 'type=bind,source=/home/mati/git/mati/xmpp-backends/config/test/,target=/etc/ejabberd',
+            'ejabberd:16.09',
+        ]
+        print(' '.join(cmd))
+        subprocess.call(cmd)
 
     try:
         backend = cls(**kwargs)
@@ -351,3 +364,6 @@ def test_backend(backend, domain, config_path='', version=''):
     if stat != 0:
         error('online_users for domain did not return 0: %s' % stat)
     ok()
+
+    if docker:
+        subprocess.call(['docker', 'stop', 'xmpp-backends-test'])
