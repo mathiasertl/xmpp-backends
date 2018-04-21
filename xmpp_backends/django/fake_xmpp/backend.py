@@ -112,7 +112,10 @@ class FakeXMPPBackend(XmppBackendBase):
             user = FakeUser.objects.get(username='%s@%s' % (username, domain))
         except FakeUser.DoesNotExist:
             raise UserNotFound(username, domain)
-        return timezone.make_naive(user.last_activity)
+        if timezone.is_aware(user.last_activity):
+            return timezone.make_naive(user.last_activity)
+        else:
+            return user.last_activity
 
     def remove_user(self, username, domain):
         FakeUser.objects.filter(username='%s@%s' % (username, domain)).delete()
