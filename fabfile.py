@@ -213,7 +213,10 @@ def test_backend(backend, domain, config_path='', version=''):
         return
 
     for cmd in config.get('BEFORE_TEST', []):
-        local(cmd)
+        context = {}
+        if docker:
+            context["DOCKER_CONTAINER"] = docker_name
+        local(cmd % context)
 
     initial_users = set(config.get('EXPECTED_USERS', set()))
 

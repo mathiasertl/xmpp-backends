@@ -27,7 +27,7 @@ xmpp_backends.ejabberd_rest.EjabberdRestBackend:
   DOCKER:
     container: mathiasertl/ejabberd
   BEFORE_TEST:
-    - docker exec xmpp-backends-docker /usr/sbin/ejabberdctl register api example.com secret
+    - docker exec %(DOCKER_CONTAINER)s /usr/sbin/ejabberdctl register api example.com secret
   EXPECTED_USERS:
     - api
   KWARGS:
