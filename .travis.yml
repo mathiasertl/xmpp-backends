@@ -16,5 +16,5 @@ install:
   - pip install -r requirements.txt -r requirements-dev.txt
 script:
   - fab check
-  - fab python setup.py test
+  - python setup.py test
   - fab test_server:$XMPP_SERVER,version=$XMPP_SERVER_VERSION
