@@ -152,54 +152,13 @@ def test_user_sessions(backend, username, domain, resource, password):
     ok()
 
 
-@task
-def test_backend(backend, domain, config_path='', version=''):
+def _test_backend(cls, config, version):
     username1 = 'example'
     resource1 = 'resource1'
+    domain = 'example.com'
     jid1 = '%s@%s' % (username1, domain)
     password1 = 'foobar'
     password2 = 'barfoo'
-    docker_name = 'xmpp-backends-docker'
-
-    sys.path.insert(0, '.')
-
-    with open(os.path.join('config', 'backends.yaml')) as stream:
-        config = yaml.load(stream.read())
-    config = config.get(backend, {})
-
-    for key, value in config.get('ENVIRONMENT', {}).items():
-        os.environ.setdefault(key, value)
-
-    # unsure if we need this
-    if config.get('PYTHONPATH'):
-        sys.path.insert(0, config['PYTHONPATH'])
-
-    if config.get('DJANGO_SETUP', False):
-        import django
-        django.setup()
-
-        if config.get('DJANGO_MIGRATE', False):
-            from django.core.management import call_command
-            call_command('migrate')
-
-    mod_path, cls_name = backend.rsplit('.', 1)
-    importlib.import_module('xmpp_backends')
-    mod = importlib.import_module(mod_path)
-    cls = getattr(mod, cls_name)
-
-    # Start docker container if requested
-    docker = config.get('DOCKER', False)
-    if docker:
-        path = os.path.join(os.getcwd(), 'config', '%s-%s' % (config['SERVER'], version))
-        container = '%s:%s' % (docker['container'], version)
-        local('docker pull %s' % container)
-
-        cmd = 'docker run -d --name=%s --mount type=bind,source=%s,target=/etc/ejabberd' % (docker_name, path)
-        for port in docker.get("ports", [5222, 5223, 5269, 5280, ]):
-            cmd += ' -p %s:%s/tcp' % (port, port)
-        cmd += ' %s' % container
-
-        local(cmd)
 
     kwargs = config.get('KWARGS', {})
     if version:
@@ -211,12 +170,6 @@ def test_backend(backend, domain, config_path='', version=''):
     except NotImplementedError as e:
         print(yellow(e))
         return
-
-    for cmd in config.get('BEFORE_TEST', []):
-        context = {}
-        if docker:
-            context["DOCKER_CONTAINER"] = docker_name
-        local(cmd % context)
 
     initial_users = set(config.get('EXPECTED_USERS', set()))
 
@@ -362,9 +315,63 @@ def test_backend(backend, domain, config_path='', version=''):
         error('online_users for domain did not return 0: %s' % stat)
     ok()
 
+
+@task
+def test_backend(backend, domain, config_path='', version=''):
+    docker_name = 'xmpp-backends-docker'
+
+    sys.path.insert(0, '.')
+
+    with open(os.path.join('config', 'backends.yaml')) as stream:
+        config = yaml.load(stream.read())
+    config = config.get(backend, {})
+
+    for key, value in config.get('ENVIRONMENT', {}).items():
+        os.environ.setdefault(key, value)
+
+    # unsure if we need this
+    if config.get('PYTHONPATH'):
+        sys.path.insert(0, config['PYTHONPATH'])
+
+    if config.get('DJANGO_SETUP', False):
+        import django
+        django.setup()
+
+        if config.get('DJANGO_MIGRATE', False):
+            from django.core.management import call_command
+            call_command('migrate')
+
+    mod_path, cls_name = backend.rsplit('.', 1)
+    importlib.import_module('xmpp_backends')
+    mod = importlib.import_module(mod_path)
+    cls = getattr(mod, cls_name)
+
+    # Start docker container if requested
+    docker = config.get('DOCKER', False)
     if docker:
-        local('docker stop %s' % docker_name)
-        local('docker rm %s' % docker_name)
+        path = os.path.join(os.getcwd(), 'config', '%s-%s' % (config['SERVER'], version))
+        container = '%s:%s' % (docker['container'], version)
+        local('docker pull %s' % container)
+
+        cmd = 'docker run -d --name=%s --mount type=bind,source=%s,target=/etc/ejabberd' % (docker_name, path)
+        for port in docker.get("ports", [5222, 5223, 5269, 5280, ]):
+            cmd += ' -p %s:%s/tcp' % (port, port)
+        cmd += ' %s' % container
+
+        local(cmd)
+
+    for cmd in config.get('BEFORE_TEST', []):
+        context = {}
+        if docker:
+            context["DOCKER_CONTAINER"] = docker_name
+        local(cmd % context)
+
+    try:
+        _test_backend(cls, config, version)
+    finally:
+        if docker:
+            local('docker stop %s' % docker_name)
+            local('docker rm %s' % docker_name)
 
 
 @task
