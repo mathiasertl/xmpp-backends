@@ -19,7 +19,6 @@ from __future__ import unicode_literals
 
 import importlib
 import ipaddress
-import json
 import os
 import subprocess
 import sys
