@@ -355,3 +355,19 @@ def test_backend(backend, domain, config_path='', version=''):
 
     if docker:
         subprocess.call(['docker', 'stop', 'xmpp-backends-test'])
+
+
+@task
+def test_server(server):
+    if '-' in server:
+        server, version = server.split('-', 1)
+
+    with open(os.path.join('config', 'backends.yaml')) as stream:
+        config = yaml.load(stream.read())
+
+    backends = {k: v for k, v in config.items() if v.get('SERVER') == server}
+    print(backends.keys())
+
+    for backend in backends:
+        print('Test %s' % green(backend))
+        test_backend(backend, 'example.com')
