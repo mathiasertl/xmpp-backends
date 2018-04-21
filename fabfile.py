@@ -28,6 +28,7 @@ import time
 from datetime import datetime
 
 import pytz
+import yaml
 from fabric.api import local
 from fabric.api import task
 from fabric.colors import green
@@ -163,34 +164,22 @@ def test_backend(backend, domain, config_path='', version=''):
 
     sys.path.insert(0, '.')
 
-    mod_name = backend.rsplit('.', 1)[-1].lower()
+    with open(os.path.join('config', 'backends.yaml')) as stream:
+        config = yaml.load(stream.read())
+    config = config.get(backend, {})
 
-    if not config_path:
-        test_path = os.path.join('config', '%s-%s.json' % (mod_name, version))
-        if os.path.exists(test_path):
-            config_path = test_path
-        else:
-            test_path = os.path.join('config', '%s.json' % mod_name)
-            config_path = test_path
+    for key, value in config.get('ENVIRONMENT', {}).items():
+        os.environ.setdefault(key, value)
 
-    print(config_path)
-    if os.path.exists(config_path):
-        with open(config_path) as stream:
-            config = json.load(stream)
-    else:
-        config = {}
-
-    if config.get('DJANGO_SETTINGS_MODULE'):
-        os.environ.setdefault('DJANGO_SETTINGS_MODULE', config['DJANGO_SETTINGS_MODULE'])
-
+    # unsure if we need this
     if config.get('PYTHONPATH'):
         sys.path.insert(0, config['PYTHONPATH'])
 
-    if config.get('django_setup', False):
+    if config.get('DJANGO_SETUP', False):
         import django
         django.setup()
 
-        if config.get('django_migrate', False):
+        if config.get('DJANGO_MIGRATE', False):
             from django.core.management import call_command
             call_command('migrate')
 
@@ -199,12 +188,12 @@ def test_backend(backend, domain, config_path='', version=''):
     mod = importlib.import_module(mod_path)
     cls = getattr(mod, cls_name)
 
-    kwargs = config.get('kwargs', {})
+    kwargs = config.get('KWARGS', {})
     if version:
         version = tuple(int(t) for t in version.split('.'))
         kwargs['version'] = version
 
-    docker = config.get('docker', True)
+    docker = config.get('docker', False)
     if docker:
         cmd = [
             'docker', 'run', '-d', '--name=xmpp-backends-test', '--rm',

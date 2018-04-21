@@ -1,0 +1,21 @@
+xmpp_backends.dummy.DummyBackend:
+    DJANGO_SETUP: true
+    ENVIRONMENT:
+        DJANGO_SETTINGS_MODULE: tests.django_settings
+    KWARGS:
+        domains:
+            - example.com
+            - example.net
+            - example.org
+
+xmpp_backends.django.fake_xmpp.backend.FakeXMPPBackend:
+    DJANGO_SETUP: true
+    DJANGO_MIGRATE: true
+    PYTHONPATH: django_dev_project
+    ENVIRONMENT:
+        DJANGO_SETTINGS_MODULE: django_dev_project.fab_settings
+    KWARGS:
+        domains:
+            - example.com
+            - example.net
+            - example.org
