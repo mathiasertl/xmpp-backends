@@ -383,7 +383,6 @@ def test_server(server, version):
         config = yaml.load(stream.read())
 
     backends = {k: v for k, v in config.items() if v.get('SERVER') == server}
-    print(backends.keys())
 
     for backend in backends:
         print('Test %s' % green(backend))
