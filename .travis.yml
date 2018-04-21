@@ -9,12 +9,12 @@ python:
   - "3.6"
   - "nightly"
 env:
-  - XMPP_SERVER=fake
-  - XMPP_SERVER=ejabberd-16.09
+  - XMPP_SERVER=fake XMPP_SERVER_VERSION=1.0
+  - XMPP_SERVER=ejabberd XMPP_SERVER_VERSION=16.09
 install:
   - pip install -U pip setuptools
   - pip install -r requirements.txt -r requirements-dev.txt
 script:
   - fab check
   - fab python setup.py test
-  - fab test_server:$XMPP_SERVER
+  - fab test_server:$XMPP_SERVER,version=$XMPP_SERVER_VERSION

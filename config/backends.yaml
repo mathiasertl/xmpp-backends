@@ -21,3 +21,15 @@ xmpp_backends.django.fake_xmpp.backend.FakeXMPPBackend:
             - example.com
             - example.net
             - example.org
+
+xmpp_backends.ejabberd_rest.EjabberdRestBackend:
+  SERVER: ejabberd
+  DOCKER:
+    container: mathiasertl/ejabberd
+  BEFORE_TEST:
+    - docker exec xmpp-backends-docker /usr/sbin/ejabberdctl register api example.com secret
+  EXPECTED_USERS:
+    - api
+  KWARGS:
+    user: api@example.com
+    password: secret

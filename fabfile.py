@@ -20,7 +20,6 @@ from __future__ import unicode_literals
 import importlib
 import ipaddress
 import os
-import subprocess
 import sys
 import threading
 import time
@@ -160,6 +159,7 @@ def test_backend(backend, domain, config_path='', version=''):
     jid1 = '%s@%s' % (username1, domain)
     password1 = 'foobar'
     password2 = 'barfoo'
+    docker_name = 'xmpp-backends-docker'
 
     sys.path.insert(0, '.')
 
@@ -187,21 +187,24 @@ def test_backend(backend, domain, config_path='', version=''):
     mod = importlib.import_module(mod_path)
     cls = getattr(mod, cls_name)
 
+    # Start docker container if requested
+    docker = config.get('DOCKER', False)
+    if docker:
+        path = os.path.join(os.getcwd(), 'config', '%s-%s' % (config['SERVER'], version))
+        container = '%s:%s' % (docker['container'], version)
+        local('docker pull %s' % container)
+
+        cmd = 'docker run -d --name=%s --mount type=bind,source=%s,target=/etc/ejabberd' % (docker_name, path)
+        for port in docker.get("ports", [5222, 5223, 5269, 5280, ]):
+            cmd += ' -p %s:%s/tcp' % (port, port)
+        cmd += ' %s' % container
+
+        local(cmd)
+
     kwargs = config.get('KWARGS', {})
     if version:
         version = tuple(int(t) for t in version.split('.'))
         kwargs['version'] = version
-
-    docker = config.get('docker', False)
-    if docker:
-        cmd = [
-            'docker', 'run', '-d', '--name=xmpp-backends-test', '--rm',
-            '-p', '5222:5222/tcp', '-p', '5223:5223/tcp', '-p', '5269:5269/tcp', '-p', '5280:5280/tcp',
-            '--mount', 'type=bind,source=/home/mati/git/mati/xmpp-backends/config/test/,target=/etc/ejabberd',
-            'ejabberd:16.09',
-        ]
-        print(' '.join(cmd))
-        subprocess.call(cmd)
 
     try:
         backend = cls(**kwargs)
@@ -209,7 +212,10 @@ def test_backend(backend, domain, config_path='', version=''):
         print(yellow(e))
         return
 
-    initial_users = set(config.get('expected_users', set()))
+    for cmd in config.get('BEFORE_TEST', []):
+        local(cmd)
+
+    initial_users = set(config.get('EXPECTED_USERS', set()))
 
     print('Testing initial state... ', end='')
     users = backend.all_users(domain)
@@ -354,11 +360,12 @@ def test_backend(backend, domain, config_path='', version=''):
     ok()
 
     if docker:
-        subprocess.call(['docker', 'stop', 'xmpp-backends-test'])
+        local('docker stop %s' % docker_name)
+        local('docker rm %s' % docker_name)
 
 
 @task
-def test_server(server):
+def test_server(server, version):
     if '-' in server:
         server, version = server.split('-', 1)
 
@@ -370,4 +377,4 @@ def test_server(server):
 
     for backend in backends:
         print('Test %s' % green(backend))
-        test_backend(backend, 'example.com')
+        test_backend(backend, 'example.com', version=version)

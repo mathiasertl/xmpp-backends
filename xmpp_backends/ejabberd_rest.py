@@ -110,6 +110,7 @@ class EjabberdRestBackend(EjabberdBackendBase):
 
         uri = '%s%s' % (self.uri, cmd)
         try:
+            print('### URI: %s' % uri)
             response = requests.post(uri, json=payload, headers=self.headers, **self.kwargs)
         except requests.exceptions.RequestException as e:
             raise BackendConnectionError(e)
