@@ -26,6 +26,7 @@ xmpp_backends.ejabberd_rest.EjabberdRestBackend:
   SERVER: ejabberd
   DOCKER:
     container: mathiasertl/ejabberd
+    ports: [5222, 5223, 5269, 5280]
   BEFORE_TEST:
     - sleep 3  # ejabberd takes a few seconds to start
     - docker exec %(DOCKER_CONTAINER)s /usr/sbin/ejabberdctl register api example.com secret
@@ -34,3 +35,18 @@ xmpp_backends.ejabberd_rest.EjabberdRestBackend:
   KWARGS:
     user: api@example.com
     password: secret
+
+xmpp_backends.ejabberd_xmlrpc.EjabberdXMLRPCBackend:
+  SERVER: ejabberd
+  DOCKER:
+    container: mathiasertl/ejabberd
+    ports: [5222, 5223, 5269, 4560]
+  BEFORE_TEST:
+    - sleep 3  # ejabberd takes a few seconds to start
+    - docker exec %(DOCKER_CONTAINER)s /usr/sbin/ejabberdctl register api example.com secret
+  EXPECTED_USERS:
+    - api
+  KWARGS:
+    user: api
+    password: secret
+    server: example.com

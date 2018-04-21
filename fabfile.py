@@ -354,7 +354,7 @@ def test_backend(backend, domain, config_path='', version=''):
         local('docker pull %s' % container)
 
         cmd = 'docker run -d --name=%s --mount type=bind,source=%s,target=/etc/ejabberd' % (docker_name, path)
-        for port in docker.get("ports", [5222, 5223, 5269, 5280, ]):
+        for port in docker.get("ports", [5222, 5223, 5269, ]):
             cmd += ' -p %s:%s/tcp' % (port, port)
         cmd += ' %s' % container
 
