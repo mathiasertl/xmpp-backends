@@ -201,7 +201,7 @@ listen:
     auth_realm: "example.com"
   - 
     port: 5280
-    ip: "127.0.0.1"
+    ip: "::"
     module: ejabberd_http
     request_handlers:
       "/ws": ejabberd_http_ws
@@ -213,7 +213,7 @@ listen:
     captcha: true
   - 
     port: 4560
-    ip: "127.0.0.1"
+    ip: "::"
     module: ejabberd_xmlrpc
     access_commands: {}
 
