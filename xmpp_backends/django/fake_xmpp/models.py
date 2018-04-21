@@ -6,6 +6,13 @@ from django.contrib.auth.models import AbstractBaseUser
 from django.db import models
 from django.utils import timezone
 from django.utils.crypto import get_random_string
+from django.utils.translation import gettext as _
+
+from ...constants import CONNECTION_XMPP
+from ...constants import CONNECTION_HTTP_POLLING
+from ...constants import CONNECTION_HTTP_BINDING
+from ...constants import CONNECTION_WEBSOCKETS
+from ...constants import CONNECTION_UNKNOWN
 
 
 class FakeUser(AbstractBaseUser):
@@ -16,6 +23,10 @@ class FakeUser(AbstractBaseUser):
     is_blocked = models.BooleanField(default=True)
 
     USERNAME_FIELD = 'username'
+
+    class Meta:
+        verbose_name = _('Fake XMPP User')
+        verbose_name_plural = _('Fake XMPP Users')
 
     @property
     def node(self):
@@ -34,6 +45,16 @@ class FakeUserSession(models.Model):
     uptime = models.DateTimeField(default=timezone.now)
     status = models.CharField(max_length=255)
     status_text = models.CharField(max_length=255)
-    connection_type = models.SmallIntegerField()
+    connection_type = models.SmallIntegerField(choices=(
+        (CONNECTION_XMPP, _('XMPP')),
+        (CONNECTION_HTTP_POLLING, _('HTTP Polling')),
+        (CONNECTION_HTTP_BINDING, _('HTTP Binding')),
+        (CONNECTION_WEBSOCKETS, _('Websockets')),
+        (CONNECTION_UNKNOWN, _('Unkown')),
+    ))
     encrypted = models.NullBooleanField()
     compressed = models.NullBooleanField()
+
+    class Meta:
+        verbose_name = _('Fake XMPP Session')
+        verbose_name_plural = _('Fake XMPP Sessions')
