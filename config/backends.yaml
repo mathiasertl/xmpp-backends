@@ -1,4 +1,5 @@
 xmpp_backends.dummy.DummyBackend:
+    SERVER: fake
     DJANGO_SETUP: true
     ENVIRONMENT:
         DJANGO_SETTINGS_MODULE: tests.django_settings
@@ -9,6 +10,7 @@ xmpp_backends.dummy.DummyBackend:
             - example.org
 
 xmpp_backends.django.fake_xmpp.backend.FakeXMPPBackend:
+    SERVER: fake
     DJANGO_SETUP: true
     DJANGO_MIGRATE: true
     PYTHONPATH: django_dev_project
