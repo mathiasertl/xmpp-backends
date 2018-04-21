@@ -9,13 +9,12 @@ python:
   - "3.6"
   - "nightly"
 env:
-  - SERVER=fake
-  - SERVER=ejabberd-16.09
+  - XMPP_SERVER=fake
+  - XMPP_SERVER=ejabberd-16.09
 install:
   - pip install -U pip setuptools
   - pip install -r requirements.txt -r requirements-dev.txt
 script:
   - fab check
   - fab python setup.py test
-  - fab test_backend:xmpp_backends.dummy.DummyBackend,example.com
-  - fab test_backend:xmpp_backends.django.fake_xmpp.backend.FakeXMPPBackend,example.com
+  - fab test_server:$XMPP_SERVER
