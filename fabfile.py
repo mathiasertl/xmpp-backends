@@ -324,14 +324,19 @@ def test_backend(backend, domain, config_path='', version=''):
         config = yaml.load(stream.read())
     config = config.get(backend, {})
 
+    # Test if this backend supports this version
     parsed_version = tuple(int(t) for t in version.split('.'))
-
     if config.get('SERVER_MIN_VERSION'):
         parsed_min = tuple(int(t) for t in config['SERVER_MIN_VERSION'].split('.'))
 
         if parsed_version < parsed_min:
             print(yellow('Backend does not support version %s of XMPP server.' % version))
             return
+
+    # Add any version-specific config overrides
+    overrides = config.get('VERSION_OVERRIDES', {})
+    if version in overrides:
+        config.update(overrides[version])
 
     for key, value in config.get('ENVIRONMENT', {}).items():
         os.environ.setdefault(key, value)

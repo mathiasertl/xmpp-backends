@@ -51,6 +51,9 @@ xmpp_backends.ejabberd_xmlrpc.EjabberdXMLRPCBackend:
     user: api
     password: secret
     server: example.com
+  VERSION_OVERRIDES:
+    "14.07":
+      KWARGS: {}
 
 xmpp_backends.ejabberdctl.EjabberdctlBackend:
   SERVER: ejabberd
@@ -60,3 +63,4 @@ xmpp_backends.ejabberdctl.EjabberdctlBackend:
     - sleep 5  # ejabberd takes a few seconds to start
   KWARGS:
     path: [docker, exec, xmpp-backends-docker, /usr/sbin/ejabberdctl]
+
