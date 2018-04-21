@@ -28,9 +28,10 @@ from .models import FakeUserSession
 
 
 class FakeXMPPBackend(XmppBackendBase):
-    def __init__(self, domains):
+    def __init__(self, domains, version):
         super(FakeXMPPBackend, self).__init__()
         self._domains = domains
+        self.version = version
 
     def all_domains(self):
         return list(self._domains)

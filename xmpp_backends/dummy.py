@@ -45,9 +45,10 @@ class DummyBackend(XmppBackendBase):
 
     library = 'django.core.cache.cache'
 
-    def __init__(self, domains):
+    def __init__(self, domains, version):
         super(DummyBackend, self).__init__()
         self._domains = domains
+        self.version = version
 
     def user_exists(self, username, domain):
         if domain not in self._domains:
