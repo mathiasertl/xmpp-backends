@@ -50,3 +50,12 @@ xmpp_backends.ejabberd_xmlrpc.EjabberdXMLRPCBackend:
     user: api
     password: secret
     server: example.com
+
+xmpp_backends.ejabberdctl.EjabberdctlBackend:
+  SERVER: ejabberd
+  DOCKER:
+    container: mathiasertl/ejabberd
+  BEFORE_TEST:
+    - sleep 3  # ejabberd takes a few seconds to start
+  KWARGS:
+    path: [docker, exec, xmpp-backends-docker, /usr/sbin/ejabberdctl]
