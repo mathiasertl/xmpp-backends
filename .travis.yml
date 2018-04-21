@@ -8,11 +8,11 @@ python:
 install:
   - pip install -U pip setuptools
   - pip install -r requirements.txt -r requirements-dev.txt
-script:
-  - test_backend:xmpp_backends.django.fake_xmpp.backend.FakeXMPPBackend,example.com
-  - fab test_backend:xmpp_backends.dummy.DummyBackend,example.com
 jobs:
   include:
       - stage: check
         script: fab check
       - script: python setup.py test
+      - stage: test
+        script: fab test_backend:xmpp_backends.django.fake_xmpp.backend.FakeXMPPBackend,example.com
+      - script: fab test_backend:xmpp_backends.dummy.DummyBackend,example.com
