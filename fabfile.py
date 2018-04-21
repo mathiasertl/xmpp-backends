@@ -161,9 +161,7 @@ def _test_backend(cls, config, version):
     password2 = 'barfoo'
 
     kwargs = config.get('KWARGS', {})
-    if version:
-        version = tuple(int(t) for t in version.split('.'))
-        kwargs['version'] = version
+    kwargs['version'] = version
 
     try:
         backend = cls(**kwargs)
@@ -326,6 +324,15 @@ def test_backend(backend, domain, config_path='', version=''):
         config = yaml.load(stream.read())
     config = config.get(backend, {})
 
+    parsed_version = tuple(int(t) for t in version.split('.'))
+
+    if config.get('SERVER_MIN_VERSION'):
+        parsed_min = tuple(int(t) for t in config['SERVER_MIN_VERSION'].split('.'))
+
+        if parsed_version < parsed_min:
+            print(yellow('Backend does not support version %s of XMPP server.' % version))
+            return
+
     for key, value in config.get('ENVIRONMENT', {}).items():
         os.environ.setdefault(key, value)
 
@@ -367,7 +374,7 @@ def test_backend(backend, domain, config_path='', version=''):
         local(cmd % context)
 
     try:
-        _test_backend(cls, config, version)
+        _test_backend(cls, config, parsed_version)
     finally:
         if docker:
             local('docker kill %s' % docker_name)
