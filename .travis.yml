@@ -16,6 +16,4 @@ stages:
   - test
 jobs:
   - stage: check
-    script:
-        - fab check
-        - python setup.py test
+    script: fab check
