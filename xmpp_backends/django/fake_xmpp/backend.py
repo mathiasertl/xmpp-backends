@@ -78,6 +78,14 @@ class FakeXMPPBackend(XmppBackendBase):
         user.set_password(password)
         user.save()
 
+    def message_user(self, username, domain, subject, message):
+        try:
+            user = FakeUser.objects.get(username='%s@%s' % (username, domain))
+        except FakeUser.DoesNotExist:
+            raise UserNotFound(username, domain)
+
+        user.message(subject, message)
+
     def user_exists(self, username, domain):
         return FakeUser.objects.filter(username='%s@%s' % (username, domain)).exists()
 

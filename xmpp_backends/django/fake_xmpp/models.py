@@ -36,6 +36,9 @@ class FakeUser(AbstractBaseUser):
     def domain(self):
         return self.username.split('@', 1)[1]
 
+    def message(self, subject, message):
+        self.messages.create(subject=subject, message=message)
+
 
 class FakeUserSession(models.Model):
     user = models.ForeignKey(FakeUser, models.CASCADE, related_name='sessions')
@@ -58,3 +61,9 @@ class FakeUserSession(models.Model):
     class Meta:
         verbose_name = _('Fake XMPP Session')
         verbose_name_plural = _('Fake XMPP Sessions')
+
+
+class FakeUserMessage(models.Model):
+    user = models.ForeignKey(FakeUser, models.CASCADE, related_name='messages')
+    subject = models.CharField(max_length=12)
+    message = models.CharField(max_length=128)
