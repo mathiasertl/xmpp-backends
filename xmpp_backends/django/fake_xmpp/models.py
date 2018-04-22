@@ -8,11 +8,11 @@ from django.utils import timezone
 from django.utils.crypto import get_random_string
 from django.utils.translation import gettext as _
 
-from ...constants import CONNECTION_XMPP
-from ...constants import CONNECTION_HTTP_POLLING
 from ...constants import CONNECTION_HTTP_BINDING
-from ...constants import CONNECTION_WEBSOCKETS
+from ...constants import CONNECTION_HTTP_POLLING
 from ...constants import CONNECTION_UNKNOWN
+from ...constants import CONNECTION_WEBSOCKETS
+from ...constants import CONNECTION_XMPP
 
 
 class FakeUser(AbstractBaseUser):
