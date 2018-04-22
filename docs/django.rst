@@ -60,3 +60,7 @@ Authentication middleware
 
 .. autoclass:: xmpp_backends.django.auth_backends.XmppBackendBackend
    :members:
+
+***********
+Development
+***********

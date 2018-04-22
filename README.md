@@ -21,6 +21,7 @@ pip install xmpp-backends
   xmlrpc library to correctly encode UTF-8 characters.
 * `ejabberdctl`: Uses the `ejabberdctl` command line utility that obviously needs to be available on the local
   machine.
+* `FakeXMPP`: Uses Djangos ORM store data in the database.
 * `dummy`: Uses Django's chache backend, useful for testing.
 
 ## ChangeLog
@@ -28,6 +29,10 @@ pip install xmpp-backends
 ### 0.6.0 (TBR)
 
 * Update requirements.
+* New ``xmpp_backends.fake_xmpp`` Django app to allow easier development if you're developing a Django app.
+* ``ejabberdctl`` backend now also accepts a list of commands to enable running this backend together with an
+  ejabberd instance running inside a Docker container.
+* Fix autodoc documentation for ``xmpp_backends.django``.
 * Test interface based on blacklist of functions, not on whitelist.
 
 ### 0.5.0 (2017-09-24)
