@@ -14,13 +14,19 @@
 
 import sys
 import os
-import shlex
 import sphinx_rtd_theme
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath('..'))
+sys.path.insert(0, os.path.join(os.path.abspath('..'), 'django_dev_project'))
+
+# NOTE: Do not use mock imports, as this breaks autodoc for xmpp_backends.django.models.XmppBackendUser
+# for some reason.
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django_dev_project.settings')
+import django
+django.setup()
 
 # -- General configuration ------------------------------------------------
 
@@ -289,10 +295,3 @@ texinfo_documents = [
 
 html_theme = "sphinx_rtd_theme"
 html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
-
-autodoc_mock_imports = [
-    'django.conf',
-    'django.contrib.auth.models',
-    'django.core.exceptions',
-    'django.utils.translation',
-]
