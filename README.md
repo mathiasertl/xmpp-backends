@@ -28,6 +28,7 @@ pip install xmpp-backends
 ### 0.6.0 (TBR)
 
 * Update requirements.
+* Test interface based on blacklist of functions, not on whitelist.
 
 ### 0.5.0 (2017-09-24)
 

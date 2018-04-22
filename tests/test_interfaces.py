@@ -53,25 +53,19 @@ class TestInterfaces(unittest.TestCase):
 
 
 class TestImplemented(unittest.TestCase):
-    not_implemented = [
-        'all_users',
-        'all_domains',
-        'all_user_sessions',
-        'block_user',
-        'check_email',
-        'check_password',
-        'create_user',
-        'get_last_activity',
-        'remove_user',
-        'set_email',
-        'set_last_activity',
-        'set_password',
-        'stats',
-        'user_exists',
+    allow_base_function = [
+        'confirm_reservation',
+        'create_reservation',
+        'datetime_to_timestamp',
+        'expire_reservation',
+        'get_random_password',
     ]
 
     def assertOverwritten(self, subclass):
-        for name in self.not_implemented:
+        for name, base_func in inspect.getmembers(XmppBackendBase, callable):
+            if name.startswith('_') or name in self.allow_base_function:
+                continue
+
             self.assertNotEqual(getattr(XmppBackendBase, name),
                                 getattr(subclass, name),
                                 "%s.%s: Function is not overwritten." % (subclass.__name__, name))
