@@ -46,6 +46,8 @@ class EjabberdctlBackend(EjabberdBackendBase):
        shell-access to your machine!
 
     :param    path: Optional path to the ``ejabberdctl`` script. The default is ``"/usr/sbin/ejabberdctl"``.
+                    The path can also be a list, e.g. if ejabberd is run inside a Docker image, you could set
+                    ``['docker', 'exec', 'ejabberd-container', '/usr/sbin/ejabberdctl']``.
     :param version: A tuple describing the version used, e.g. ``(16, 12,)``. See :ref:`version parameter
         <ejabberd_version>` for a more detailed explanation.
     """
