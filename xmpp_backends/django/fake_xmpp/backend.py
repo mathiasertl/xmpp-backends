@@ -84,7 +84,7 @@ class FakeXMPPBackend(XmppBackendBase):
         except FakeUser.DoesNotExist:
             return  # ejabberd does not return anything either
 
-        user.message(subject, message)
+        user.message(subject, message, sender=domain)
 
     def user_exists(self, username, domain):
         return FakeUser.objects.filter(username='%s@%s' % (username, domain)).exists()

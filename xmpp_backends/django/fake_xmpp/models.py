@@ -36,8 +36,8 @@ class FakeUser(AbstractBaseUser):
     def domain(self):
         return self.username.split('@', 1)[1]
 
-    def message(self, subject, message):
-        self.messages.create(subject=subject, message=message)
+    def message(self, subject, message, sender):
+        self.messages.create(subject=subject, message=message, sender=sender)
 
 
 class FakeUserSession(models.Model):
@@ -65,5 +65,7 @@ class FakeUserSession(models.Model):
 
 class FakeUserMessage(models.Model):
     user = models.ForeignKey(FakeUser, models.CASCADE, related_name='messages')
+    sender = models.CharField(max_length=64)
+    date = models.DateTimeField(default=timezone.now)
     subject = models.CharField(max_length=12)
     message = models.CharField(max_length=128)
