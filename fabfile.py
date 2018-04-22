@@ -259,6 +259,14 @@ def _test_backend(cls, config, version):
         error('message_user() did not return None: %s' % msg)
     ok()
 
+    print('Send message to non-existing user...', end='')
+    try:
+        msg = backend.message_user('wrong-username', domain, 'subject', 'message')
+        ok()
+    except UserNotFound as e:
+        # ejabberd api does not indicate any error in this case
+        error('set_last_activity raised UserNotFound: %s' % e)
+
     try:
         print('Get (empty) list of user sessions... ', end='')
         sessions = backend.user_sessions(username1, domain)
