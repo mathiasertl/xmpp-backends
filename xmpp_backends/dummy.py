@@ -232,5 +232,17 @@ class DummyBackend(XmppBackendBase):
         """Always returns 0."""
         return 0
 
-    def message_user(self, username, domain):
-        pass
+    def message_user(self, username, domain, subject, message):
+        user = '%s@%s' % (username, domain)
+        data = self.module.get(user)
+        if data is None:
+            return  # user does not exist
+
+        data.setdefault('messages', [])
+        data['messages'].append({
+            'date': datetime.utcnow(),
+            'message': message,
+            'sender': domain,
+            'subject': subject,
+        })
+        self.module.set(user, data)
