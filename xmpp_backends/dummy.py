@@ -231,3 +231,6 @@ class DummyBackend(XmppBackendBase):
     def stats(self, stat, domain=None):
         """Always returns 0."""
         return 0
+
+    def message_user(self, username, domain):
+        pass
