@@ -64,3 +64,14 @@ Authentication middleware
 ***********
 Development
 ***********
+
+Database backend
+================
+
+.. autoclass:: xmpp_backends.django.fake_xmpp.backend.FakeXMPPBackend
+   :members:
+
+Dummy backend
+=============
+
+.. autoclass:: xmpp_backends.dummy.DummyBackend

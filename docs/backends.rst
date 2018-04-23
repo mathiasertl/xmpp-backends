@@ -39,20 +39,6 @@ ejabberdctl
 .. autoclass:: xmpp_backends.ejabberdctl.EjabberdctlBackend
    :members:
 
-************
-Fake Backend
-************
-
-.. autoclass:: xmpp_backends.django.fake_xmpp.backend.FakeXMPPBackend
-   :members:
-
-*************
-Dummy backend
-*************
-
-.. autoclass:: xmpp_backends.dummy.DummyBackend
-   :members:
-
 ***********************
 ejabberd specific notes
 ***********************
