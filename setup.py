@@ -26,7 +26,7 @@ class django_test(test):
 
 setup(
     name='xmpp-backends',
-    version='0.5.0',
+    version='0.6.0',
     description='A set of classes with common interfaces to communicate with XMPP servers.',
     author='Mathias Ertl',
     author_email='mati@jabber.at',
@@ -34,6 +34,8 @@ setup(
     packages=[
         'xmpp_backends',
         'xmpp_backends.django',
+        'xmpp_backends.django.fake_xmpp',
+        'xmpp_backends.django.fake_xmpp.migrations',
     ],
     cmdclass={
         'test': django_test,
@@ -42,7 +44,7 @@ setup(
     install_requires=install_requires,
     test_suite='tests',
     classifiers=[
-        "Development Status :: 4 - Beta",
+        "Development Status :: 5 - Stable",
         "Environment :: Web Environment",
         "Framework :: Django",
         "Intended Audience :: System Administrators",
