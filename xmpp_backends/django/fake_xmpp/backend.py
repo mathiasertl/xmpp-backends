@@ -36,10 +36,6 @@ class FakeXMPPBackend(XmppBackendBase):
     def all_domains(self):
         return list(self._domains)
 
-    def all_users(self, domain):
-        qs = FakeUser.objects.filter(username__endswith='@%s' % domain)
-        return set([u.split('@', 1)[0] for u in qs.values_list('username', flat=True)])
-
     def all_user_sessions(self):
         return set([UserSession(
             backend=self,
@@ -55,6 +51,10 @@ class FakeXMPPBackend(XmppBackendBase):
             encrypted=s.encrypted,
             compressed=s.compressed
         ) for s in FakeUserSession.objects.all()])
+
+    def all_users(self, domain):
+        qs = FakeUser.objects.filter(username__endswith='@%s' % domain)
+        return set([u.split('@', 1)[0] for u in qs.values_list('username', flat=True)])
 
     def block_user(self, username, domain):
         try:
@@ -73,22 +73,6 @@ class FakeXMPPBackend(XmppBackendBase):
 
         return user.email == email
 
-    def create_user(self, username, domain, password, email=None):
-        user = FakeUser.objects.create(username='%s@%s' % (username, domain), email=email)
-        user.set_password(password)
-        user.save()
-
-    def message_user(self, username, domain, subject, message):
-        try:
-            user = FakeUser.objects.get(username='%s@%s' % (username, domain))
-        except FakeUser.DoesNotExist:
-            return  # ejabberd does not return anything either
-
-        user.message(subject, message, sender=domain)
-
-    def user_exists(self, username, domain):
-        return FakeUser.objects.filter(username='%s@%s' % (username, domain)).exists()
-
     def check_password(self, username, domain, password):
         try:
             user = FakeUser.objects.get(username='%s@%s' % (username, domain))
@@ -97,21 +81,8 @@ class FakeXMPPBackend(XmppBackendBase):
 
         return user.check_password(password)
 
-    def set_email(self, username, domain, email):
-        try:
-            user = FakeUser.objects.get(username='%s@%s' % (username, domain))
-        except FakeUser.DoesNotExist:
-            raise UserNotFound(username, domain)
-
-        user.email = email
-        user.save()
-
-    def set_password(self, username, domain, password):
-        try:
-            user = FakeUser.objects.get(username='%s@%s' % (username, domain))
-        except FakeUser.DoesNotExist:
-            raise UserNotFound(username, domain)
-
+    def create_user(self, username, domain, password, email=None):
+        user = FakeUser.objects.create(username='%s@%s' % (username, domain), email=email)
         user.set_password(password)
         user.save()
 
@@ -125,8 +96,25 @@ class FakeXMPPBackend(XmppBackendBase):
         else:
             return user.last_activity
 
+    def message_user(self, username, domain, subject, message):
+        try:
+            user = FakeUser.objects.get(username='%s@%s' % (username, domain))
+        except FakeUser.DoesNotExist:
+            return  # ejabberd does not return anything either
+
+        user.message(subject, message, sender=domain)
+
     def remove_user(self, username, domain):
         FakeUser.objects.filter(username='%s@%s' % (username, domain)).delete()
+
+    def set_email(self, username, domain, email):
+        try:
+            user = FakeUser.objects.get(username='%s@%s' % (username, domain))
+        except FakeUser.DoesNotExist:
+            raise UserNotFound(username, domain)
+
+        user.email = email
+        user.save()
 
     def set_last_activity(self, username, domain, status=u'', timestamp=None):
         try:
@@ -142,6 +130,15 @@ class FakeXMPPBackend(XmppBackendBase):
             timestamp = timezone.make_naive(timestamp, pytz.utc)
 
         user.last_activity = timestamp
+        user.save()
+
+    def set_password(self, username, domain, password):
+        try:
+            user = FakeUser.objects.get(username='%s@%s' % (username, domain))
+        except FakeUser.DoesNotExist:
+            raise UserNotFound(username, domain)
+
+        user.set_password(password)
         user.save()
 
     def start_user_session(self, username, domain, resource, **kwargs):
@@ -182,6 +179,9 @@ class FakeXMPPBackend(XmppBackendBase):
             raise UserNotFound(username, domain)
 
         FakeUserSession.objects.filter(user=user, resource=resource).delete()
+
+    def user_exists(self, username, domain):
+        return FakeUser.objects.filter(username='%s@%s' % (username, domain)).exists()
 
     def user_sessions(self, username, domain):
         try:
