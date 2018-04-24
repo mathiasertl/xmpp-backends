@@ -28,6 +28,16 @@ from .models import FakeUserSession
 
 
 class FakeXMPPBackend(XmppBackendBase):
+    """A backend that uses the ``xmpp_backends.django.fake_xmpp`` Django app as backend.
+
+    This backend is useful if you develop a Django application and don't want to run a real XMPP server.
+
+    .. WARNING:: This backend is not intended for production use.
+
+    :param domains: A list of domains this backend should serve.
+    :param version: Not actually used.
+    """
+
     def __init__(self, domains, version):
         super(FakeXMPPBackend, self).__init__()
         self._domains = domains

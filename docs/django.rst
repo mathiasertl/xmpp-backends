@@ -65,11 +65,28 @@ Authentication middleware
 Development
 ***********
 
-Database backend
+Fake XMPP server
 ================
 
+If you want to develop a Django project and don't want to run a real XMPP server
+on your development server, you can use the ``fake_xmpp`` app. Simply enable it
+in ``INSTALLED_APPS`` and configure a your ``XMPP_BACKENDS``::
+
+   INSTALLED_APPS = [
+       #...
+       'xmpp_backends.django.fake_xmpp',
+   ]
+
+   XMPP_BACKENDS = {
+    'default': {
+        'BACKEND': 'xmpp_backends.django.fake_xmpp.backend.FakeXMPPBackend',
+        'domains': ['example.com', 'example.net', 'example.org'],
+        'version': (1, 0),  # doesn't do anything, reserved for future use.
+    },
+
+The app also adds all models to the admin interface, so you can add users etc. there.
+
 .. autoclass:: xmpp_backends.django.fake_xmpp.backend.FakeXMPPBackend
-   :members:
 
 Dummy backend
 =============
