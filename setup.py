@@ -44,7 +44,7 @@ setup(
     install_requires=install_requires,
     test_suite='tests',
     classifiers=[
-        "Development Status :: 5 - Stable",
+        "Development Status :: 5 - Production/Stable",
         "Environment :: Web Environment",
         "Framework :: Django",
         "Intended Audience :: System Administrators",
