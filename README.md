@@ -34,6 +34,8 @@ pip install xmpp-backends
   ejabberd instance running inside a Docker container.
 * Fix autodoc documentation for ``xmpp_backends.django``.
 * Test interface based on blacklist of functions, not on whitelist.
+* New `fab test_server` command that tests all backends for a specific server.
+* `fab test_backend` now starts Docker containers for historic versions of ejabberd.
 
 ### 0.5.0 (2017-09-24)
 
