@@ -640,8 +640,6 @@ modules:
   mod_configure: {} # requires mod_adhoc
   ## mod_delegation: {} # for xep0356
   mod_echo: {}
-  mod_irc: 
-    default_encoding: "utf-8"
   mod_http_bind:
     max_inactivity: 60
   # mod_bosh: added in 16.12: https://blog.process-one.net/ejabberd-16-12/
