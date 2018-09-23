@@ -165,7 +165,6 @@ def _test_backend(cls, config, version):
     password2 = 'barfoo'
 
     kwargs = config.get('KWARGS', {})
-    kwargs['version'] = version
 
     try:
         backend = cls(**kwargs)

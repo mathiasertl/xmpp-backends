@@ -16,6 +16,7 @@
 from __future__ import unicode_literals
 
 import logging
+import warnings
 from datetime import datetime
 from datetime import timedelta
 from subprocess import PIPE
@@ -48,12 +49,14 @@ class EjabberdctlBackend(EjabberdBackendBase):
     :param    path: Optional path to the ``ejabberdctl`` script. The default is ``"/usr/sbin/ejabberdctl"``.
                     The path can also be a list, e.g. if ejabberd is run inside a Docker image, you could set
                     ``['docker', 'exec', 'ejabberd-container', '/usr/sbin/ejabberdctl']``.
-    :param version: A tuple describing the version used, e.g. ``(16, 12,)``. See :ref:`version parameter
-        <ejabberd_version>` for a more detailed explanation.
+    :param version: Deprecated, no longer use this parameter.
     """
 
-    def __init__(self, path='/usr/sbin/ejabberdctl', version=(18, 6, ), **kwargs):
+    def __init__(self, path='/usr/sbin/ejabberdctl', version=None, **kwargs):
         super(EjabberdctlBackend, self).__init__(**kwargs)
+
+        if version is not None:
+            warnings.warn("The version parameter is deprecated.", DeprecationWarning)
 
         self.ejabberdctl = path
         if isinstance(path, six.string_types):
@@ -61,9 +64,6 @@ class EjabberdctlBackend(EjabberdBackendBase):
 
         if self.api_version <= (14, 7):
             log.warn('ejabberd <= 14.07 is really broken and many calls will not work!')
-
-    def get_version(self):
-        return self.version
 
     def ctl(self, *args):
         cmd = self.ejabberdctl + list(args)

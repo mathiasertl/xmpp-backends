@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 import logging
 import socket
+import warnings
 from datetime import datetime
 from datetime import timedelta
 
@@ -72,15 +73,17 @@ class EjabberdXMLRPCBackend(EjabberdBackendBase):
     :param         user: Username of the JID used for authentication.
     :param       server: Server of the JID used for authenticiation.
     :param     password: The password of the given JID.
-    :param      version: A tuple describing the ejabberd version used, e.g. ``(16, 12,)``. See
-        :ref:`version parameter <ejabberd_version>` for a more detailed explanation.
+    :param      version: Deprecated, no longer use this parameter.
     """
     credentials = None
 
     def __init__(self, uri='http://127.0.0.1:4560', transport=None, encoding=None, verbose=0, allow_none=0,
-                 use_datetime=0, context=None, user=None, server=None, password=None, version=(18, 6, ),
+                 use_datetime=0, context=None, user=None, server=None, password=None, version=None,
                  **kwargs):
         super(EjabberdXMLRPCBackend, self).__init__(**kwargs)
+
+        if version is not None:
+            warnings.warn("The version parameter is deprecated.", DeprecationWarning)
 
         kwargs = {
             'transport': transport,
@@ -100,10 +103,6 @@ class EjabberdXMLRPCBackend(EjabberdBackendBase):
                 'server': server,
                 'password': password,
             }
-        self.version = version
-
-    def get_version(self):
-        return self.version
 
     def rpc(self, cmd, **kwargs):
         """Generic helper function to call an RPC method."""

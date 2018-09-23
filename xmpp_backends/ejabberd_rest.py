@@ -17,6 +17,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import logging
+import warnings
 from datetime import datetime
 from datetime import timedelta
 
@@ -74,8 +75,7 @@ class EjabberdRestBackend(EjabberdBackendBase):
     :param       uri: The URI of the API.
     :param      user: User used in authenticating with the API.
     :param  password: Password used in authenticating with the API.
-    :param   version: A tuple describing the version used, e.g. ``(16, 12,)``. See
-        :ref:`version parameter <ejabberd_version>` for a more detailed explanation.
+    :param   version: Deprecated, no longer use this parameter.
     :param \**kwargs: All keyword parameters are directly passed to the ``requests`` module. Please
         see the documentation there for possible parameters (e.g. SSL validation, etc.).
     """
@@ -83,8 +83,11 @@ class EjabberdRestBackend(EjabberdBackendBase):
     minimum_version = (16, 2)
 
     def __init__(self, uri='http://127.0.0.1:5280/api/', user=None, password=None,
-                 version=(17, 7, ), version_cache_timeout=3600, **kwargs):
+                 version=None, version_cache_timeout=3600, **kwargs):
         super(EjabberdRestBackend, self).__init__(version_cache_timeout=version_cache_timeout)
+
+        if version is not None:
+            warnings.warn("The version parameter is deprecated.", DeprecationWarning)
 
         if not uri.endswith('/'):
             uri += '/'
@@ -93,14 +96,8 @@ class EjabberdRestBackend(EjabberdBackendBase):
         self.kwargs = kwargs
         self.headers = kwargs.pop('headers', {})
         self.headers.setdefault('X-Admin', 'true')
-        self.version = version
         if user:
             self.kwargs['auth'] = (user, password)
-
-    def get_version(self, response):
-        if response.headers.get('Ejabberd-Version'):
-            return response.headers.get('Ejabberd-Version').split('.')
-        return self.version
 
     def post(self, cmd, allowed_status=None, **payload):
         if allowed_status is None:
