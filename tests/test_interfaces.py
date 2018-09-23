@@ -31,8 +31,8 @@ class TestInterfaces(unittest.TestCase):
                 continue
 
             self.assertEqual(
-                inspect.getargspec(base_func),
-                inspect.getargspec(getattr(subclass, name)),
+                inspect.signature(base_func),
+                inspect.signature(getattr(subclass, name)),
                 "%s.%s has a different signature" % (subclass.__name__, name)
             )
 
