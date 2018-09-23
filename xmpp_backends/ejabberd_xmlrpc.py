@@ -295,11 +295,18 @@ class EjabberdXMLRPCBackend(EjabberdBackendBase):
             if version == (14, 7):
                 raise NotSupportedError('ejabberd 14.07 does not support getting all sessions via xmlrpc.')
             raise
+
+        if version < (18, 6):
+            # The key used here was silently changed in 18.06.
+            sessions_key = 'sessions'
+        else:
+            sessions_key = 'session'
+
         sessions = set()
         for data in result:
             # The data structure is a bit weird, its a list of one-element dicts.  We itemize each dict and
             # then flatten the resulting list
-            session = [d.items() for d in data['sessions']]
+            session = [d.items() for d in data[sessions_key]]
             session = dict([item for sublist in session for item in sublist])
 
             username, domain = session['jid'].split('@', 1)
