@@ -31,6 +31,7 @@ pip install xmpp-backends
 * Update requirements.
 * Also test ejabberd versions 18.03, 18.04 and 18.06.
 * Fully support Python 3.7 and Django 2.1.
+* Modify the test-suite so that DeprecationWarnings from Django are an error.
 
 ### 0.6.0 (2018-04-24)
 
