@@ -35,13 +35,11 @@ class FakeXMPPBackend(XmppBackendBase):
     .. WARNING:: This backend is not intended for production use.
 
     :param domains: A list of domains this backend should serve.
-    :param version: Not actually used.
     """
 
-    def __init__(self, domains, version):
+    def __init__(self, domains):
         super(FakeXMPPBackend, self).__init__()
         self._domains = domains
-        self.version = version
 
     def get_api_version(self):
         return (1, 0)

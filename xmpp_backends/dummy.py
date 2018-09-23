@@ -45,10 +45,9 @@ class DummyBackend(XmppBackendBase):
 
     library = 'django.core.cache.cache'
 
-    def __init__(self, domains, version):
+    def __init__(self, domains):
         super(DummyBackend, self).__init__()
         self._domains = domains
-        self.version = version
 
     def get_api_version(self):
         return (1, 0)
