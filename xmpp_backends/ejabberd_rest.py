@@ -80,7 +80,7 @@ class EjabberdRestBackend(EjabberdBackendBase):
         see the documentation there for possible parameters (e.g. SSL validation, etc.).
     """
     credentials = None
-    minimum_version = (16, 1)
+    minimum_version = (16, 2)
 
     def __init__(self, uri='http://127.0.0.1:5280/api/', user=None, password=None,
                  version=(17, 7, ), version_cache_timeout=3600, **kwargs):
