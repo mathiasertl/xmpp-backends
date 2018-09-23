@@ -16,6 +16,8 @@
 import inspect
 import unittest
 
+import six
+
 from xmpp_backends.base import XmppBackendBase
 from xmpp_backends.django.fake_xmpp.backend import FakeXMPPBackend
 from xmpp_backends.dummy import DummyBackend
@@ -30,11 +32,18 @@ class TestInterfaces(unittest.TestCase):
             if name.startswith('_'):
                 continue
 
-            self.assertEqual(
-                inspect.signature(base_func),
-                inspect.signature(getattr(subclass, name)),
-                "%s.%s has a different signature" % (subclass.__name__, name)
-            )
+            if six.PY2:
+                self.assertEqual(
+                    inspect.getargspec(base_func),
+                    inspect.getargspec(getattr(subclass, name)),
+                    "%s.%s has a different signature" % (subclass.__name__, name)
+                )
+            else:
+                self.assertEqual(
+                    inspect.signature(base_func),
+                    inspect.signature(getattr(subclass, name)),
+                    "%s.%s has a different signature" % (subclass.__name__, name)
+                )
 
     def test_ejabberd_xmlrpc(self):
         self.assertEqualInterface(EjabberdXMLRPCBackend)
