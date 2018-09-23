@@ -21,7 +21,7 @@ from xmpp_backends.dummy import DummyBackend
 
 class TestDummySessions(TestCase):
     def setUp(self):
-        self.backend = DummyBackend(domains=['example.com'], version=(1, 0))
+        self.backend = DummyBackend(domains=['example.com'])
 
     def test_wrong_user(self):
         self.assertEqual(self.backend.all_user_sessions(), set())

@@ -564,11 +564,11 @@ class EjabberdBackendBase(XmppBackendBase):
     def parse_connection_string(self, connection):
         """Parse string as returned by the ``connected_users_info`` or ``user_sessions_info`` API calls.
 
-        >>> EjabberdBackendBase().parse_connection_string('c2s_tls', (17, 8, ))
+        >>> EjabberdBackendBase().parse_connection_string('c2s_tls')
         (0, True, False)
-        >>> EjabberdBackendBase().parse_connection_string('c2s_compressed_tls', (17, 8, ))
+        >>> EjabberdBackendBase().parse_connection_string('c2s_compressed_tls')
         (0, True, True)
-        >>> EjabberdBackendBase().parse_connection_string('http_bind', (17, 8, ))
+        >>> EjabberdBackendBase().parse_connection_string('http_bind')
         (2, None, None)
 
         :param connection: The connection string as returned by the ejabberd APIs.
