@@ -352,6 +352,15 @@ def test_backend(backend, domain, config_path='', version=''):
     if config.get('PYTHONPATH'):
         sys.path.insert(0, config['PYTHONPATH'])
 
+    # Setup Django (Before import of class, otherwise import might fail)
+    if config.get('DJANGO_SETUP', False):
+        import django
+        django.setup()
+
+        if config.get('DJANGO_MIGRATE', False):
+            from django.core.management import call_command
+            call_command('migrate')
+
     # import the class
     mod_path, cls_name = backend.rsplit('.', 1)
     importlib.import_module('xmpp_backends')
@@ -363,14 +372,6 @@ def test_backend(backend, domain, config_path='', version=''):
     if cls.minimum_version and parsed_version < cls.minimum_version:
         print(yellow('Backend does not support version %s of XMPP server.' % version))
         return
-
-    if config.get('DJANGO_SETUP', False):
-        import django
-        django.setup()
-
-        if config.get('DJANGO_MIGRATE', False):
-            from django.core.management import call_command
-            call_command('migrate')
 
     # Start docker container if requested
     docker = config.get('DOCKER', False)
