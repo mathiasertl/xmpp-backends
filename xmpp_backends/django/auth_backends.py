@@ -36,7 +36,7 @@ class XmppBackendBackend(object):
     field.
     """
 
-    def authenticate(self, username, password):
+    def authenticate(self, request, username, password):
         try:
             user = User.objects.get(**{User.USERNAME_FIELD: username, })
 
