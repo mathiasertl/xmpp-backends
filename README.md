@@ -30,7 +30,7 @@ pip install xmpp-backends
 
 * Update requirements.
 * Also test ejabberd versions 18.03, 18.04 and 18.06.
-* Fully support Python 3.7 and Django 2.1.
+* Fully support Django 2.1.
 * Modify the test-suite so that DeprecationWarnings from Django are an error.
 * `all_user_sessions()` returns a valid status and status text for ejabberd >= 18.06 (the fields were added
   to the underlying API call).
