@@ -4,7 +4,8 @@
 import warnings
 from django.utils import deprecation  # NOQA
 warnings.filterwarnings('error', category=deprecation.RemovedInNextVersionWarning)  # NOQA
-warnings.filterwarnings('always', category=deprecation.RemovedInDjango30Warning)  # NOQA
+if hasattr(deprecation, 'RemovedInDjango30Warning'):
+    warnings.filterwarnings('always', category=deprecation.RemovedInDjango30Warning)  # NOQA
 
 DEBUG = True
 SECRET_KEY = 'dummy'
