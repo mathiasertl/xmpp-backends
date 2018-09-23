@@ -39,16 +39,16 @@ from xmpp_backends.base import UserNotFound
 
 
 def error(msg, status=1):
-    print(red(msg))
+    print(red(msg), flush=True)
     sys.exit(status)
 
 
 def warn(msg):
-    print(yellow(msg))
+    print(yellow(msg), flush=True)
 
 
 def ok(msg='OK.'):
-    print(green(msg))
+    print(green(msg), flush=True)
 
 
 @task
