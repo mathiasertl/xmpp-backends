@@ -256,6 +256,7 @@ class EjabberdRestBackend(EjabberdBackendBase):
         version = self.get_version(response)
         data = response.json()
         sessions = set()
+
         for d in data:
             started = pytz.utc.localize(datetime.utcnow() - timedelta(seconds=d['uptime']))
             username, domain = d['jid'].split('@', 1)
@@ -270,8 +271,8 @@ class EjabberdRestBackend(EjabberdBackendBase):
                 priority=d['priority'],
                 ip_address=self.parse_ip_address(d['ip'], version),
                 uptime=started,
-                status='',  # d['status'],
-                status_text='',  # d['statustext'],
+                status=d.get('status', ''),  # ejabberd <= 18.04 does not contain this key
+                status_text=d.get('statustext', ''),  # ejabberd <= 18.04 does not contain this key
                 connection_type=typ, encrypted=encrypted, compressed=compressed
             ))
         return sessions

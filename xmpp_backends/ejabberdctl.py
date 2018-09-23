@@ -270,7 +270,12 @@ class EjabberdctlBackend(EjabberdBackendBase):
         sessions = set()
 
         for line in out.splitlines():
-            jid, conn, ip, _p, prio, node, uptime = line.split('\t', 7)
+            if version < (18, 6):
+                jid, conn, ip, _p, prio, node, uptime = line.split('\t', 6)
+                status = ''
+                statustext = ''
+            else:
+                jid, conn, ip, _p, prio, node, uptime, status, resource, statustext = line.split('\t', 9)
 
             username, domain = jid.split('@', 1)
             domain, resource = domain.split('/', 1)
@@ -289,8 +294,8 @@ class EjabberdctlBackend(EjabberdBackendBase):
                 priority=prio,
                 ip_address=self.parse_ip_address(ip, version),
                 uptime=started,
-                status='',  # session['status'],
-                status_text='',  # session['statustext'],
+                status=status,
+                status_text=statustext,
                 connection_type=typ, encrypted=encrypted, compressed=compressed
             ))
 

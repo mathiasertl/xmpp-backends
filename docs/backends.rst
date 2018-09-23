@@ -80,6 +80,10 @@ of integers describing the version, e.g. ``(16, 9, )`` for ejabberd version 16.0
 Version-specific notes
 ======================
 
+* **ejabberd <= 18.04**: UserSessions returned by
+  :py:func:`~xmpp_backends.base.XmppBackendBase.all_user_sessions` will have an
+  empty status and statustext, as the underlying API call does not return that
+  data.
 * **ejabberd <= 17.03:** Ejabberd 17.03 and earlier return the timestamp for
   ``get_last_activity`` in the system timezone, not UTC. See `this github issue
   <https://github.com/processone/ejabberd/issues/1565>`_.

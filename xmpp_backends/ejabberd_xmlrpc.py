@@ -321,8 +321,8 @@ class EjabberdXMLRPCBackend(EjabberdBackendBase):
                 priority=session['priority'],
                 ip_address=self.parse_ip_address(session['ip'], version),
                 uptime=started,
-                status='',  # session['status'],
-                status_text='',  # session['statustext'],
+                status=session.get('status', ''),  # ejabberd <= 18.04 does not contain this key
+                status_text=session.get('statustext', ''),  # ejabberd <= 18.04 does not contain this key
                 connection_type=typ, encrypted=encrypted, compressed=compressed
             ))
         return sessions

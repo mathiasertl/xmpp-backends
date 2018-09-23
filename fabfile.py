@@ -88,16 +88,20 @@ def start_bot(jid, password, host, port):
     return xmpp, thread
 
 
-def test_session(session, username, domain):
+def test_session(backend, version, session, username, domain, status='available', status_text=''):
     assert session.username == username, 'Username: "%s" vs "%s"' % (session.username, username)
     assert session.domain == domain, 'Domain does not match'
+    if version >= (18, 6):
+        assert session.status == status, 'Status does not match: "%s" vs "%s"' % (session.status, status)
+        assert session.status_text == status_text, 'Status Text does not match: "%s" vs "%s"' % (
+            session.status_text, status_text)
     assert isinstance(session.ip_address, (ipaddress.IPv4Address, ipaddress.IPv6Address))
     assert isinstance(session.uptime, datetime)
     assert isinstance(session.priority, int)
     assert session.priority >= 0
 
 
-def test_user_sessions(backend, username, domain, resource, password):
+def test_user_sessions(backend, version, username, domain, resource, password):
     print('Start tests requiring a running session... ', end='')
     xmpp = None
     if hasattr(backend, 'start_user_session'):
@@ -116,7 +120,7 @@ def test_user_sessions(backend, username, domain, resource, password):
         if len(user_sessions) != 1:
             error('Found wrong number of user sessions: %s' % user_sessions)
         session = list(user_sessions)[0]
-        test_session(session, username, domain)
+        test_session(backend, version, session, username, domain)
 
     try:
         sessions = backend.all_user_sessions()
@@ -126,7 +130,7 @@ def test_user_sessions(backend, username, domain, resource, password):
         if len(sessions) != 1:
             error('Found wrong number of user sessions: %s' % sessions)
         session = list(sessions)[0]
-        test_session(session, username, domain)
+        test_session(backend, version, session, username, domain)
 
     # Stop session again and see that it's gone
     backend.stop_user_session(username, domain, resource)
@@ -278,7 +282,7 @@ def _test_backend(cls, config, version):
         ok()
 
     try:
-        test_user_sessions(backend, username1, domain, resource1, password2)
+        test_user_sessions(backend, version, username1, domain, resource1, password2)
     finally:
         backend.stop_user_session(username1, domain, resource1)
 
