@@ -39,16 +39,16 @@ from xmpp_backends.base import UserNotFound
 
 
 def error(msg, status=1):
-    print(red(msg), flush=True)
+    print(red(msg))
     sys.exit(status)
 
 
 def warn(msg):
-    print(yellow(msg), flush=True)
+    print(yellow(msg))
 
 
 def ok(msg='OK.'):
-    print(green(msg), flush=True)
+    print(green(msg))
 
 
 @task
@@ -411,5 +411,5 @@ def test_server(server, version):
     backends = {k: v for k, v in config.items() if v.get('SERVER') == server}
 
     for backend in backends:
-        print('Test %s' % green(backend), flush=True)
+        print('Test %s' % green(backend))
         test_backend(backend, 'example.com', version=version)
