@@ -26,7 +26,13 @@ pip install xmpp-backends
 
 ## ChangeLog
 
-### 0.6.0 (TBR)
+### 0.7.0 (TBR)
+
+* Update requirements.
+* Also test ejabberd versions 18.03, 18.04 and 18.06.
+* Fully support Python 3.7 and Django 2.1.
+
+### 0.6.0 (2018-04-24)
 
 * Update requirements.
 * New ``xmpp_backends.fake_xmpp`` Django app to allow easier development if you're developing a Django app.
