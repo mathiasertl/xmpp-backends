@@ -85,7 +85,7 @@ class EjabberdRestBackend(EjabberdBackendBase):
                  version=(17, 7, ), version_cache_timeout=3600, **kwargs):
         super(EjabberdRestBackend, self).__init__(version_cache_timeout=version_cache_timeout)
 
-        if version <= (16, 1):
+        if self.api_version <= (16, 1):
             raise NotImplementedError('EjabberdRestBackend does not support ejabberd <= 16.01.')
 
         if not uri.endswith('/'):
@@ -144,9 +144,8 @@ class EjabberdRestBackend(EjabberdBackendBase):
 
     def get_last_activity(self, username, domain):
         response = self.post('get_last', user=username, host=domain)
-        version = self.get_version(response)
 
-        if version < (17, 4):
+        if self.api_version < (17, 4):
             result = response.json()['last_activity'].lower().strip()
 
             if result == 'never':
@@ -190,19 +189,18 @@ class EjabberdRestBackend(EjabberdBackendBase):
 
     def user_sessions(self, username, domain):
         response = self.post('user_sessions_info', user=username, host=domain)
-        version = self.get_version(response)
         data = response.json()
         sessions = set()
         for d in data:
             started = pytz.utc.localize(datetime.utcnow() - timedelta(seconds=d['uptime']))
-            typ, encrypted, compressed = self.parse_connection_string(d['connection'], version)
+            typ, encrypted, compressed = self.parse_connection_string(d['connection'])
             sessions.add(UserSession(
                 backend=self,
                 username=username,
                 domain=domain,
                 resource=d['resource'],
                 priority=d['priority'],
-                ip_address=self.parse_ip_address(d['ip'], version),
+                ip_address=self.parse_ip_address(d['ip']),
                 uptime=started,
                 status=d['status'],
                 status_text=d['statustext'],
@@ -257,7 +255,6 @@ class EjabberdRestBackend(EjabberdBackendBase):
         # {'port': 49094, 'ip': '::1', 'connection': 'c2s', 'priority': 0, 'uptime': 3,
         #  'node': 'ejabberd@pallene', 'jid': 'example@example.com/3951214195792401555238'}
         response = self.post('connected_users_info')
-        version = self.get_version(response)
         data = response.json()
         sessions = set()
 
@@ -266,14 +263,14 @@ class EjabberdRestBackend(EjabberdBackendBase):
             username, domain = d['jid'].split('@', 1)
             domain, resource = domain.split('/', 1)
 
-            typ, encrypted, compressed = self.parse_connection_string(d['connection'], version)
+            typ, encrypted, compressed = self.parse_connection_string(d['connection'])
             sessions.add(UserSession(
                 backend=self,
                 username=username,
                 domain=domain,
                 resource=resource,
                 priority=d['priority'],
-                ip_address=self.parse_ip_address(d['ip'], version),
+                ip_address=self.parse_ip_address(d['ip']),
                 uptime=started,
                 status=d.get('status', ''),  # ejabberd <= 18.04 does not contain this key
                 status_text=d.get('statustext', ''),  # ejabberd <= 18.04 does not contain this key

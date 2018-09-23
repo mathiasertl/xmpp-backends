@@ -59,12 +59,10 @@ class EjabberdctlBackend(EjabberdBackendBase):
         if isinstance(path, six.string_types):
             self.ejabberdctl = [path]
 
-        self.version = version
-
-        if version == (14, 7):
-            log.warn('ejabberd 14.07 is really broken and many calls will not work!')
-        if version < (13, 6):
-            raise NotImplementedError('EjabberdRestBackend does not support ejabberd <= 16.01.')
+        if self.api_version < (13, 6):
+            raise NotImplementedError('EjabberdctlBackend does not support ejabberd < 13.06.')
+        elif self.api_version <= (14, 7):
+            log.warn('ejabberd <= 14.07 is really broken and many calls will not work!')
 
     def get_version(self):
         return self.version
@@ -94,7 +92,6 @@ class EjabberdctlBackend(EjabberdBackendBase):
 
     def user_sessions(self, username, domain):
         code, out, err = self.ctl('user_sessions_info', username, domain)
-        version = self.get_version()
         sessions = set()
         out = out.decode('utf-8')  # bytes -> str in py3, str -> unicode in py2
 
@@ -107,20 +104,20 @@ class EjabberdctlBackend(EjabberdBackendBase):
             else:
                 prio = int(prio)
 
-            typ, encrypted, compressed = self.parse_connection_string(conn, version)
+            typ, encrypted, compressed = self.parse_connection_string(conn)
             sessions.add(UserSession(
                 backend=self,
                 username=username,
                 domain=domain,
                 resource=resource,
                 priority=prio,
-                ip_address=self.parse_ip_address(ip, version),
+                ip_address=self.parse_ip_address(ip),
                 uptime=started,
                 status=status, status_text=status_text,
                 connection_type=typ, encrypted=encrypted, compressed=compressed
             ))
 
-        if len(sessions) == 0 and version == (14, 7):
+        if len(sessions) == 0 and self.api_version == (14, 7):
             raise NotSupportedError("ejabberd 14.07 always returns an empty list.")
 
         return sessions
@@ -146,7 +143,6 @@ class EjabberdctlBackend(EjabberdBackendBase):
 
     def get_last_activity(self, username, domain):
         code, out, err = self.ctl('get_last', username, domain)
-        version = self.get_version()
 
         if code != 0:
             raise BackendError(code)
@@ -154,7 +150,7 @@ class EjabberdctlBackend(EjabberdBackendBase):
         if six.PY3:
             out = out.decode('utf-8')
 
-        if version < (17, 4):
+        if self.api_version < (17, 4):
             out = out.strip()
             if out == 'Online':
                 return datetime.utcnow()
@@ -181,12 +177,11 @@ class EjabberdctlBackend(EjabberdBackendBase):
         timestamp = str(self.datetime_to_timestamp(timestamp))
         code, out, err = self.ctl('set_last', username, domain, timestamp, status)
 
-        version = self.get_version()
-        if code == 1 and version >= (16, 1):
+        if code == 1 and self.api_version >= (16, 1):
             # ejabberd returns status code 1 at least since 16.09
             return
         elif code != 0:
-            if code == 1 and version == (14, 7):
+            if code == 1 and self.api_version == (14, 7):
                 raise NotSupportedError("ejabberd 14.07 does not support setting last activity.")
 
             raise BackendError(code)
@@ -197,8 +192,7 @@ class EjabberdctlBackend(EjabberdBackendBase):
         # connections. And stopping existing connections doesn't work either.
         code, out, err = self.ctl('ban_account', username, domain, 'Blocked')
         if code != 0:
-            version = self.get_version()
-            if code == 1 and version == (14, 7):
+            if code == 1 and self.api_version == (14, 7):
                 raise NotSupportedError("ejabberd 14.07 does not support banning accounts.")
 
             raise BackendError(code)
@@ -214,8 +208,7 @@ class EjabberdctlBackend(EjabberdBackendBase):
             raise BackendError(code)
 
     def set_password(self, username, domain, password):
-        version = self.get_version()
-        if version <= (16, 1, ) and not self.user_exists(username, domain):
+        if self.api_version <= (16, 1, ) and not self.user_exists(username, domain):
             # 16.01 just creates the user upon change_password!
             # NOTE: This may also affect other versions < 16.09.
             raise UserNotFound(username, domain)
@@ -237,9 +230,8 @@ class EjabberdctlBackend(EjabberdBackendBase):
     def message_user(self, username, domain, subject, message):
         """Currently use send_message_chat and discard subject, because headline messages are not stored by
         mod_offline."""
-        version = self.get_version()
         jid = '%s@%s' % (username, domain)
-        if version <= (14, 7):
+        if self.api_version <= (14, 7):
             # TODO: it's unclear when send_message was introduced
             command = 'send_message_chat'
             args = domain, '%s@%s' % (username, domain), message
@@ -275,11 +267,10 @@ class EjabberdctlBackend(EjabberdBackendBase):
         if code != 0:
             raise BackendError(code)
         out = out.decode('utf-8')  # bytes -> str in py3, str -> unicode in py2
-        version = self.get_version()
         sessions = set()
 
         for line in out.splitlines():
-            if version < (18, 6):
+            if self.api_version < (18, 6):
                 jid, conn, ip, _p, prio, node, uptime = line.split('\t', 6)
                 status = ''
                 statustext = ''
@@ -294,14 +285,14 @@ class EjabberdctlBackend(EjabberdBackendBase):
                 prio = int(prio)
 
             started = pytz.utc.localize(datetime.utcnow() - timedelta(int(uptime)))
-            typ, encrypted, compressed = self.parse_connection_string(conn, version)
+            typ, encrypted, compressed = self.parse_connection_string(conn)
             sessions.add(UserSession(
                 backend=self,
                 username=username,
                 domain=domain,
                 resource=resource,
                 priority=prio,
-                ip_address=self.parse_ip_address(ip, version),
+                ip_address=self.parse_ip_address(ip),
                 uptime=started,
                 status=status,
                 status_text=statustext,

@@ -148,9 +148,8 @@ class EjabberdXMLRPCBackend(EjabberdBackendBase):
 
     def get_last_activity(self, username, domain):
         result = self.rpc('get_last', user=username, host=domain)
-        version = self.get_version()
 
-        if version < (17, 4):
+        if self.api_version < (17, 4):
             # ejabberd 17.04 introduced a change:
             #       https://github.com/processone/ejabberd/issues/1565
             activity = result['last_activity']
@@ -190,7 +189,6 @@ class EjabberdXMLRPCBackend(EjabberdBackendBase):
             raise BackendError(result.get('text', 'Unknown Error'))
 
     def user_sessions(self, username, domain):
-        version = self.get_version()
         result = self.rpc('user_sessions_info', user=username, host=domain)
         raw_sessions = result.get('sessions_info', [])
         sessions = set()
@@ -201,14 +199,14 @@ class EjabberdXMLRPCBackend(EjabberdBackendBase):
             session = dict([item for sublist in session for item in sublist])
 
             started = pytz.utc.localize(datetime.utcnow() - timedelta(seconds=session['uptime']))
-            typ, encrypted, compressed = self.parse_connection_string(session['connection'], version)
+            typ, encrypted, compressed = self.parse_connection_string(session['connection'])
             sessions.add(UserSession(
                 backend=self,
                 username=username,
                 domain=domain,
                 resource=session['resource'],
                 priority=session['priority'],
-                ip_address=self.parse_ip_address(session['ip'], version),
+                ip_address=self.parse_ip_address(session['ip']),
                 uptime=started,
                 status=session['status'],
                 status_text=session['statustext'],
@@ -231,8 +229,7 @@ class EjabberdXMLRPCBackend(EjabberdBackendBase):
             raise BackendError(result.get('text', 'Unknown Error'))
 
     def set_password(self, username, domain, password):
-        version = self.get_version()
-        if version <= (16, 1, ) and not self.user_exists(username, domain):
+        if self.api_version <= (16, 1, ) and not self.user_exists(username, domain):
             # 16.01 just creates the user upon change_password!
             # NOTE: This may also affect other versions < 16.09.
             raise UserNotFound(username, domain)
@@ -250,11 +247,10 @@ class EjabberdXMLRPCBackend(EjabberdBackendBase):
             raise BackendError(result.get('text', 'Unknown Error'))
 
     def block_user(self, username, domain):
-        version = self.get_version()
         try:
             result = self.rpc('ban_account', user=username, host=domain, reason='Blocked.')
         except BackendError:
-            if version == (14, 7):
+            if self.api_version == (14, 7):
                 raise NotSupportedError('ejabberd 14.07 does not support getting all sessions via xmlrpc.')
             raise
 
@@ -267,14 +263,13 @@ class EjabberdXMLRPCBackend(EjabberdBackendBase):
         """Currently use send_message_chat and discard subject, because headline messages are not
         stored by mod_offline."""
 
-        version = self.get_version()
         kwargs = {
             'body': message,
             'from': domain,
             'to': '%s@%s' % (username, domain),
         }
 
-        if version <= (14, 7):
+        if self.api_version <= (14, 7):
             # TODO: it's unclear when send_message was introduced
             command = 'send_message_chat'
         else:
@@ -296,15 +291,14 @@ class EjabberdXMLRPCBackend(EjabberdBackendBase):
         return set([e['username'] for e in users])
 
     def all_user_sessions(self):
-        version = self.get_version()
         try:
             result = self.rpc('connected_users_info')['connected_users_info']
         except BackendError:
-            if version == (14, 7):
+            if self.api_version == (14, 7):
                 raise NotSupportedError('ejabberd 14.07 does not support getting all sessions via xmlrpc.')
             raise
 
-        if version < (18, 6):
+        if self.api_version < (18, 6):
             # The key used here was silently changed in 18.06.
             sessions_key = 'sessions'
         else:
@@ -320,14 +314,14 @@ class EjabberdXMLRPCBackend(EjabberdBackendBase):
             username, domain = session['jid'].split('@', 1)
             domain, resource = domain.split('/', 1)
             started = pytz.utc.localize(datetime.utcnow() - timedelta(seconds=session['uptime']))
-            typ, encrypted, compressed = self.parse_connection_string(session['connection'], version)
+            typ, encrypted, compressed = self.parse_connection_string(session['connection'])
             sessions.add(UserSession(
                 backend=self,
                 username=username,
                 domain=domain,
                 resource=resource,
                 priority=session['priority'],
-                ip_address=self.parse_ip_address(session['ip'], version),
+                ip_address=self.parse_ip_address(session['ip']),
                 uptime=started,
                 status=session.get('status', ''),  # ejabberd <= 18.04 does not contain this key
                 status_text=session.get('statustext', ''),  # ejabberd <= 18.04 does not contain this key
