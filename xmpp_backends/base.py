@@ -159,6 +159,7 @@ class XmppBackendBase(object):
     """
     _module = None
 
+    minimum_version = None
     version_cache_timeout = None
     version_cache_timestamp = None
     version_cache_value = None
@@ -244,6 +245,11 @@ class XmppBackendBase(object):
             return self.version_cache_value  # we have a cached value
 
         self.version_cache_value = self.get_api_version()
+
+        if self.minimum_version and self.version_cache_value < self.minimum_version:
+            raise NotSupportedError('%s requires ejabberd >= %s' % (self.__class__.__name__,
+                                                                    self.minimum_version))
+
         self.version_cache_timestamp = now
         return self.version_cache_value
 
@@ -525,6 +531,8 @@ class EjabberdBackendBase(XmppBackendBase):
 
     This class overwrites a few methods common to all ejabberd backends.
     """
+
+    minimum_version = (14, 7)
 
     def parse_version_string(self, version):
         return tuple(int(t) for t in version.split('.'))

@@ -59,9 +59,7 @@ class EjabberdctlBackend(EjabberdBackendBase):
         if isinstance(path, six.string_types):
             self.ejabberdctl = [path]
 
-        if self.api_version < (13, 6):
-            raise NotImplementedError('EjabberdctlBackend does not support ejabberd < 13.06.')
-        elif self.api_version <= (14, 7):
+        if self.api_version <= (14, 7):
             log.warn('ejabberd <= 14.07 is really broken and many calls will not work!')
 
     def get_version(self):

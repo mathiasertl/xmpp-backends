@@ -82,8 +82,6 @@ class EjabberdXMLRPCBackend(EjabberdBackendBase):
                  **kwargs):
         super(EjabberdXMLRPCBackend, self).__init__(**kwargs)
 
-        if version < (13, 6):
-            raise NotImplementedError('EjabberdRestBackend does not support ejabberd <= 14.07.')
         kwargs = {
             'transport': transport,
             'encoding': encoding,
