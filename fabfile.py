@@ -178,6 +178,7 @@ def _test_backend(cls, config, version):
     print('Testing API version... ', end='')
     if version != backend.api_version:
         error('API version returned %s, but should have returned %s.' % (version, backend.api_version))
+    ok()
 
     print('Testing initial state... ', end='')
     users = backend.all_users(domain)
