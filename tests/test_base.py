@@ -22,6 +22,7 @@ from datetime import datetime
 import pytz
 import six
 from xmpp_backends.base import XmppBackendBase
+from xmpp_backends.base import EjabberdBackendBase
 from xmpp_backends.base import UserSession
 from xmpp_backends.constants import CONNECTION_HTTP_BINDING
 from xmpp_backends.constants import CONNECTION_XMPP
@@ -161,6 +162,15 @@ class TestUserSessions(unittest.TestCase):
         session_a.resource = 'new'
         sessions.add(session_b)
         self.assertEqual(len(sessions), 2)
+
+
+class EjabberdBackendBaseTests(unittest.TestCase):
+    def test_base(self):
+        backend = EjabberdBackendBase()
+        self.assertEqual(backend.parse_status_string('ejabberd 18.06 is running in that node'), (18, 6))
+        self.assertEqual(backend.parse_status_string('ejabberd 18.06-1 is running in that node'), (18, 6))
+        self.assertEqual(backend.parse_status_string('ejabberd 18.06-1~afa90 is running in that node'),
+                         (18, 6))
 
 
 def load_tests(loader, tests, ignore):

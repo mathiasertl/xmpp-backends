@@ -43,6 +43,9 @@ class FakeXMPPBackend(XmppBackendBase):
         self._domains = domains
         self.version = version
 
+    def get_api_version(self):
+        return (1, 0)
+
     def all_domains(self):
         return list(self._domains)
 

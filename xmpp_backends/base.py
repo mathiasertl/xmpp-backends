@@ -20,9 +20,11 @@ from __future__ import unicode_literals
 import ipaddress
 import logging
 import random
+import re
 import string
 import time
 from datetime import datetime
+from datetime import timedelta
 from importlib import import_module
 
 import pytz
@@ -150,8 +152,22 @@ class XmppBackendBase(object):
     Set this attribute to an import path and you will be able to access the module as ``self.module``. This
     way you don't have to do a module-level import, which would mean that everyone has to have that library
     installed, even if they're not using your backend.
+
+    :param version_cache_timeout: How long the API version for this backend will be cached.
+    :type  version_cache_timeout: int or timedelta
+
     """
     _module = None
+
+    version_cache_timeout = None
+    version_cache_timestamp = None
+    version_cache_value = None
+
+    def __init__(self, version_cache_timeout=3600):
+        if isinstance(version_cache_timeout, int):
+            version_cache_timeout = timedelta(seconds=version_cache_timeout)
+        self.version_cache_timeout = version_cache_timeout
+        super(XmppBackendBase, self).__init__()
 
     @property
     def module(self):
@@ -217,6 +233,35 @@ class XmppBackendBase(object):
         if chars is None:
             chars = string.ascii_letters + string.digits
         return ''.join(random.choice(chars) for x in range(length))
+
+    @property
+    def api_version(self):
+        """Cached version of :py:func:`~xmpp_backends.base.XmppBackendBase.get_api_version`."""
+
+        now = datetime.utcnow()
+
+        if self.version_cache_timestamp and self.version_cache_timestamp + self.version_cache_timeout > now:
+            return self.version_cache_value  # we have a cached value
+
+        self.version_cache_value = self.get_api_version()
+        self.version_cache_timestamp = now
+        return self.version_cache_value
+
+    def get_api_version(self):
+        """Get the API version used by this backend.
+
+        Note that this function is usually not invoked directly but through
+        :py:attr:`~xmpp_backends.base.XmppBackendBase.api_version`.
+
+        The value returned by this function is used by various backends to determine how to call various API
+        backends and/or how to parse th data returned by them. Backends generally assume that this function is
+        always working and return the correct value.
+
+        If your backend implementation cannot get this value, it should be passed via the constructor and
+        statically returned for the livetime of the instance.
+        """
+
+        raise NotImplementedError
 
     def user_exists(self, username, domain):
         """Verify that the given user exists.
@@ -480,6 +525,17 @@ class EjabberdBackendBase(XmppBackendBase):
 
     This class overwrites a few methods common to all ejabberd backends.
     """
+
+    def parse_version_string(self, version):
+        return tuple(int(t) for t in version.split('.'))
+
+    def parse_status_string(self, data):
+        match = re.search(r'([^ ]*) is running in that node', data)
+        if not match:
+            raise BackendError('Could not determine API version.')
+
+        return self.parse_version_string(match.groups()[0].split('-', 1)[0])
+
     def has_usable_password(self, username, domain):
         """Always return ``True``.
 

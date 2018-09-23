@@ -175,6 +175,10 @@ def _test_backend(cls, config, version):
 
     initial_users = set(config.get('EXPECTED_USERS', set()))
 
+    print('Testing API version... ', end='')
+    if version != backend.api_version:
+        error('API version returned %s, but should have returned %s.' % (version, backend.api_version))
+
     print('Testing initial state... ', end='')
     users = backend.all_users(domain)
     if users != initial_users:
@@ -409,5 +413,5 @@ def test_server(server, version):
     backends = {k: v for k, v in config.items() if v.get('SERVER') == server}
 
     for backend in backends:
-        print('Test %s' % green(backend))
+        print('Test %s' % green(backend), flush=True)
         test_backend(backend, 'example.com', version=version)

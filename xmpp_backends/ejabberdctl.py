@@ -52,7 +52,9 @@ class EjabberdctlBackend(EjabberdBackendBase):
         <ejabberd_version>` for a more detailed explanation.
     """
 
-    def __init__(self, path='/usr/sbin/ejabberdctl', version=(17, 7, )):
+    def __init__(self, path='/usr/sbin/ejabberdctl', version=(18, 6, ), **kwargs):
+        super(EjabberdctlBackend, self).__init__(**kwargs)
+
         self.ejabberdctl = path
         if isinstance(path, six.string_types):
             self.ejabberdctl = [path]
@@ -73,6 +75,13 @@ class EjabberdctlBackend(EjabberdBackendBase):
         p = Popen(cmd, stdout=PIPE, stderr=PIPE)
         stdout, stderr = p.communicate()
         return p.returncode, stdout, stderr
+
+    def get_api_version(self):
+        code, out, err = self.ctl('status')
+        if code == 0:
+            return self.parse_status_string(out.decode('utf-8'))
+        else:
+            raise BackendError(code)
 
     def user_exists(self, username, domain):
         code, out, err = self.ctl('check_account', username, domain)

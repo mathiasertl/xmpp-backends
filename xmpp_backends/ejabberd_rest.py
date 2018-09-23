@@ -82,8 +82,8 @@ class EjabberdRestBackend(EjabberdBackendBase):
     credentials = None
 
     def __init__(self, uri='http://127.0.0.1:5280/api/', user=None, password=None,
-                 version=(17, 7, ), **kwargs):
-        super(EjabberdRestBackend, self).__init__()
+                 version=(17, 7, ), version_cache_timeout=3600, **kwargs):
+        super(EjabberdRestBackend, self).__init__(version_cache_timeout=version_cache_timeout)
 
         if version <= (16, 1):
             raise NotImplementedError('EjabberdRestBackend does not support ejabberd <= 16.01.')
@@ -117,6 +117,10 @@ class EjabberdRestBackend(EjabberdBackendBase):
         if response.status_code not in allowed_status:
             raise BackendError('HTTP %s: %s' % (response.status_code, response.content))
         return response
+
+    def get_api_version(self):
+        result = self.post('status')
+        return self.parse_status_string(result.json())
 
     def create_user(self, username, domain, password, email=None):
         result = self.post('register', user=username, host=domain, password=password,

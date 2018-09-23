@@ -78,11 +78,12 @@ class EjabberdXMLRPCBackend(EjabberdBackendBase):
     credentials = None
 
     def __init__(self, uri='http://127.0.0.1:4560', transport=None, encoding=None, verbose=0, allow_none=0,
-                 use_datetime=0, context=None, user=None, server=None, password=None, version=(17, 7, )):
-        super(EjabberdXMLRPCBackend, self).__init__()
+                 use_datetime=0, context=None, user=None, server=None, password=None, version=(18, 6, ),
+                 **kwargs):
+        super(EjabberdXMLRPCBackend, self).__init__(**kwargs)
 
         if version < (13, 6):
-            raise NotImplementedError('EjabberdRestBackend does not support ejabberd <= 16.01.')
+            raise NotImplementedError('EjabberdRestBackend does not support ejabberd <= 14.07.')
         kwargs = {
             'transport': transport,
             'encoding': encoding,
@@ -120,6 +121,13 @@ class EjabberdXMLRPCBackend(EjabberdBackendBase):
         except (xmlrpclib.ProtocolError, BadStatusLine) as e:
             log.error(e)
             raise BackendError("Error reaching backend.")
+
+    def get_api_version(self):
+        result = self.rpc('status')
+        if result['res'] == 0:
+            return self.parse_status_string(result.get('text', ''))
+        else:
+            raise BackendError(result.get('text', 'Unknown Error'))
 
     def create_user(self, username, domain, password, email=None):
         result = self.rpc('register', user=username, host=domain, password=password)
