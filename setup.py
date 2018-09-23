@@ -26,7 +26,7 @@ class django_test(test):
 
 setup(
     name='xmpp-backends',
-    version='0.6.0',
+    version='0.7.0',
     description='A set of classes with common interfaces to communicate with XMPP servers.',
     author='Mathias Ertl',
     author_email='mati@jabber.at',

@@ -26,9 +26,10 @@ pip install xmpp-backends
 
 ## ChangeLog
 
-### 0.7.0 (TBR)
+### 0.7.0 (2018-09-23)
 
 * Update requirements.
+* Current xmpp-backends version is no available as a tuple in xmpp_backends.VERSION.
 * Also test ejabberd versions 18.03, 18.04 and 18.06.
 * Backend classes now get the API version directly from the backend via the `api_version` property.
 * The `version` parameter and `get_version` functions are now deprecated in favor of `api_version`.
