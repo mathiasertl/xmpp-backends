@@ -24,7 +24,6 @@ xmpp_backends.django.fake_xmpp.backend.FakeXMPPBackend:
 
 xmpp_backends.ejabberd_rest.EjabberdRestBackend:
   SERVER: ejabberd
-  SERVER_MIN_VERSION: "16.02"
   DOCKER:
     container: mathiasertl/ejabberd
     ports: [5222, 5223, 5269, 5280]
