@@ -1,6 +1,7 @@
 # Basic django settings
 
 # It's an error if the next version is already broken
+import warnings
 from django.utils import deprecation  # NOQA
 warnings.filterwarnings('error', category=deprecation.RemovedInNextVersionWarning)  # NOQA
 warnings.filterwarnings('always', category=deprecation.RemovedInDjango30Warning)  # NOQA
