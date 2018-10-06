@@ -399,7 +399,6 @@ def test_backend(backend, domain, config_path='', version=''):
     finally:
         if docker:
             local('docker kill %s' % docker_name)
-            local('docker rm %s' % docker_name)
 
 
 @task
