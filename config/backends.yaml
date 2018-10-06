@@ -53,6 +53,8 @@ xmpp_backends.ejabberd_xmlrpc.EjabberdXMLRPCBackend:
   VERSION_OVERRIDES:
     "14.07":
       KWARGS: {}
+    "15.07":
+      KWARGS: {}
 
 xmpp_backends.ejabberdctl.EjabberdctlBackend:
   SERVER: ejabberd
