@@ -17,8 +17,7 @@ env:
   - XMPP_SERVER=ejabberd XMPP_SERVER_VERSION=16.01  # Ubuntu 16.04
   - XMPP_SERVER=ejabberd XMPP_SERVER_VERSION=16.09  # Debian Stretch
   - XMPP_SERVER=ejabberd XMPP_SERVER_VERSION=17.04  # Debian Jessie - apt.jabber.at
-  - XMPP_SERVER=ejabberd XMPP_SERVER_VERSION=17.07  # Ubuntu 16.04 - apt.jabber.at
-  - XMPP_SERVER=ejabberd XMPP_SERVER_VERSION=17.08
+  - XMPP_SERVER=ejabberd XMPP_SERVER_VERSION=17.08  # Ubuntu 16.04 - apt.jabber.at
   - XMPP_SERVER=ejabberd XMPP_SERVER_VERSION=18.01  # Ubuntu 18.04
   - XMPP_SERVER=ejabberd XMPP_SERVER_VERSION=18.03
   - XMPP_SERVER=ejabberd XMPP_SERVER_VERSION=18.04
