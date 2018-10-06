@@ -90,6 +90,11 @@ Version-specific notes
 * **ejabberd <= 16.01:** :py:func:`~xmpp_backends.base.XmppBackendBase.set_password`
   does a second API call verifying that the user exists, as the underlying API
   call (``change_password``) creates the user if it doesn't exist.
+* **ejabberd == 15.07:** The
+  :py:func:`~xmpp_backends.base.XmppBackendBase.all_user_sessions` will raise
+  :py:class:`~xmpp_backends.base.NotSupportedError`, as this version always
+  returns an empty list. This call works in 14.07 and 16.01, it's unknown where
+  exactly this broke and when it was fixed. 
 * **ejabberd <= 14.07:** :py:func:`~xmpp_backends.base.XmppBackendBase.block_user` and
   :py:func:`~xmpp_backends.base.XmppBackendBase.all_user_sessions` will raise
   :py:class:`~xmpp_backends.base.NotSupportedError`, as the underlying API call is known to be broken.

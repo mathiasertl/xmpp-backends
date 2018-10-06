@@ -209,6 +209,10 @@ class EjabberdXMLRPCBackend(EjabberdBackendBase):
                 status_text=session['statustext'],
                 connection_type=typ, encrypted=encrypted, compressed=compressed
             ))
+
+        if len(sessions) == 0 and self.api_version <= (15, 7):
+            raise NotSupportedError("ejabberd <= 15.07 always returns an empty list.")
+
         return sessions
 
     def stop_user_session(self, username, domain, resource, reason=''):
@@ -324,6 +328,10 @@ class EjabberdXMLRPCBackend(EjabberdBackendBase):
                 status_text=session.get('statustext', ''),  # ejabberd <= 18.04 does not contain this key
                 connection_type=typ, encrypted=encrypted, compressed=compressed
             ))
+
+        if len(sessions) == 0 and self.api_version == (15, 7):
+            raise NotSupportedError("ejabberd <= 15.07 always returns an empty list.")
+
         return sessions
 
     def remove_user(self, username, domain):
