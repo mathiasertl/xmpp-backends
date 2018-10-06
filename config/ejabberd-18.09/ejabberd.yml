@@ -134,10 +134,8 @@ listen:
     port: 5061
     module: ejabberd_sip
     tls: true
-    certfile: 'CERTFILE'
   - ip: "::"
     port: 5222
-    certfile: 'CERTFILE'
     module: ejabberd_c2s
     max_stanza_size: 1048576
     shaper: c2s_shaper
@@ -146,7 +144,6 @@ listen:
     protocol_options: 'TLSOPTS'
     ciphers: 'CIPHERS'
     # see https://www.ejabberd.im/faq/tcp
-    resend_on_timeout: if_offline
     zlib: true
   - ip: "::"
     port: 5223
@@ -157,9 +154,7 @@ listen:
     tls: true
     protocol_options: 'TLSOPTS'
     ciphers: 'CIPHERS'
-    certfile: 'CERTFILE'
     # see https://www.ejabberd.im/faq/tcp
-    resend_on_timeout: if_offline
     zlib: true
   - ip: "::"
     port: 5269
@@ -170,11 +165,6 @@ listen:
     port: 5349
     module: ejabberd_stun
     tls: true
-    certfile: 'CERTFILE'
-    use_turn: true
-    turn_ip: "127.0.0.1"
-    turn_min_port: 49152
-    turn_max_port: 50000
   - 
     port: 5280
     ip: "::"
@@ -197,7 +187,8 @@ listen:
 ## password storage (see auth_password_format option).
 disable_sasl_mechanisms: "digest-md5"
 
-s2s_certfile: 'CERTFILE'
+certfiles: 
+  - 'CERTFILE'
 s2s_protocol_options: 'TLSOPTS'
 
 ##
@@ -640,8 +631,6 @@ modules:
   mod_configure: {} # requires mod_adhoc
   ## mod_delegation: {} # for xep0356
   mod_echo: {}
-  mod_http_bind:
-    max_inactivity: 60
   # mod_bosh: added in 16.12: https://blog.process-one.net/ejabberd-16-12/
   mod_bosh: {}
   ## mod_http_fileserver:
@@ -692,7 +681,8 @@ modules:
     search: false
   mod_version: {}
   # mod_stream_mgmt: added in 17.03: https://blog.process-one.net/ejabberd-17-03/
-  mod_stream_mgmt: {}
+  mod_stream_mgmt:
+    resend_on_timeout: if_offline
   # mod_s2s_dialback: added in 17.03: https://blog.process-one.net/ejabberd-17-03/
   mod_s2s_dialback: {}
   mod_http_api: {}
