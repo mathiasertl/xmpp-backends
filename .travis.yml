@@ -35,10 +35,14 @@ matrix:
     # 14.07 is very old, if someone uses that, most likely not with new python versions
     - env: XMPP_SERVER=ejabberd XMPP_SERVER_VERSION=14.07
       python: "3.5"
+    - env: XMPP_SERVER=ejabberd XMPP_SERVER_VERSION=14.07
       python: "3.6"
+    - env: XMPP_SERVER=ejabberd XMPP_SERVER_VERSION=14.07
       python: "nightly"
     # 15.07 is very old, if someone uses that, most likely not with new python versions
     - env: XMPP_SERVER=ejabberd XMPP_SERVER_VERSION=15.07
       python: "3.5"
+    - env: XMPP_SERVER=ejabberd XMPP_SERVER_VERSION=15.07
       python: "3.6"
+    - env: XMPP_SERVER=ejabberd XMPP_SERVER_VERSION=15.07
       python: "nightly"
