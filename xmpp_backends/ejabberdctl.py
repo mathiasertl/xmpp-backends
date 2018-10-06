@@ -115,8 +115,8 @@ class EjabberdctlBackend(EjabberdBackendBase):
                 connection_type=typ, encrypted=encrypted, compressed=compressed
             ))
 
-        if len(sessions) == 0 and self.api_version == (14, 7):
-            raise NotSupportedError("ejabberd 14.07 always returns an empty list.")
+        if len(sessions) == 0 and self.api_version <= (15, 7):
+            raise NotSupportedError("ejabberd <= 15.07 always returns an empty list.")
 
         return sessions
 
@@ -304,6 +304,10 @@ class EjabberdctlBackend(EjabberdBackendBase):
                 status_text=statustext,
                 connection_type=typ, encrypted=encrypted, compressed=compressed
             ))
+
+        if len(sessions) == 0 and self.api_version == (15, 7):
+            # NOTE: 14.07 and 16.01 work, unclear were/when this broke and when it was fixed
+            raise NotSupportedError("ejabberd = 15.07 always returns an empty list.")
 
         return sessions
 

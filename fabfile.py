@@ -62,6 +62,9 @@ def check():
 
 @task
 def start_bot(jid, password, host, port):
+    #import logging
+    #logging.basicConfig(level=logging.DEBUG, format='%(levelname)-8s %(message)s')
+
     class EchoBot(ClientXMPP):
         def __init__(self, jid, password, *args, **kwargs):
             ClientXMPP.__init__(self, jid=jid, password=password, *args, **kwargs)
@@ -119,17 +122,18 @@ def test_user_sessions(backend, version, username, domain, resource, password):
         pass  # we already notified about this earlier.
     else:
         if len(user_sessions) != 1:
-            error('Found wrong number of user sessions: %s' % user_sessions)
+            error('Found wrong number of user sessions (1): %s' % user_sessions)
         session = list(user_sessions)[0]
         test_session(backend, version, session, username, domain)
 
     try:
         sessions = backend.all_user_sessions()
+        print(sessions)
     except NotSupportedError:
         pass  # we already notified about this earlier.
     else:
         if len(sessions) != 1:
-            error('Found wrong number of user sessions: %s' % sessions)
+            error('Found wrong number of user sessions (2): %s' % sessions)
         session = list(sessions)[0]
         test_session(backend, version, session, username, domain)
 
@@ -153,7 +157,7 @@ def test_user_sessions(backend, version, username, domain, resource, password):
         pass  # we already notified about this earlier.
     else:
         if user_sessions != set():
-            error('Found wrong number of user sessions: %s' % user_sessions)
+            error('Found wrong number of user sessions (3): %s' % user_sessions)
     ok()
 
 
@@ -212,9 +216,13 @@ def _test_backend(cls, config, version):
     all_domains = backend.all_domains()
     if list(sorted(all_domains)) != ['example.com', 'example.net', 'example.org']:
         error('Backend serves wrong domains: %s' % ', '.join(all_domains))
-    sessions = backend.all_user_sessions()
-    if sessions != set():
-        error('Backend has initial sessions: %s' % sessions)
+    try:
+        sessions = backend.all_user_sessions()
+    except NotSupportedError:  # 15.07 is broken
+        pass  # We have a separate line for that later
+    else:
+        if sessions != set():
+            error('Backend has initial sessions: %s' % sessions)
     ok()
 
     print('Create and test example user... ', end='')
