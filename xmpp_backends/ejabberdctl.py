@@ -173,13 +173,21 @@ class EjabberdctlBackend(EjabberdBackendBase):
 
     def set_last_activity(self, username, domain, status='', timestamp=None):
         timestamp = str(self.datetime_to_timestamp(timestamp))
+
+        version = self.api_version
+        if status == '' and version >= (15, 7) and version < (16, 1):
+            # ejabberd 15.07 does not allow an empty string as status
+            # ejabberd 16.01 accepts an empty string as parameter
+            # NOTE: unclear if 15.09, 15.10, 15.11 require this.
+            status = 'set by xmpp-backend'
+
         code, out, err = self.ctl('set_last', username, domain, timestamp, status)
 
-        if code == 1 and self.api_version >= (16, 1):
-            # ejabberd returns status code 1 at least since 16.09
+        if code == 1 and version >= (15, 7):
+            # ejabberd returns status code 1 at least since 15.07
             return
         elif code != 0:
-            if code == 1 and self.api_version == (14, 7):
+            if code == 1 and version == (14, 7):
                 raise NotSupportedError("ejabberd 14.07 does not support setting last activity.")
 
             raise BackendError(code)
