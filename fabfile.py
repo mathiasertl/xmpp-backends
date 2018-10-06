@@ -20,6 +20,7 @@ from __future__ import unicode_literals
 import importlib
 import ipaddress
 import os
+import subprocess
 import sys
 import threading
 import time
@@ -398,7 +399,7 @@ def test_backend(backend, domain, config_path='', version=''):
         _test_backend(cls, config, parsed_version)
     finally:
         if docker:
-            local('docker kill %s' % docker_name)
+            subprocess.call(['docker', 'kill', docker_name])
 
 
 @task
