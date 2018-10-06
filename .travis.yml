@@ -36,6 +36,8 @@ matrix:
     - env: XMPP_SERVER=ejabberd XMPP_SERVER_VERSION=14.07
       python: "3.5"
       python: "3.6"
+      python: "nightly"
     - env: XMPP_SERVER=ejabberd XMPP_SERVER_VERSION=15.07
       python: "3.5"
       python: "3.6"
+      python: "nightly"
