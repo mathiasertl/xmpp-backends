@@ -128,7 +128,6 @@ def test_user_sessions(backend, version, username, domain, resource, password):
 
     try:
         sessions = backend.all_user_sessions()
-        print(sessions)
     except NotSupportedError:
         pass  # we already notified about this earlier.
     else:
