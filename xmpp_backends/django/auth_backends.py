@@ -17,13 +17,14 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 from django.contrib.auth import get_user_model
+from django.contrib.auth.backend import RemoteUserBackend
 
 from . import xmpp_backend
 
 User = get_user_model()
 
 
-class XmppBackendBackend(object):
+class XmppBackendBackend(RemoteUserBackend):
     """Authentication backend to authenticate against your XMPP server.
 
     To use this backend, simply configure the ``AUTHENTICATION_BACKENDS`` setting::
