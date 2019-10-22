@@ -1,6 +1,6 @@
 Django==1.11.11; python_version < '3.4'
 Django==2.0.8; python_version >= '3.4' and python_version < '3.5'
-Django==2.1.2; python_version >= '3.5'
+Django==2.1.11; python_version >= '3.5'
 Fabric3==1.14.post1
 PyYAML==3.13
 Sphinx==1.8.1
