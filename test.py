@@ -16,7 +16,6 @@
 import argparse
 import subprocess
 
-
 parser = argparse.ArgumentParser(description="Run the test-suite.")
 subparsers = parser.add_subparsers(help='commands', dest='command')
 subparsers.add_parser('test', help='Run the test suite.')

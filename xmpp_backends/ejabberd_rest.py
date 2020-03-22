@@ -76,7 +76,7 @@ class EjabberdRestBackend(EjabberdBackendBase):
     :param      user: User used in authenticating with the API.
     :param  password: Password used in authenticating with the API.
     :param   version: Deprecated, no longer use this parameter.
-    :param \**kwargs: All keyword parameters are directly passed to the ``requests`` module. Please
+    :param  **kwargs: All keyword parameters are directly passed to the ``requests`` module. Please
         see the documentation there for possible parameters (e.g. SSL validation, etc.).
     """
     credentials = None

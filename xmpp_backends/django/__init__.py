@@ -13,8 +13,6 @@
 # You should have received a copy of the GNU General Public License along with xmpp-backends.  If
 # not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import unicode_literals, absolute_import
-
 from importlib import import_module
 from threading import local
 
