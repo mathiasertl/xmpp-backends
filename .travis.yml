@@ -3,6 +3,8 @@ services:
   - docker
 language: python
 python:
+  # NOTE: not testing in 3.5 b/c requirements-dev has django 3.0
+  #- "3.5"
   - "3.6"
   - "3.7" 
   - "3.8" 
