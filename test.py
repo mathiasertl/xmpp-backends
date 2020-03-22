@@ -429,7 +429,7 @@ elif args.command == 'test-server':
         test_backend(backend, 'example.com', version=args.version)
 elif args.command == 'test':
     rootdir = os.path.dirname(os.path.realpath(__file__))
-    report_dir = os.path.join(rootdir, 'build', 'coverage')
+    report_dir = os.path.join(rootdir, 'docs', '_build', 'coverage')
     cov = coverage.Coverage(
         cover_pylib=False, branch=True, source=['xmpp_backends'],
         omit=['*migrations/*']
