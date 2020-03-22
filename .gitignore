@@ -2,6 +2,7 @@
 *.sw[po]
 /*egg-info/
 /.coverage
+/.tox/
 /MANIFEST
 /build/
 /dist/
