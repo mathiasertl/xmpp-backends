@@ -5,10 +5,10 @@
 # option) any later version.
 #
 # xmpp-backends is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
-# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
 # for more details.
 #
-# You should have received a copy of the GNU General Public License along with xmpp-backends.  If not, see
+# You should have received a copy of the GNU General Public License along with xmpp-backends. If not, see
 # <http://www.gnu.org/licenses/>.
 
 from django.contrib.auth.models import AbstractBaseUser
