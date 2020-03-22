@@ -22,6 +22,7 @@ import subprocess
 import sys
 import threading
 import time
+import warnings
 from datetime import datetime
 
 import pytz
@@ -412,6 +413,11 @@ if args.command == 'code-quality':
     flake8 = ['flake8'] + files
     print(' '.join(flake8))
     subprocess.run(flake8, check=True)
+
+    warnings.simplefilter("error")
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'tests.django_settings')
+    django.setup()
+    call_command('check')
 elif args.command == 'test-server':
     with open(os.path.join('config', 'backends.yaml')) as stream:
         config = yaml.load(stream.read(), Loader=yaml.SafeLoader)
@@ -422,6 +428,7 @@ elif args.command == 'test-server':
         print('Test %s' % backend)
         test_backend(backend, 'example.com', version=args.version)
 elif args.command == 'test':
+    warnings.simplefilter("error")
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'tests.django_settings')
     django.setup()
     call_command('test', 'tests')
