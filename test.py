@@ -432,7 +432,11 @@ elif args.command == 'test':
     report_dir = os.path.join(rootdir, 'docs', '_build', 'coverage')
     cov = coverage.Coverage(
         cover_pylib=False, branch=True, source=['xmpp_backends'],
-        omit=['*migrations/*']
+        omit=['*migrations/*',
+              'xmpp_backends/ejabberdctl.py',
+              'xmpp_backends/ejabberd_xmlrpc.py',
+              'xmpp_backends/ejabberd_rest.py',
+        ]
     )
     cov.start()
 
