@@ -26,6 +26,16 @@ pip install xmpp-backends
 
 ## ChangeLog
 
+### 0.8.0 (TBR)
+
+* Add support for Python 3.7 and 3.8.
+* Add support for Django 2.2 and 3.0.
+* Add support for ejabberd 18.09.
+* Drop support for Python 2.7 and 3.4.
+* Drop support for Django 1.11, 2.0 and 2.1.
+* Drop support for ejabberd 14.07.
+* Run test suite with warnings turned into errors to make sure that deprecated Django code is found.
+
 ### 0.7.0 (2018-09-23)
 
 * Update requirements.
