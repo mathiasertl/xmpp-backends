@@ -17,9 +17,10 @@ from datetime import datetime
 
 import pytz
 import six
-from xmpp_backends.base import XmppBackendBase
+
 from xmpp_backends.base import EjabberdBackendBase
 from xmpp_backends.base import UserSession
+from xmpp_backends.base import XmppBackendBase
 from xmpp_backends.constants import CONNECTION_HTTP_BINDING
 from xmpp_backends.constants import CONNECTION_XMPP
 

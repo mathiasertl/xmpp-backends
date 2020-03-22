@@ -13,11 +13,8 @@
 
 from django.test import TestCase
 
-from xmpp_backends.django.models import XmppBackendUser
 from xmpp_backends.django.auth_backends import XmppBackendBackend
-
-from xmpp_backends.base import UserNotFound
-from xmpp_backends.dummy import DummyBackend
+from xmpp_backends.django.models import XmppBackendUser
 
 
 class XmppBackendUserTestCase(TestCase):

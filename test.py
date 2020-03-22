@@ -25,12 +25,11 @@ import time
 import warnings
 from datetime import datetime
 
+import django
 import pytz
 import yaml
-from sleekxmpp import ClientXMPP
-
-import django
 from django.core.management import call_command
+from sleekxmpp import ClientXMPP
 
 from xmpp_backends.base import NotSupportedError
 from xmpp_backends.base import UserNotFound
@@ -405,7 +404,7 @@ def test_backend(backend, domain, config_path='', version=''):
 
 
 if args.command == 'code-quality':
-    files = ['xmpp_backends', 'setup.py', 'test.py']
+    files = ['xmpp_backends', 'setup.py', 'test.py', 'tests']
     isort = ['isort', '--check-only', '--diff', '-rc'] + files
     print(' '.join(isort))
     subprocess.run(isort, check=True)
