@@ -28,6 +28,9 @@ import pytz
 import yaml
 from sleekxmpp import ClientXMPP
 
+import django
+from django.core.management import call_command
+
 from xmpp_backends.base import NotSupportedError
 from xmpp_backends.base import UserNotFound
 
@@ -354,7 +357,6 @@ def test_backend(backend, domain, config_path='', version=''):
         django.setup()
 
         if config.get('DJANGO_MIGRATE', False):
-            from django.core.management import call_command
             call_command('migrate')
 
     # import the class
@@ -412,10 +414,16 @@ if args.command == 'code-quality':
     subprocess.run(flake8, check=True)
 elif args.command == 'test-server':
     with open(os.path.join('config', 'backends.yaml')) as stream:
-        config = yaml.load(stream.read())
+        config = yaml.load(stream.read(), Loader=yaml.SafeLoader)
 
     backends = {k: v for k, v in config.items() if v.get('SERVER') == args.server}
 
     for backend in backends:
         print('Test %s' % backend)
         test_backend(backend, 'example.com', version=args.version)
+elif args.command == 'test':
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'tests.django_settings')
+    django.setup()
+    call_command('test', 'tests')
+else:
+    parser.print_usage()
