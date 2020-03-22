@@ -12,7 +12,7 @@
 # <http://www.gnu.org/licenses/>.
 
 from django.contrib.auth import get_user_model
-from django.contrib.auth.backend import RemoteUserBackend
+from django.contrib.auth.backends import RemoteUserBackend
 
 from . import xmpp_backend
 
