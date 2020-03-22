@@ -17,6 +17,13 @@ DATABASES = {
     }
 }
 
+XMPP_BACKENDS = {
+    'default': {
+        'BACKEND': 'xmpp_backends.dummy.DummyBackend',
+        'domains': ['example.com'],
+    },
+}
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -26,6 +33,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'xmpp_backends.django.fake_xmpp',
+    'tests.test_app',
 ]
 
 MIDDLEWARE = [

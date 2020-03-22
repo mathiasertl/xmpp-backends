@@ -11,6 +11,7 @@
 # You should have received a copy of the GNU General Public License along with xmpp-backends. If not, see
 # <http://www.gnu.org/licenses/>.
 
+from django.core.cache import cache
 from django.test import TestCase
 
 from xmpp_backends.base import UserNotFound
@@ -19,7 +20,13 @@ from xmpp_backends.dummy import DummyBackend
 
 class TestDummySessions(TestCase):
     def setUp(self):
+        cache.clear()
         self.backend = DummyBackend(domains=['example.com'])
+        super().setUp()
+
+    def tearDown(self):
+        cache.clear()
+        super().tearDown()
 
     def test_wrong_user(self):
         self.assertEqual(self.backend.all_user_sessions(), set())
@@ -46,6 +53,3 @@ class TestDummySessions(TestCase):
         self.backend.stop_user_session(node, domain, rsrc)
         self.assertEqual(self.backend.all_user_sessions(), set())
         self.assertEqual(self.backend.user_sessions(node, domain), set())
-
-    def tearDown(self):
-        self.backend.module.clear()
