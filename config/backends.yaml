@@ -15,7 +15,7 @@ xmpp_backends.django.fake_xmpp.backend.FakeXMPPBackend:
     DJANGO_MIGRATE: true
     PYTHONPATH: django_dev_project
     ENVIRONMENT:
-        DJANGO_SETTINGS_MODULE: django_dev_project.fab_settings
+        DJANGO_SETTINGS_MODULE: tests.django_settings
     KWARGS:
         domains:
             - example.com
