@@ -16,10 +16,10 @@ import socket
 import warnings
 from datetime import datetime
 from datetime import timedelta
+from http.client import BadStatusLine
+from xmlrpc import client as xmlrpclib
 
 import pytz
-import six
-from six.moves.http_client import BadStatusLine
 
 from .base import BackendConnectionError
 from .base import BackendError
@@ -28,12 +28,6 @@ from .base import NotSupportedError
 from .base import UserExists
 from .base import UserNotFound
 from .base import UserSession
-
-if six.PY2:  # we have a special version for Python2
-    from . import xmlrpclib
-else:  # use the default for Python3 (god save us all!)
-    from xmlrpc import client as xmlrpclib
-
 
 log = logging.getLogger(__name__)
 
@@ -87,9 +81,6 @@ class EjabberdXMLRPCBackend(EjabberdBackendBase):
             'allow_none': allow_none,
             'use_datetime': use_datetime,
         }
-        if six.PY2 and version <= (14, 7, ):
-            kwargs['utf8_encoding'] = 'php'
-            kwargs['context'] = context
 
         self.client = xmlrpclib.ServerProxy(uri, **kwargs)
         if user is not None:

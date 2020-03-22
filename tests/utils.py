@@ -12,9 +12,6 @@
 # <http://www.gnu.org/licenses/>.
 
 import doctest
-import re
-
-import six
 
 FORCE_TEXT_FLAG = doctest.register_optionflag('FORCE_TEXT')
 
@@ -23,8 +20,4 @@ class CompatDoctestChecker(doctest.OutputChecker):
     """OutputChecker for py2/py3 compatible unicode strings."""
 
     def check_output(self, want, got, optionflags):
-        if six.PY2 is True and optionflags & FORCE_TEXT_FLAG:
-            got = re.sub("u'(.*?)'", "'\\1'", got)
-            got = re.sub('u"(.*?)"', '"\\1"', got)
-
         return doctest.OutputChecker.check_output(self, want, got, optionflags)

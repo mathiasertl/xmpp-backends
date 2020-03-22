@@ -24,7 +24,6 @@ from datetime import timedelta
 from importlib import import_module
 
 import pytz
-import six
 
 from .constants import CONNECTION_HTTP_BINDING
 from .constants import CONNECTION_UNKNOWN
@@ -76,7 +75,6 @@ class UserNotFound(BackendError):
         return s
 
 
-@six.python_2_unicode_compatible
 class UserSession(object):
     """An object describing a user session.
 
@@ -98,16 +96,6 @@ class UserSession(object):
     """
     def __init__(self, backend, username, domain, resource, priority, ip_address, uptime, status, status_text,
                  connection_type, encrypted, compressed):
-        # make sure that data is in unicode
-        if six.PY2 is True:
-            if isinstance(username, six.binary_type):
-                username = username.decode('utf-8')
-            if isinstance(domain, six.binary_type):
-                domain = domain.decode('utf-8')
-            if isinstance(resource, six.binary_type):
-                resource = resource.decode('utf-8')
-            if isinstance(status_text, six.binary_type):
-                status_text = status_text.decode('utf-8')
 
         self._backend = backend
         self.username = username
@@ -133,10 +121,7 @@ class UserSession(object):
         return '%s@%s/%s' % (self.username, self.domain, self.resource)
 
     def __repr__(self):
-        val = '<UserSession: %s@%s/%s>' % (self.username, self.domain, self.resource)
-        if six.PY2 is True:
-            return val.encode('utf-8')
-        return val
+        return '<UserSession: %s@%s/%s>' % (self.username, self.domain, self.resource)
 
 
 class XmppBackendBase(object):
@@ -210,14 +195,9 @@ class XmppBackendBase(object):
         if dt is None:
             return int(time.time())
 
-        if six.PY3:
-            if not dt.tzinfo:
-                dt = pytz.utc.localize(dt)
-            return int(dt.timestamp())
-        else:
-            if dt.tzinfo:
-                dt = dt.replace(tzinfo=None) - dt.utcoffset()
-            return int((dt - datetime(1970, 1, 1)).total_seconds())
+        if not dt.tzinfo:
+            dt = pytz.utc.localize(dt)
+        return int(dt.timestamp())
 
     def get_random_password(self, length=32, chars=None):
         """Helper function that gets a random password.
@@ -604,8 +584,5 @@ class EjabberdBackendBase(XmppBackendBase):
         """
         if ip_address.startswith('::FFFF:'):
             ip_address = ip_address[7:]
-        if six.PY2 and isinstance(ip_address, str):
-            # ipaddress constructor does not eat str in py2 :-/
-            ip_address = ip_address.decode('utf-8')
 
         return ipaddress.ip_address(ip_address)

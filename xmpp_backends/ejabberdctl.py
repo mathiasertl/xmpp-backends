@@ -19,7 +19,6 @@ from subprocess import PIPE
 from subprocess import Popen
 
 import pytz
-import six
 
 from .base import BackendError
 from .base import EjabberdBackendBase
@@ -55,7 +54,7 @@ class EjabberdctlBackend(EjabberdBackendBase):
             warnings.warn("The version parameter is deprecated.", DeprecationWarning)
 
         self.ejabberdctl = path
-        if isinstance(path, six.string_types):
+        if isinstance(path, str):
             self.ejabberdctl = [path]
 
         if self.api_version <= (14, 7):
@@ -141,8 +140,7 @@ class EjabberdctlBackend(EjabberdBackendBase):
         if code != 0:
             raise BackendError(code)
 
-        if six.PY3:
-            out = out.decode('utf-8')
+        out = out.decode('utf-8')
 
         if self.api_version < (17, 4):
             out = out.strip()
@@ -216,8 +214,7 @@ class EjabberdctlBackend(EjabberdBackendBase):
             raise UserNotFound(username, domain)
 
         code, out, err = self.ctl('change_password', username, domain, password)
-        if six.PY3:
-            out = out.decode('utf-8')
+        out = out.decode('utf-8')
 
         if code == 1 and out == '{not_found,"unknown_user"}\n':
             raise UserNotFound(username, domain)
@@ -249,8 +246,7 @@ class EjabberdctlBackend(EjabberdBackendBase):
         code, out, err = self.ctl('registered_vhosts')
         if code != 0:
             raise BackendError(code)
-        if six.PY3:
-            out = out.decode('utf-8')
+        out = out.decode('utf-8')
 
         return set(out.splitlines())
 
@@ -258,9 +254,7 @@ class EjabberdctlBackend(EjabberdBackendBase):
         code, out, err = self.ctl('registered_users', domain)
         if code != 0:
             raise BackendError(code)
-
-        if six.PY3:
-            out = out.decode('utf-8')
+        out = out.decode('utf-8')
 
         return set(out.splitlines())
 
