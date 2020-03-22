@@ -16,3 +16,4 @@
 /docs/_build/
 /py2/
 /py3/
+/.coverage

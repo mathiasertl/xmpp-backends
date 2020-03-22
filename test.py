@@ -25,6 +25,7 @@ import time
 import warnings
 from datetime import datetime
 
+import coverage
 import django
 import pytz
 import yaml
@@ -427,9 +428,22 @@ elif args.command == 'test-server':
         print('Test %s' % backend)
         test_backend(backend, 'example.com', version=args.version)
 elif args.command == 'test':
+    rootdir = os.path.dirname(os.path.realpath(__file__))
+    report_dir = os.path.join(rootdir, 'build', 'coverage')
+    cov = coverage.Coverage(
+        cover_pylib=False, branch=True, source=['xmpp_backends'],
+        omit=['*migrations/*']
+    )
+    cov.start()
+
     warnings.simplefilter("error")
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'tests.django_settings')
     django.setup()
     call_command('test', 'tests')
+
+    cov.stop()
+    cov.save()
+    total_coverage = cov.html_report(directory=report_dir)
+    print('Test coverage: %.2f%%' % total_coverage)
 else:
     parser.print_usage()
