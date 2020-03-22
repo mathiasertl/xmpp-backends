@@ -21,8 +21,7 @@ from xmpp_backends.dummy import DummyBackend
 
 
 class XmppBackendUserTestCase(TestCase):
-    def test_smth(self):
-        print('yeah')
+    pass
 
 
 class XmppBackendBackendTestCase(TestCase):
