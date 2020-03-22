@@ -53,14 +53,6 @@ def ok(msg='OK.'):
 
 
 @task
-def check():
-    """Run code-quality checks."""
-
-    local('isort --check-only --diff -rc xmpp_backends setup.py fabfile.py')
-    local('flake8 xmpp_backends/ setup.py fabfile.py')
-
-
-@task
 def start_bot(jid, password, host, port):
     #import logging
     #logging.basicConfig(level=logging.DEBUG, format='%(levelname)-8s %(message)s')
