@@ -32,5 +32,23 @@ install:
   - pip install -r requirements.txt -r requirements-dev.txt
 script:
   - ./test.py code-quality
-  - python setup.py test
+  - ./test.py test
   - ./test.py test-server $XMPP_SERVER $XMPP_SERVER_VERSION
+matrix:
+    exclude:
+        - env: XMPP_SERVER=fake XMPP_SERVER_VERSION=1.0 DJANGO=3.0.4
+          python: "3.5"
+        - env: XMPP_SERVER=ejabberd XMPP_SERVER_VERSION=16.09 DJANGO=3.0.4
+          python: "3.5"
+        - env: XMPP_SERVER=ejabberd XMPP_SERVER_VERSION=17.08 DJANGO=3.0.4
+          python: "3.5"
+        - env: XMPP_SERVER=ejabberd XMPP_SERVER_VERSION=18.01 DJANGO=3.0.4
+          python: "3.5"
+        - env: XMPP_SERVER=ejabberd XMPP_SERVER_VERSION=18.03 DJANGO=3.0.4
+          python: "3.5"
+        - env: XMPP_SERVER=ejabberd XMPP_SERVER_VERSION=18.04 DJANGO=3.0.4
+          python: "3.5"
+        - env: XMPP_SERVER=ejabberd XMPP_SERVER_VERSION=18.06 DJANGO=3.0.4
+          python: "3.5"
+        - env: XMPP_SERVER=ejabberd XMPP_SERVER_VERSION=18.09 DJANGO=3.0.4
+          python: "3.5"
