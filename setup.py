@@ -1,27 +1,6 @@
 #!/usr/bin/env python
 
-import os
-import sys
-
 from setuptools import setup
-from setuptools.command.test import test
-
-PY2 = sys.version_info[0] == 2
-install_requires = [
-    'six>=1.10.0',
-]
-
-if PY2:
-    install_requires.append('ipaddress>=1.0.18')
-
-
-class django_test(test):
-    def run(self):
-        os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'tests.django_settings')
-        sys.path.insert(0, '.')
-        import django
-        django.setup()
-        test.run(self)  # super() fails, LOL
 
 
 setup(
@@ -37,11 +16,7 @@ setup(
         'xmpp_backends.django.fake_xmpp',
         'xmpp_backends.django.fake_xmpp.migrations',
     ],
-    cmdclass={
-        'test': django_test,
-    },
     license="GNU General Public License (GPL) v3",
-    install_requires=install_requires,
     test_suite='tests',
     classifiers=[
         "Development Status :: 5 - Production/Stable",
@@ -51,13 +26,11 @@ setup(
         "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
         "Operating System :: OS Independent",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 2",
-        "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.4",
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
-        #"Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
         "Topic :: Internet :: WWW/HTTP",
         "Topic :: Communications :: File Sharing",
     ],
