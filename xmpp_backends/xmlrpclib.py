@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # XML-RPC CLIENT LIBRARY
 # $Id$
 #

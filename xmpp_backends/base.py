@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # This file is part of xmpp-backends (https://github.com/mathiasertl/xmpp-backends).
 #
 # xmpp-backends is free software: you can redistribute it and/or modify it under the terms of the GNU General
@@ -14,8 +12,6 @@
 # <http://www.gnu.org/licenses/>.
 
 """Common code for XMPP backends."""
-
-from __future__ import unicode_literals
 
 import ipaddress
 import logging

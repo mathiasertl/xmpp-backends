@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # xmpp-backends documentation build configuration file, created by
 # sphinx-quickstart on Wed Nov 18 23:30:35 2015.
 #
