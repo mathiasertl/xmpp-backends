@@ -32,9 +32,6 @@ import yaml
 from django.core.management import call_command
 from sleekxmpp import ClientXMPP
 
-from xmpp_backends.base import NotSupportedError
-from xmpp_backends.base import UserNotFound
-
 parser = argparse.ArgumentParser(description="Run the test-suite.")
 subparsers = parser.add_subparsers(help='commands', dest='command')
 subparsers.add_parser('test', help='Run the test suite.')
@@ -99,6 +96,8 @@ def test_session(backend, version, session, username, domain, status='available'
 
 
 def test_user_sessions(backend, version, username, domain, resource, password):
+    from xmpp_backends.base import NotSupportedError
+
     print('Start tests requiring a running session... ', end='')
     xmpp = None
     if hasattr(backend, 'start_user_session'):
@@ -154,6 +153,9 @@ def test_user_sessions(backend, version, username, domain, resource, password):
 
 
 def _test_backend(cls, config, version):
+    from xmpp_backends.base import NotSupportedError
+    from xmpp_backends.base import UserNotFound
+
     username1 = 'example'
     resource1 = 'resource1'
     domain = 'example.com'
@@ -435,8 +437,7 @@ elif args.command == 'test':
         omit=['*migrations/*',
               'xmpp_backends/ejabberdctl.py',
               'xmpp_backends/ejabberd_xmlrpc.py',
-              'xmpp_backends/ejabberd_rest.py',
-        ]
+              'xmpp_backends/ejabberd_rest.py']
     )
     cov.start()
 
