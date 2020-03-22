@@ -14,9 +14,7 @@
 from django.core.cache import cache
 from django.test import TestCase
 
-from xmpp_backends.django.auth_backends import XmppBackendBackend
 from xmpp_backends.django import xmpp_backend
-from xmpp_backends.django.models import XmppBackendUser
 
 from .test_app.models import XmppUser
 
@@ -85,8 +83,3 @@ class XmppBackendUserTestCase(TestCase):
         u.set_unusable_password()
         self.assertFalse(u.check_password(pwd))
         self.assertFalse(xmpp_backend.check_password(u.node, u.domain, pwd))
-
-
-
-class XmppBackendBackendTestCase(TestCase):
-    pass

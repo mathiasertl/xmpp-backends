@@ -14,10 +14,9 @@
 from datetime import datetime
 from datetime import timedelta
 
-from freezegun import freeze_time
-
 from django.core.cache import cache
 from django.test import TestCase
+from freezegun import freeze_time
 
 from xmpp_backends.base import UserNotFound
 from xmpp_backends.django.fake_xmpp.backend import FakeXMPPBackend
