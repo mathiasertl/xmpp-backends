@@ -3,23 +3,30 @@ services:
   - docker
 language: python
 python:
-  # NOTE: not testing in 3.5 b/c requirements-dev has django 3.0
-  #- "3.5"
+  - "3.5"
   - "3.6"
   - "3.7" 
   - "3.8" 
   # nightly currently broken in travis
   #- "nightly"
 env:
-  - XMPP_SERVER=fake XMPP_SERVER_VERSION=1.0
-  - XMPP_SERVER=ejabberd XMPP_SERVER_VERSION=16.01  # Ubuntu 16.04
-  - XMPP_SERVER=ejabberd XMPP_SERVER_VERSION=16.09  # Debian Stretch
-  - XMPP_SERVER=ejabberd XMPP_SERVER_VERSION=17.08  # Ubuntu 16.04 - apt.jabber.at
-  - XMPP_SERVER=ejabberd XMPP_SERVER_VERSION=18.01  # Ubuntu 18.04
-  - XMPP_SERVER=ejabberd XMPP_SERVER_VERSION=18.03
-  - XMPP_SERVER=ejabberd XMPP_SERVER_VERSION=18.04
-  - XMPP_SERVER=ejabberd XMPP_SERVER_VERSION=18.06
-  - XMPP_SERVER=ejabberd XMPP_SERVER_VERSION=18.09
+  - XMPP_SERVER=fake XMPP_SERVER_VERSION=1.0 DJANGO=2.2.11
+  - XMPP_SERVER=fake XMPP_SERVER_VERSION=1.0 DJANGO=3.0.4
+  - XMPP_SERVER=ejabberd XMPP_SERVER_VERSION=16.01 DJANGO=2.2.11  # Ubuntu 16.04
+  - XMPP_SERVER=ejabberd XMPP_SERVER_VERSION=16.09 DJANGO=2.2.11  # Debian Stretch
+  - XMPP_SERVER=ejabberd XMPP_SERVER_VERSION=16.09 DJANGO=3.0.4   # Debian Stretch
+  - XMPP_SERVER=ejabberd XMPP_SERVER_VERSION=17.08 DJANGO=2.2.11  # Ubuntu 16.04 - apt.jabber.at
+  - XMPP_SERVER=ejabberd XMPP_SERVER_VERSION=17.08 DJANGO=3.0.4   # Ubuntu 16.04 - apt.jabber.at
+  - XMPP_SERVER=ejabberd XMPP_SERVER_VERSION=18.01 DJANGO=2.2.11  # Ubuntu 18.04
+  - XMPP_SERVER=ejabberd XMPP_SERVER_VERSION=18.01 DJANGO=3.0.4   # Ubuntu 18.04
+  - XMPP_SERVER=ejabberd XMPP_SERVER_VERSION=18.03 DJANGO=2.2.11 
+  - XMPP_SERVER=ejabberd XMPP_SERVER_VERSION=18.03 DJANGO=3.0.4
+  - XMPP_SERVER=ejabberd XMPP_SERVER_VERSION=18.04 DJANGO=2.2.11 
+  - XMPP_SERVER=ejabberd XMPP_SERVER_VERSION=18.04 DJANGO=3.0.4
+  - XMPP_SERVER=ejabberd XMPP_SERVER_VERSION=18.06 DJANGO=2.2.11 
+  - XMPP_SERVER=ejabberd XMPP_SERVER_VERSION=18.06 DJANGO=3.0.4
+  - XMPP_SERVER=ejabberd XMPP_SERVER_VERSION=18.09 DJANGO=2.2.11
+  - XMPP_SERVER=ejabberd XMPP_SERVER_VERSION=18.09 DJANGO=3.0.4
 install:
   - pip install -U pip setuptools
   - pip install -r requirements.txt -r requirements-dev.txt
