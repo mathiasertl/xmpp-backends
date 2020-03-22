@@ -1,3 +1,0 @@
-pytz
-six
-ipaddress ; python_version < '3'
