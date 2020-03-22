@@ -55,7 +55,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'xmpp-backends'
-copyright = u'2015-2016, Mathias Ertl'
+copyright = u'2015-2020, Mathias Ertl'
 author = u'Mathias Ertl'
 
 # The version info for the project you're documenting, acts as replacement for
