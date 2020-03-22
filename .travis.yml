@@ -25,4 +25,4 @@ install:
 script:
   - ./test.py code-quality
   - python setup.py test
-  - fab test_server:$XMPP_SERVER,version=$XMPP_SERVER_VERSION
+  - ./test.py test-server $XMPP_SERVER $XMPP_SERVER_VERSION
