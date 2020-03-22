@@ -3,8 +3,8 @@ import os
 import sys
 
 if __name__ == "__main__":
-    # so we can use xmpp_settings as if it were installed
-    sys.path.insert(0, os.pardir)
+    pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    sys.path.insert(0, pardir)
 
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "django_dev_project.settings")
     try:
