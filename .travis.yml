@@ -29,7 +29,8 @@ env:
   - XMPP_SERVER=ejabberd XMPP_SERVER_VERSION=18.09 DJANGO=3.0.4
 install:
   - pip install -U pip setuptools
-  - pip install -r requirements.txt -r requirements-dev.txt
+  - pip install -r requirements.txt -r requirements-test.txt
+  - pip install django==${DJANGO}
 script:
   - ./test.py code-quality
   - ./test.py test
